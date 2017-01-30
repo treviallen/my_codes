@@ -207,6 +207,34 @@ def get_sheef_field(sheef, key):
         keydat.append(ev[key])
     
     return keydat
+    
+
+def sheef2htmk_csv(sheeffile):
+    
+    '''
+    returns OQ compliant catalogue in csv fmt
+    '''
+    
+    from io_catalogues import parse_sheef
+    from numpy import nan
+    
+    sheef = parse_sheef(sheeffile)
+        
+    # make oq cat dict
+    header = ','.join(('eventID','year', 'month', 'day', 'hour', 'minute', 'second', 'longitude', 'latitude','depth','magnitude','magnitudeType','Agency'))
+    oq_dat = header + '\n'
+    # loop thru eqs
+    for s in sheef:
+        line = ','.join((s['datestr'],str(s['year']), str(s['month']),str(s['day']),str(s['hour']),str(s['min']),str(nan),str(s['lon']),str(s['lat']), \
+                        str(s['dep']),str(s['prefmag']),s['prefmagtype'],s['locsrc']))
+        oq_dat += line + '\n'
+        
+    #write to OQ out
+    print 'Writing HMTK csv...\n'
+    hmtkfile = sheeffile.split('.')[0] + '_hmtk.csv'
+    f = open(hmtkfile, 'wb')
+    f.write(oq_dat)
+    f.close()
 
 '''
 write_sheef:  writes sheef formatted catalogue from input dictionary
