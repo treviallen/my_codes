@@ -209,7 +209,7 @@ def get_sheef_field(sheef, key):
     return keydat
     
 
-def sheef2htmk_csv(sheeffile):
+def sheef2hmtk_csv(sheeffile):
     
     '''
     returns OQ compliant catalogue in csv fmt
