@@ -235,6 +235,51 @@ def sheef2hmtk_csv(sheeffile):
     f = open(hmtkfile, 'wb')
     f.write(oq_dat)
     f.close()
+    
+def hmtk2sheef(hmtkcat, sheeffile):
+    '''
+    takes HMTK catalogue class and writes to SHEEF-formatted file
+    '''
+    print 'Writing HMTK to SHEEF...'
+    newsheef = ''
+    cat = catalogue_gk.data #just shorten variable name
+    for i in range(0, catalogue_gk.get_number_events()):
+        mag = str('%0.1f' % cat['magnitude'][i])
+        
+        lat = '  ' + str('%0.3f' % cat['latitude'][i])
+        
+        lon = str('%0.3f' % cat['longitude'][i])
+        if cat['longitude'][i] > -100.:
+            lon = ' ' + lon
+        
+        dep = str('%0.2f' % cat['depth'][i])
+        if isnan(cat['depth'][i]):
+            dep = '         '
+        elif cat['depth'][i] < 10.:
+            dep = '     ' + dep
+        elif cat['depth'][i] < 100.:
+            dep = '    ' + dep
+        else:
+            dep = '   ' + dep
+        
+        src = '  ' + cat['Agency'][i]
+        if len(src) == 3:
+            src += '  '
+        elif len(src) == 3:
+            src += ' '
+            
+        mtype = cat['magnitudeType'][i]
+        if len(mtype) == 2:
+            mtype += ' '
+            
+        mag2 = str('%0.2f' % cat['magnitude'][i])
+        
+        newsheef += ' '.join(('', str(cat['eventID'][i]), '', mag, '', lon, lat, src, dep, ' ', mtype, '', mag, 'UK    ', mag2)) + '\n'
+        
+    f = open(sheeffile, 'wb')
+    f.write(newsheef)
+    f.close()
+    
 
 '''
 write_sheef:  writes sheef formatted catalogue from input dictionary
