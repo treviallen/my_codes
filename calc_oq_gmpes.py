@@ -242,11 +242,12 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
 # calls and calculates candidate interface GMPEs - values returned in ln(g)
 def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
-    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SInter
-    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SInterCascadia
+    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SInter, ZhaoEtAl2006SInterCascadia
+    from openquake.hazardlib.gsim.ghofrani_atkinson_2014 import GhofraniAtkinson2014, GhofraniAtkinson2014Cascadia
     from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SInter
     from openquake.hazardlib.gsim.youngs_1997 import YoungsEtAl1997SInter
     from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SInter
+    from openquake.hazardlib.gsim.atkinson_macias_2009 import AtkinsonMacias2009
     from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -268,6 +269,7 @@ def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     sites.vs30measured = False
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.backarc = [0.]
     
     rup = RuptureContext()
     rup.mag = mag
@@ -298,11 +300,20 @@ def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = AbrahamsonEtAl2015SInter()
     Aea15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    gmpe = AtkinsonMacias2009()
+    AM09imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = GhofraniAtkinson2014()
+    GA14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = GhofraniAtkinson2014Cascadia()
+    GA14CISimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
     # prepare Atkinson & Adams 2013
     #print 'interface',  mag, dists.rjb[0]
     AA13imt = atkinson_adams_2013(mag, dists.rrup[0], crust_ty = crust_ty) # note AA13 model uses Rrup
     
-    return Yea97imt, AB03imt, Zea06imt, Zea06CISimt, AA13imt, Aea15imt
+    return Yea97imt, AB03imt, Zea06imt, Zea06CISimt, AM09imt, AA13imt, GA14imt, GA14CISimt, Aea15imt
 
 # calls and calculates candidate SCR GMPEs
 def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
@@ -326,6 +337,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     sites.vs30measured = False
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    
 
     rup = RuptureContext()
     rup.mag = mag
