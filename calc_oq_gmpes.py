@@ -197,9 +197,11 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
 # calls and calculates candidate intraslab GMPEs - values returned in ln(g)
 def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
-    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SSlab
-    from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SSlab
+    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SSlab, ZhaoEtAl2006SSlabCascadia 
+    from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SSlab, AtkinsonBoore2003SSlabCascadiaNSHMP2008
     from openquake.hazardlib.gsim.youngs_1997 import YoungsEtAl1997SSlab
+    from openquake.hazardlib.gsim.garcia_2005 import GarciaEtAl2005SSlab
+    from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
     from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -212,6 +214,7 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #sites.z1pt0 = exp(28.5 - (3.82/8.)*log(sites.vs30**8 + 378.7**8)) # in m; from ChiouYoungs2008
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.backarc = [0.]
 
     rup = RuptureContext()
     rup.mag = mag
@@ -222,23 +225,39 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
     dists = DistancesContext()
     dists.rrup = array([rrup])
+    dists.rhypo = array([rrup]) # assume only interested in closest piont to the fault
     dists.rjb = array([rjb])
     dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
 
     gmpe = ZhaoEtAl2006SSlab()
     Zea06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = ZhaoEtAl2006SSlabCascadia()
+    Zea06Casimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = ZhaoEtAl2006SSlabCascadia()
+    Zea06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
     gmpe = AtkinsonBoore2003SSlab()
     AB03imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = AtkinsonBoore2003SSlabCascadiaNSHMP2008()
+    AB03Casimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
     gmpe = YoungsEtAl1997SSlab()
     Yea97imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = GarciaEtAl2005SSlab()
+    Gea05imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = AbrahamsonEtAl2015SSlab()
+    Aea15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
     # prepare Atkinson & Adams 2013
     #repi = sqrt(rrup**2 - dep**2)
     AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
 
-    return Yea97imt, AB03imt, Zea06imt, AA13imt
+    return Yea97imt, AB03imt, AB03Casimt, Gea05imt, Zea06imt, Zea06Casimt, AA13imt, Aea15imt
 
 # calls and calculates candidate interface GMPEs - values returned in ln(g)
 def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
