@@ -702,6 +702,31 @@ def mask_outside_polygons(polys, facecolor, plt):
 
     return patch
 
+def get_WGS84_area(geom):
+    '''
+    geom = shapely polygon
+    '''
+    import pyproj    
+    import shapely.ops as ops
+    #from shapely.geometry.polygon import Polygon
+    from functools import partial
+        
+    geom_area = ops.transform(
+        partial(
+            pyproj.transform,
+            pyproj.Proj(init='EPSG:4326'),
+            pyproj.Proj(
+                proj='aea',
+                lat1=geom.bounds[1],
+                lat2=geom.bounds[3])),
+        geom)
+    
+    # Print the area in km^2
+    print geom_area.area / 1000000.
+    
+    return geom_area.area / 1000000.
+
+
 # !!!!!!!!!!code to convert projections!!!!!!!!!!
 # http://all-geo.org/volcan01010/2012/11/change-coordinates-with-pyproj/
 # http://stackoverflow.com/questions/26452972/coordinates-conversion-with-pyproj
