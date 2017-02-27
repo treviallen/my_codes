@@ -332,7 +332,7 @@ def labelpolygon(m, plt, sf, field, **kwargs):
     recs = sf.records()
     
     # get field index
-    findex = get_field_index(sf, field)
+    findex = get_field_index(sf, field) 
     
     for i, shape in enumerate(shapes):
         centroid = Polygon(shape.points).centroid.wkt
@@ -341,7 +341,7 @@ def labelpolygon(m, plt, sf, field, **kwargs):
         if tx > m.xmin and tx < m.xmax and ty > m.ymin and ty < m.ymax:
             if value == None or value == recs[i][findex]:
                 plt.text(tx + xoff, ty + yoff, recs[i][findex], size=fsize, \
-                         weight=fweight, color=col, style=fstyle)
+                         weight=fweight, color=col, style=fstyle, va='center', ha='center')
                      
         '''
         centroidx = []
