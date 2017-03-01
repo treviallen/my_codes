@@ -14,20 +14,34 @@ def return_annualised_haz_curves(hazcurvefile):
     hazcurves = []
     
     # try parsing xml file
-    try:
-        from openquake.nrmllib.hazard.parsers import HazardCurveXMLParser
-        
-        hcm = HazardCurveXMLParser(hazcurvefile).parse()
-        
-        #extract curve lat/lons from POES
-        for loc, poes in hcm:
-            curvelon.append(loc.x)
-            curvelat.append(loc.y)
-            hazcurves.append((poes))
-        
-        investigation_time = float(hcm.metadata['investigation_time'])
-        metadata = hcm.metadata
+    #try:
+    #from openquake.nrmllib.hazard.parsers import HazardCurveXMLParser
+    #from nrmllib.hazard.parsers import HazardCurveXMLParser
+    from oq_output.hazard_curve_converter import read_hazard_curves
+    '''
+    hcm = HazardCurveXMLParser(hazcurvefile).parse()
     
+    #extract curve lat/lons from POES
+    for loc, poes in hcm:
+        curvelon.append(loc.x)
+        curvelat.append(loc.y)
+        hazcurves.append((poes))
+    
+    investigation_time = float(hcm.metadata['investigation_time'])
+    metadata = hcm.metadata
+    '''
+    metadata = read_hazard_curves(hazcurvefile)
+    
+    curvelon = []
+    curvelat = []
+    hazcurves = []
+    for curve in metadata['curves']:
+        curvelon.append(curve[0])
+        curvelat.append(curve[1])
+        hazcurves.append(curve[2:])
+    
+    investigation_time = metadata['investigation_time']
+    """
     # from OQ V2.2, returns csv files
     except:
         csvlines = open(hazcurvefile).readlines()
@@ -46,6 +60,7 @@ def return_annualised_haz_curves(hazcurvefile):
             curvelon.append(float(dat[0]))
             curvelat.append(float(dat[1]))
             hazcurves.append([float(x) for x in dat[2:]])
+    """
     
     curvelon = array(curvelon)  
     curvelat = array(curvelat)
