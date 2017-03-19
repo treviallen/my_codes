@@ -236,14 +236,16 @@ def sheef2hmtk_csv(sheeffile):
     f.write(oq_dat)
     f.close()
     
+    return hmtkfile
+    
 def hmtk2sheef(hmtkcat, sheeffile):
     '''
     takes HMTK catalogue class and writes to SHEEF-formatted file
     '''
     print 'Writing HMTK to SHEEF...'
     newsheef = ''
-    cat = catalogue_gk.data #just shorten variable name
-    for i in range(0, catalogue_gk.get_number_events()):
+    cat = hmtkcat.data #just shorten variable name
+    for i in range(0, hmtkcat.get_number_events()):
         mag = str('%0.1f' % cat['magnitude'][i])
         
         lat = '  ' + str('%0.3f' % cat['latitude'][i])
