@@ -722,7 +722,7 @@ def get_WGS84_area(geom):
         geom)
     
     # Print the area in km^2
-    print geom_area.area / 1000000.
+    #print geom_area.area / 1000000.
     
     return geom_area.area / 1000000.
 

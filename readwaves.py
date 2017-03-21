@@ -128,7 +128,7 @@ def readeqwave(wavfile):
                     if i >= nsamp[j]:
                         data[j, i] = np.nan
                     else:
-                        data[j, i] = int(dat[j].strip('\n'))
+                        data[j, i] = int(round(float(dat[j].strip('\n'))))
 
         ind = line.find('--------')
         if ind >= 0:
@@ -310,7 +310,7 @@ def readseismac(wavfile):
     from datetime import datetime
 
     #print '\nReading header info...'
-    header = open(wavfile)
+    header = open(wavfile, 'rU')
 #    header = header[0]
 
     readdat = 0
@@ -404,21 +404,24 @@ def readseismac(wavfile):
         # now get orientation
         if comp.find('z ') >= 0 or comp.find('v ') >= 0 or comp.find('Up') >= 0 \
             or comp.find('u ') >= 0 or comp.find('U Tran') >= 0 or comp.find('Z ') >= 0 \
-            or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0:
+            or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0 \
+            or comp.startswith('vertical') >= 0:
              o = 'Z'
         elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.find('East') >= 0 \
             or comp.find('E Tran') >= 0 or comp.find('E ') >= 0 or comp.find('X ') >= 0 \
-            or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0:
+            or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0 \
+            or comp.startswith('east') >= 0:
              o = 'E'
         elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.find('North') >= 0 \
             or comp.find('N Tran') >= 0 or comp.find('N ') >= 0 or comp.find('Y ') >= 0 \
-            or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0:
+            or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0 \
+            or comp.startswith('north') >= 0:
              o = 'N'
         else:
              o = 'U' # Unknown
 
         comps[i] = g + it + o
-        print comps
+        #print comps
 
         i += 1
 
