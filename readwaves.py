@@ -14,18 +14,32 @@ Code to read various ASCII wavefile formats, including:
 import numpy as np
 
 def check_file_fmt(wavfile):
-    f = open(wavfile, 'r')
-    firstline = f.readline()
-    if firstline.find('Nanometrics') == 0:
-        fmt = 'nmx'
-    elif firstline.find('ARRIVALS') == 0:
-        fmt = 'eqw'
-    elif firstline.find('Event:') == 0:
-        fmt = 'bkn'
-    elif firstline.find('TIMESERIES') == 0:
-        fmt = 'tspair'
-    elif firstline.find('FileType=TimeSeries') == 0:
-        fmt = 'sm'
+    # check to see if mseed first
+    from obspy.core import read
+
+    print '\nObsPy Installed'
+
+    # try testing if SAC or miniSEED
+    try:
+        st = read(wavfile)
+        sacseed = True
+        fmt = 'mseed'
+
+    except:
+        sacseed = False
+    
+        f = open(wavfile, 'r')
+        firstline = f.readline()
+        if firstline.find('Nanometrics') == 0:
+            fmt = 'nmx'
+        elif firstline.find('ARRIVALS') == 0:
+            fmt = 'eqw'
+        elif firstline.find('Event:') == 0:
+            fmt = 'bkn'
+        elif firstline.find('TIMESERIES') == 0:
+            fmt = 'tspair'
+        elif firstline.find('FileType=TimeSeries') == 0:
+            fmt = 'sm'
 
     return fmt
     
@@ -43,6 +57,10 @@ def return_data(wavfile):
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readseismac(wavfile)
     elif fmt == 'bkn':
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readbkn(wavfile)
+    elif fmt == 'mseed':
+        from obspy.core import read
+        st = read(wavfile)
+        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readseed(st)
     else:
         '\nFile format not recognised!'
         
@@ -144,8 +162,8 @@ def readeqwave(wavfile):
     # assume no BB
     i = 0
     for comp in comps:
-        ind = comp.find('Acc')
-        if ind >= 0:
+        if comp.find('Acc') or comp.find(' a') or comp.find(' A ') \
+           or comp.find('c04') or comp.find('c05') or comp.find('c06'):
             it = 'N'
             g = 'H'
         else:
