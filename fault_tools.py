@@ -344,7 +344,7 @@ def mag2area_So15inter(mag):
     
     m0 = mw2m0(mag) # in N-m
     a = 1.72E-09
-    b = 4.17
+    b = log10(4.17)
     sig = 1.481
     
     return 10**(log10(a) + b * log10(m0)), sig # in km^2

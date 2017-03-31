@@ -240,8 +240,10 @@ def drawoneshapepoly(m, plt, sf, field, value, **kwargs):
     
     # get field index
     findex = get_field_index(sf, field)
+    #print 'findex', findex
 
     for i, shape in enumerate(shapes):
+        #print 'i', i
         if recs[i][findex] == value:
             # get colour
             try:
@@ -722,7 +724,7 @@ def get_WGS84_area(geom):
         geom)
     
     # Print the area in km^2
-    print geom_area.area / 1000000.
+    #print geom_area.area / 1000000.
     
     return geom_area.area / 1000000.
 
