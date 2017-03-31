@@ -16,19 +16,18 @@ def cosine_taper(data):
     import numpy as np
 #    import matplotlib.pyplot as plt
 
-    r = 0.15
-    n = len(data)
+    r = 0.2
+    n = len(data[0])
     m = n*r / 2.0
-    #x = np.arange(0,n)
-    #y = np.ones(np.shape(data)) # this is the taper function
-    y = np.ones_like(data) # this is the taper function
+    x = np.arange(0,n)
+    y = np.ones(np.shape(data)) # this is the taper function
 
     for i in range(0,n):
         i1 = i + 1
         if i <= m-1:
-            y[i] = 0.5 * i * (1-np.cos(2*np.pi*i / (2*m))) / i1
+            y[0,i] = 0.5 * i * (1-np.cos(2*np.pi*i / (2*m))) / i1
         elif i >= n-m:
-            y[i] = 0.5 * i * (1-np.cos(2*np.pi*(n-i-1) / (2*m))) / i1
+            y[0,i] = 0.5 * i * (1-np.cos(2*np.pi*(n-i-1) / (2*m))) / i1
 
     # plot taper function
 #    plt.figure(2,figsize=(16,9))
@@ -38,17 +37,41 @@ def cosine_taper(data):
     return data * y, y
 
 # this function asks for and applies a 4th order bandpass Butterworth filter
-def butter_filter_user(lofreq, hifreq, freq, wavfft):
+def butter_filter_user(inst_ty, sps, freq, wavfft, seltask):
     import numpy as np
     filtfft = wavfft
     # filter order
     ford = 4.0
 
+    # set initial hi & lo pass frequencies
+    if inst_ty == 'B' or inst_ty == 'N' or inst_ty == 'H':
+        lofreq = 0.02
+    else:
+        lofreq = 0.2
+
+    # override if plotting FFT
+    if seltask == '2':
+        lofreq = 0.02
+
+    # set low pass at Nyquist frequency
+    hifreq = sps / 2.0
+
+    # ask for user input
+    txt = '\n'+'High pass Butterworth corner ['+str(lofreq)+' Hz] > '
+    var = raw_input(txt)
+    if var != '':
+        lofreq = float(var)
+
+    txt = '\n'+'Low pass Butterworth corner ['+str(hifreq)+' Hz] > '
+    var = raw_input(txt)
+    if var != '':
+        hifreq = float(var)
+
     # do high pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / lofreq)**(-2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / lofreq)**(-2*ford))
 
     # do low pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / hifreq)**(2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / hifreq)**(2*ford))
 
     # remover zero freq
     filtfft[0] *= 0.0
@@ -77,10 +100,10 @@ def butter_filter_auto(inst_ty, sps, freq, wavfft):
     hifreq = sps / 2.0
 
     # do high pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / lofreq)**(-2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / lofreq)**(-2*ford))
 
     # do low pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / hifreq)**(2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / hifreq)**(2*ford))
 
     # remover zero freq
     filtfft[0] *= 0.0
@@ -150,48 +173,46 @@ def calc_fft(data, sps):
 #    import matplotlib.pyplot as plt
     import numpy as np
 
-    #n = len(data[0])
-    n = len(data)
+    n = len(data[0])
 
     # calc FFT
-    #wavfft = np.fft.fft(data[0],n)
-    wavfft = np.fft.fft(data,n)
+    wavfft = np.fft.fft(data[0],n)
 
     # get frequencies
     freq = np.fft.fftfreq(n, d=1./sps)
-    #freq = freq.reshape(1,n)
+    freq = freq.reshape(1,n)
 
     return freq, wavfft
 
 # this function prepares data for the response spectral calculation
-# this function prepares data for the response spectral calculation
 def prep_psa(corfftr, corffti, freq, inst_ty):
-
-    from numpy import fft, abs, max, pi
-
+    import numpy as np
+    
     # get velocity time history for PGV
-    complex_array = corfftr + 1j*corffti
+    complex_array = corfftr[0] + 1j*corffti[0]
     
     if inst_ty == 'N': # if accelerometer
-       complex_array[1:] = complex_array[1:] / (2 * pi * abs(freq[1:]))
-       complex_array[0] = 0 + 1j*0
-
-    n = len(corfftr)
-    ivel = fft.ifft(complex_array,n).real
-    pgv = max(abs(ivel))    
-      
+        complex_array[1:] = complex_array[1:] / (2 * np.pi * abs(freq[0,1:]))
+        complex_array[0] = 0 + 1j*0
+        
+    n = len(corfftr[0])
+    ivel = np.fft.ifft(complex_array,n)
+    pgv = max(abs(ivel.real))
+        
     # get acceleration time history
-    if inst_ty != 'N': # if seismometer
-        complex_array = complex_array * (2 * pi * abs(freq))
-
-    n = len(corfftr)
-    iacc = fft.ifft(complex_array,n).real
+    complex_array = corfftr[0] + 1j*corffti[0]
     
+    if inst_ty != 'N': # if seismometer
+        complex_array = complex_array * (2 * np.pi * abs(freq[0]))
+
+    n = len(corfftr[0])
+    iacc = np.fft.ifft(complex_array,n)
+
     return pgv, iacc, ivel
     
 # this function calculated response spectral acceleration of a SODF
 # structure with a damping of h (usually 5%)
-def calc_response_spectra(iacc, sps, h):
+def calc_response_spectra(iacc, sps, h, minT, maxT):
     import numpy as np
 
     print '\nCalculating ' + str(h) + '% damped response spectrum. Please be patient.'
@@ -200,17 +221,23 @@ def calc_response_spectra(iacc, sps, h):
     dt = 1. / sps
 
     # set size of 100 periods
-    nT = 100
+    nT = 100    
     T = np.logspace(-2,1,num=nT)
-    psa = np.zeros((nT,1))
-    sd = np.zeros((nT,1))
+    
+    # strip periods that are out of range
+    idx = np.where((T >=  minT) & (T <= maxT))[0]
+    nTstrip = len(idx)
+    Tstrip = T[idx]
+    
+    psa = np.zeros((nTstrip,1))
+    sd = np.zeros((nTstrip,1))
 
     # set PGA value
     pga = np.max(np.abs(iacc))
 
     # now start first loop
-    for i in range(0, nT):
-        K = 2 * np.pi / T[i]
+    for i in range(0, nTstrip):
+        K = 2 * np.pi / Tstrip[i]
         C = 2 * damp * K
         beta = 0.25
         gamma = 0.5
@@ -244,4 +271,4 @@ def calc_response_spectra(iacc, sps, h):
         sd[i] = maxx
         psa[i] = maxx*K
 
-    return T, psa, pga
+    return Tstrip, psa, pga

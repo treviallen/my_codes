@@ -14,18 +14,32 @@ Code to read various ASCII wavefile formats, including:
 import numpy as np
 
 def check_file_fmt(wavfile):
-    f = open(wavfile, 'r')
-    firstline = f.readline()
-    if firstline.find('Nanometrics') == 0:
-        fmt = 'nmx'
-    elif firstline.find('ARRIVALS') == 0:
-        fmt = 'eqw'
-    elif firstline.find('Event:') == 0:
-        fmt = 'bkn'
-    elif firstline.find('TIMESERIES') == 0:
-        fmt = 'tspair'
-    elif firstline.find('FileType=TimeSeries') == 0:
-        fmt = 'sm'
+    # check to see if mseed first
+    from obspy.core import read
+
+    print '\nObsPy Installed'
+
+    # try testing if SAC or miniSEED
+    try:
+        st = read(wavfile)
+        sacseed = True
+        fmt = 'mseed'
+
+    except:
+        sacseed = False
+    
+        f = open(wavfile, 'r')
+        firstline = f.readline()
+        if firstline.find('Nanometrics') == 0:
+            fmt = 'nmx'
+        elif firstline.find('ARRIVALS') == 0:
+            fmt = 'eqw'
+        elif firstline.find('Event:') == 0:
+            fmt = 'bkn'
+        elif firstline.find('TIMESERIES') == 0:
+            fmt = 'tspair'
+        elif firstline.find('FileType=TimeSeries') == 0:
+            fmt = 'sm'
 
     return fmt
     
@@ -43,6 +57,10 @@ def return_data(wavfile):
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readseismac(wavfile)
     elif fmt == 'bkn':
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readbkn(wavfile)
+    elif fmt == 'mseed':
+        from obspy.core import read
+        st = read(wavfile)
+        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readseed(st)
     else:
         '\nFile format not recognised!'
         
@@ -128,7 +146,7 @@ def readeqwave(wavfile):
                     if i >= nsamp[j]:
                         data[j, i] = np.nan
                     else:
-                        data[j, i] = int(dat[j].strip('\n'))
+                        data[j, i] = int(round(float(dat[j].strip('\n'))))
 
         ind = line.find('--------')
         if ind >= 0:
@@ -144,8 +162,8 @@ def readeqwave(wavfile):
     # assume no BB
     i = 0
     for comp in comps:
-        ind = comp.find('Acc')
-        if ind >= 0:
+        if comp.find('Acc') or comp.find(' a') or comp.find(' A ') \
+           or comp.find('c04') or comp.find('c05') or comp.find('c06'):
             it = 'N'
             g = 'H'
         else:
@@ -310,7 +328,7 @@ def readseismac(wavfile):
     from datetime import datetime
 
     #print '\nReading header info...'
-    header = open(wavfile)
+    header = open(wavfile, 'rU')
 #    header = header[0]
 
     readdat = 0
@@ -404,21 +422,24 @@ def readseismac(wavfile):
         # now get orientation
         if comp.find('z ') >= 0 or comp.find('v ') >= 0 or comp.find('Up') >= 0 \
             or comp.find('u ') >= 0 or comp.find('U Tran') >= 0 or comp.find('Z ') >= 0 \
-            or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0:
+            or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0 \
+            or comp.startswith('vertical') >= 0:
              o = 'Z'
         elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.find('East') >= 0 \
             or comp.find('E Tran') >= 0 or comp.find('E ') >= 0 or comp.find('X ') >= 0 \
-            or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0:
+            or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0 \
+            or comp.startswith('east') >= 0:
              o = 'E'
         elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.find('North') >= 0 \
             or comp.find('N Tran') >= 0 or comp.find('N ') >= 0 or comp.find('Y ') >= 0 \
-            or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0:
+            or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0 \
+            or comp.startswith('north') >= 0:
              o = 'N'
         else:
              o = 'U' # Unknown
 
         comps[i] = g + it + o
-        print comps
+        #print comps
 
         i += 1
 
