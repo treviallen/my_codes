@@ -10,6 +10,17 @@ def print_functions():
         if line.find('def') >= 0:
             print line.strip('def ').strip('\n')
             
+# flattens a single key value from a list of dictionaries
+def dict2array(dictList, key):
+    from numpy import array
+    
+    flatList = []
+    for dl in dictList:
+        flatList.append(dl[key])
+        
+    return array(flatList)
+
+
 # returns unknown int value from a string
 def getintval(line,start,stop):
     from numpy import nan
