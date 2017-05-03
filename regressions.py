@@ -50,7 +50,16 @@ def bilinear_reg_free(c, x):
     
     return ans1 + ans2
     
-
+def get_linear_fixed_slope(slope, x, y):
+    def linear_fixed_slope(c, x):  
+                                       
+        return meanslope * x + c[0]
+    
+    # do something here
+    
+        
+    return intercept
+    
 ##############################################################
 # example
 ##############################################################

@@ -8,42 +8,31 @@ Created on Tue Oct 21 16:17:40 2014
 def return_annualised_haz_curves(hazcurvefile):
     from numpy import array, log
     
-    # set variables
+    # set lists to fill
     curvelat = []
     curvelon = []
     hazcurves = []
     
-    # try parsing xml file
-    #try:
-    #from openquake.nrmllib.hazard.parsers import HazardCurveXMLParser
-    #from nrmllib.hazard.parsers import HazardCurveXMLParser
-    from oq_output.hazard_curve_converter import read_hazard_curves
-    '''
-    hcm = HazardCurveXMLParser(hazcurvefile).parse()
-    
-    #extract curve lat/lons from POES
-    for loc, poes in hcm:
-        curvelon.append(loc.x)
-        curvelat.append(loc.y)
-        hazcurves.append((poes))
-    
-    investigation_time = float(hcm.metadata['investigation_time'])
-    metadata = hcm.metadata
-    '''
-    metadata = read_hazard_curves(hazcurvefile)
-    
-    curvelon = []
-    curvelat = []
-    hazcurves = []
-    for curve in metadata['curves']:
-        curvelon.append(curve[0])
-        curvelat.append(curve[1])
-        hazcurves.append(curve[2:])
-    
-    investigation_time = metadata['investigation_time']
-    """
-    # from OQ V2.2, returns csv files
-    except:
+    # try parsing old xml first
+    if hazcurvefile.endswith('xml'):
+        from openquake.nrmllib.hazard.parsers import HazardCurveXMLParser
+        #from oq_output.hazard_curve_converter import read_hazard_curves
+        from oq_output.hazard_curve_converter import HazardCurveXMLParser
+        
+        hcm = HazardCurveXMLParser(hazcurvefile).parse()
+        
+        #extract curve lat/lons from POES
+        for loc, poes in hcm:
+            curvelon.append(loc.x)
+            curvelat.append(loc.y)
+            hazcurves.append((poes))
+        
+        investigation_time = float(hcm.metadata['investigation_time'])
+        metadata = hcm.metadata
+        
+    # from OQ V2.2, returns csv files only
+    elif hazcurvefile.endswith('csv'):
+        print 'perhaps here?'
         csvlines = open(hazcurvefile).readlines()
         
         # get investigation time
@@ -59,17 +48,14 @@ def return_annualised_haz_curves(hazcurvefile):
             dat = line.split(',')
             curvelon.append(float(dat[0]))
             curvelat.append(float(dat[1]))
-            hazcurves.append([float(x) for x in dat[2:]])
-    """
+            hazcurves.append(array([float(x) for x in dat[2:]]))
     
-    curvelon = array(curvelon)  
-    curvelat = array(curvelat)
-    hazcurves = array(hazcurves)
-        
+    # now get annualised curves
     annual_hazcurves = []
     for i, hazcurve in enumerate(hazcurves):
-        # for curves, plot annual probablility - need to check this!
-        P0 = 1 - hazcurve
+        # for curves, plot annual probablility
+        print hazcurve
+        P0 = 1 - array(hazcurve)
         n = -1*log(P0)
         annual_hazcurves.append(n / investigation_time)
         
