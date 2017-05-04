@@ -54,7 +54,6 @@ def return_annualised_haz_curves(hazcurvefile):
     annual_hazcurves = []
     for i, hazcurve in enumerate(hazcurves):
         # for curves, plot annual probablility
-        print hazcurve
         P0 = 1 - array(hazcurve)
         n = -1*log(P0)
         annual_hazcurves.append(n / investigation_time)
@@ -90,7 +89,6 @@ def interp_hazard_curve(sitelon, sitelat, hazcurvefile):
     from scipy import interpolate
     import warnings
     warnings.filterwarnings("ignore")
-    
     
     hcm = HazardCurveXMLParser(hazcurvefile).parse()
     
