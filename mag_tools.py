@@ -50,5 +50,62 @@ def utsu_ml2mw(ml):
     else:
         mw = ml
     return mw
+    
+# do Ghasemi 2017 fixed-hinge bilinear GOR ML2MW as used for the NSHA18
+def ghasemi_bl_ml2mw(ml):
+    a1 = 0.66199378
+    a2 = 1.2156352
+    a3 = 1.07488336
+    mx = 4.5
+    my = a1 * mx + a2
+    
+    if ml <= mx:
+        mw = a1 * ml + a2
+    else:
+        mw = a3 * (ml - mx) + my
+        
+    return mw
+
+# this is what was used in the DRAFT NSHA!!!    
+def ghasemi_bl_ml2mw_stupid_trevor(ml):
+    a1 = 0.66199378
+    a2 = 1.2156352
+    a3 = 1.2156352
+    mx = 4.5
+    my = a1 * mx + a2
+    
+    if ml <= mx:
+        mw = a1 * ml + a2
+    else:
+        mw = a3 * (ml - mx) + my
+        
+    return mw
+
+def ghasemi_bl_mw2ml(mw):
+    a1 = 0.66199378
+    a2 = 1.2156352
+    a3 = 1.2156352
+    mx = 4.5
+    my = a1 * mx + a2
+    
+    ml = (mw - a2) / a1
+    
+    if ml > mx:
+        ml = mx + (mw - my) / a3
+        
+    return ml
+    
+def ghasemi_bl_mb2mw(mb):
+    c1 = 1.1438907424442797
+    c2 = 1.0509630268292971
+    
+    return c1 * mb + c2
+    
+
+def ghasemi_bl_ms2mw(ms):    
+    c1 = 0.84896727404297323
+    c2 = -0.87192285009579173
+    
+    return c1 * mb + c2
 
     
