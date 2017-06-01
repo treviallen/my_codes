@@ -254,6 +254,10 @@ def extrap1d(interpolator):
 
     return ufunclike
 
+##############################################################################
+# datetime functions
+##############################################################################
+
 # convert YYYYMMDD to Julian day
 def ymd2doy(yyyy, mm, dd):
     from datetime import datetime
@@ -272,7 +276,26 @@ def doy2ymd(yyyy, doy):
     
 # time delta to days, hours, mins
 def timedelta2days_hours_minutes(td):
-            return td.days, td.seconds//3600, (td.seconds//60)%60
+    return td.days, td.seconds//3600, (td.seconds//60)%60
+
+# from https://stackoverflow.com/questions/6451655/python-how-to-convert-datetime-dates-to-decimal-years
+def toYearFraction(date):
+    from datetime import datetime as dt
+    import time
+
+    def sinceEpoch(date): # returns seconds since epoch
+        return time.mktime(date.timetuple())
+    s = sinceEpoch
+
+    year = date.year
+    startOfThisYear = dt(year=year, month=1, day=1)
+    startOfNextYear = dt(year=year+1, month=1, day=1)
+
+    yearElapsed = s(date) - s(startOfThisYear)
+    yearDuration = s(startOfNextYear) - s(startOfThisYear)
+    fraction = yearElapsed/yearDuration
+
+    return date.year + fraction
 
 # list files with a given extension
 def listdir_extension(folder, extension):
@@ -330,5 +353,24 @@ def dbf2csv(dbffile):
     else:
       print "Filename does not end with .dbf"
 
-   
+# eqns taken from: https://earthquake.usgs.gov/hazards/learn/basics.php
+def get_probability_from_percent_chance(percent_chance, investigation_time):
+     from numpy import log
+
+     p0 = 1 - (percent_chance / 100.)
+     n = -log(p0)
+     probability = n / investigation_time
+     return_period = 1. / probability
+
+     return return_period, probability
+
+def get_percent_chance_from_return_period(return_period, investigation_time):
+    from numpy import exp
+
+    n = (1. / return_period) * investigation_time
+    p0 = exp(-n)
+    percent_chance = 100*(1 - p0)
+
+    return percent_chance
+
 

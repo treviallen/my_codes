@@ -368,8 +368,8 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
-    from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
-    from atkinson_adams_2013 import atkinson_adams_2013
+    #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
+    #from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
     
@@ -424,15 +424,15 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = BooreEtAl2014()
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
-    gmpe = YenierAtkinson2015CEUS()
-    YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    #gmpe = YenierAtkinson2015CEUS()
+    #YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     crust_ty = 'ena'
     
     #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
     AA13imt = []
 
-    return Tea02imt, C03imt, AB06imt, CY08imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, AA13imt, Bea14imt, YA15imt
+    return Tea02imt, C03imt, AB06imt, CY08imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, AA13imt, Bea14imt #, YA15imt
 
 def allen2012_gsim(mag, dep, rrup):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
@@ -454,6 +454,46 @@ def allen2012_gsim(mag, dep, rrup):
     A12imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     return A12imt
+    
+def gaull1990_gsim(mag, dep, rhypo):
+    '''
+    from openquake.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
+                                                    GaullEtAL1990SoutheasternAustralia, \
+                                                    GaullEtAL1990PGAfromPGVWesternAustralia, \
+                                                    GaullEtAL1990PGAfromPGVSoutheasternAustralia
+    '''
+    from gaull_1990 import GaullEtAL1990WesternAustralia, \
+                                                    GaullEtAL1990SoutheasternAustralia, \
+                                                    GaullEtAL1990PGAfromPGVWesternAustralia, \
+                                                    GaullEtAL1990PGAfromPGVSoutheasternAustralia
+                                                    
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from openquake.hazardlib.imt import PGA
+    from openquake.hazardlib.const import StdDev
+    from numpy import array
+    
+    sites = SitesContext()
+
+    rup = RuptureContext()
+    rup.mag = mag # input MW - GaullEtAL1990 corrects to ML
+    rup.hypo_depth = dep
+
+    dists = DistancesContext()
+    dists.rhypo = array([rhypo])
+    
+    gmpe = GaullEtAL1990WesternAustralia()
+    G90WAimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
+
+    gmpe = GaullEtAL1990SoutheasternAustralia()
+    G90SEAimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
+    
+    gmpe = GaullEtAL1990PGAfromPGVWesternAustralia()
+    G90WA_PGVimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])} 
+    
+    gmpe = GaullEtAL1990PGAfromPGVSoutheasternAustralia()
+    G90SEA_PGVimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
+    
+    return G90WAimt, G90SEAimt, G90WA_PGVimt, G90SEA_PGVimt
     
 def jdfn_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30):
     from openquake.hazardlib.gsim.gsim_table import GMPETable
