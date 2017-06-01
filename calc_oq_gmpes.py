@@ -456,7 +456,7 @@ def allen2012_gsim(mag, dep, rrup):
     return A12imt
     
 def gaull1990_gsim(mag, dep, rhypo):
-    '''
+    
     from openquake.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
                                                     GaullEtAL1990SoutheasternAustralia, \
                                                     GaullEtAL1990PGAfromPGVWesternAustralia, \
@@ -466,7 +466,7 @@ def gaull1990_gsim(mag, dep, rhypo):
                                                     GaullEtAL1990SoutheasternAustralia, \
                                                     GaullEtAL1990PGAfromPGVWesternAustralia, \
                                                     GaullEtAL1990PGAfromPGVSoutheasternAustralia
-                                                    
+    '''                                               
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from openquake.hazardlib.imt import PGA
     from openquake.hazardlib.const import StdDev

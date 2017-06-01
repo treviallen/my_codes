@@ -84,7 +84,7 @@ def ghasemi_bl_ml2mw_stupid_trevor(ml):
 def ghasemi_bl_mw2ml(mw):
     a1 = 0.66199378
     a2 = 1.2156352
-    a3 = 1.2156352
+    a3 = 1.07488336
     mx = 4.5
     my = a1 * mx + a2
     
