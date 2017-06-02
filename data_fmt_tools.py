@@ -178,6 +178,7 @@ def append_seed(mseedfiles, outfile):
 # mseedfiles = tuple of files
 def merge_seed(mseedfiles):
     from obspy.core import read, Stream
+    from misc_tools import doy2ymd
     
     st = Stream()
     for wave in mseedfiles:
@@ -185,19 +186,29 @@ def merge_seed(mseedfiles):
         
         # now merge
         st.merge(method=0, fill_value=0)
-    outfile = mseedfiles[0].strip('.mseed') + '.mrg.mseed'
+    
+    sta = st[0].stats['station']
+    tmpname = mseedfiles[0].strip('.mseed').split('_')
+    print tmpname
+    ymdhmd = doy2ymd(tmpname[0][0:4], tmpname[0][4:]) + str('%04d' % float(tmpname[1]))
+    outfile = '.'.join((ymdhmd,sta,'mrg.mseed'))
+    print outfile
     st.write(outfile, format='MSEED')
 
 # merge jump seed files to one
 def merge_jump_seed(seedfolder, hhmm):
     
-    from misc_tools import listdir_extension, doy2ymd
+    from misc_tools import listdir_extension
     from data_fmt_tools import append_seed, merge_seed
     from os import sep, path, remove
     
-    
+    if not isinstance(hhmm, float):
+        hhmm = float(hhmm)
+    print hhmm
     #seedfolder = '/Users/tallen/Documents/Earthquake_Data/GA_Network_Data/GHSS/2012171'
     #hhmm = 1054
+    
+    
     
     if seedfolder.endswith(sep):
         seedfolder = seedfolder[0:-1]
@@ -210,6 +221,7 @@ def merge_jump_seed(seedfolder, hhmm):
     
     # look for seed files
     seedfiles = listdir_extension(seedfolder, 'seed')
+    #print seedfiles
     
     # first, append files with similar timestamp
     quitAppend = False
@@ -218,14 +230,16 @@ def merge_jump_seed(seedfolder, hhmm):
     while quitAppend == False:
         appendfiles = []
         for file in seedfiles:
-            if file.startswith('_'.join((yyyydoy, str(hhmm+inc)))):
+            #print '_'.join((yyyydoy, str('%04d' % (hhmm+inc)))), hhmm
+            if file.startswith('_'.join((yyyydoy, str('%04d' % (hhmm+inc))))):
+            
                 appendfiles.append(path.join(seedfolder,file))
         
         if not appendfiles: # quit append
             quitAppend = True
         
         else: # write to seed
-            outseed = '_'.join((yyyydoy, str(hhmm+inc), stn)) + '.mseed'
+            outseed = '_'.join((yyyydoy, str(hhmm+inc), stn.upper())) + '.mseed'
             append_seed(appendfiles, outseed)
             inc += 2
             
@@ -233,6 +247,7 @@ def merge_jump_seed(seedfolder, hhmm):
             mrgfiles.append(outseed)
             
     # now merge into one seed file
+    print mrgfiles
     merge_seed(mrgfiles)
     
     # remove tmp files
