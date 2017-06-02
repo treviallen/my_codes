@@ -147,6 +147,19 @@ def calc_HB87(comp, logA, rhyp):
 
     return HB87
 
+# Bakun & Joyner (1984) - SoCal
+
+def calc_BJ84(comp, logA, rhyp):
+    logA0 = np.log10(rhyp) + 0.00301 * rhyp + 0.70
+    BJ84 = logA + logA0
+
+    magstr = 'HB87:\t' + str("%0.1f" % BJ84)
+    if comp == 0: # if vertical
+        magstr = magstr + '*'
+    print magstr
+
+    return BJ84
+
 # Gaull & Gregson (1991) - WA
 def calc_GG91(comp, logA, rhyp):
     GG91 = logA + 1.137 * np.log10(rhyp) + 0.000657 * rhyp + 0.66
@@ -257,6 +270,9 @@ def main(filename, logA, rhyp, eqdep):
 
     # calculate Hutton & Boore (1987)
     HB87 = calc_HB87(comp, logA, rhyp)
+    
+    # calculate Bakun & Joyner (1984)
+    BJ84 = calc_BJ84(comp, logA, rhyp)
 
     # calculate GG91
     GG91 = calc_GG91(comp, logA, rhyp)    
