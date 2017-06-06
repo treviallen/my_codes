@@ -337,7 +337,6 @@ def eqwave2mseed(eqwfile):
 def get_iris_data(datetime, sta, net):     
     from obspy.core.utcdatetime import UTCDateTime
     from obspy.clients.fdsn.client import Client
-    from sys import argv
     
     '''
     Code to extract IRIS data, one station at a time.  Exports mseed file to 
@@ -383,3 +382,84 @@ def get_iris_data(datetime, sta, net):
         
         print '    e.g.: python get_iris_data.py (2010,4,20,0,16) kmbl\n'
     '''
+
+def get_cwb_data(Y,m,d,H,M):
+    '''
+    origintime = tuple fmt (Y,m,d,H,M)
+    '''
+    import datetime
+    from os import path, makedirs
+    from obspy.core import utcdatetime
+    #from obspy.core.event import Event, Magnitude, Origin
+    from obspy.clients.neic.client import Client
+    
+    ##########################################################################
+    # set constants and funcs
+    ##########################################################################
+    
+    # initialize the cwb port
+    client=Client(host='10.7.161.60',port=2061,debug=False, timeout=60)
+    
+    ##########################################################################
+    # set event time
+    ##########################################################################
+    print Y,m,d,H,M    
+    dt = datetime.datetime(Y,m,d,H,M)
+    
+    print dt
+    
+    # convert datetime object to UTCdatetime
+    dt = utcdatetime.UTCDateTime(dt)
+    
+    ''' the time window to request the data will be 20 minutes, check maximum travel time and increase this value accordingly '''
+    #end_time=start_time+960 # 16 minutes
+    start_time = dt - datetime.timedelta(seconds=60)
+    end_time   = dt + datetime.timedelta(seconds=960) # 16 minutes
+    #end_time   = dt + datetime.timedelta(seconds=600) # 5 minutes
+    
+    
+    ''' get all waveform data available, use wildcards to reduce the data volume and speedup the process,
+    unfortunately we need to request few times for every number of characters that forms the station name '''
+    # kluge to fix non-retrieval of data  - loop through alphabet integers
+    for ch in range(ord('A'), ord('Z')+1):
+        print 'Stations beginning with ', chr(ch)
+    #    st_3 = client.get_waveforms("AU", chr(ch)+"??", "", "[BSEH]?[ENZ]", start_time,end_time)
+    #    st_4 = client.get_waveforms("AU", chr(ch)+"???", "", "[BSEH]?[ENZ]", start_time,end_time)
+        st_3 = client.get_waveforms("AU", chr(ch)+"??", "", "[BSEH][HN][ENZ]", start_time,end_time)
+        st_4 = client.get_waveforms("AU", chr(ch)+"???", "", "[BSEH][HN][ENZ]", start_time,end_time)
+        if ch == ord('A'):
+            if len(st_4) > 0:
+                st=st_3+st_4
+            else:
+                st=st_3
+        
+        else:
+            if len(st_4) > 0:
+                st+=st_3+st_4
+            else:
+                st+=st_3
+    
+    # Cleanup duplicate traces returned by server
+     #       st.merge(-1) #-1 method only merges overlapping or adjacent traces with same i            
+    # Now sort the streams by station and channel
+    st.sort()
+    # Cleanup duplicate traces returned by server
+    for tr in st:
+        if tr.stats['sampling_rate'] < 20:
+            st.remove(tr)
+        
+    st.merge(1, fill_value=None) #1 method only merges overlapping or adjacent traces with same id
+    # Now sort the streams by station and channel
+    st.sort()
+    
+    # check if waves folder exists
+    if not path.isdir('waves'):
+        makedirs('waves')
+        
+    # set mseed filename
+    msfile = path.join('waves', dt.strftime('%Y%m%d%H%M')+'.mseed')
+    
+    # now write streams for each event to mseed
+    st.write(msfile, format="MSEED") 
+    print st
+        
