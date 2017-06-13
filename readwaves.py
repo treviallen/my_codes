@@ -553,11 +553,12 @@ def readseed(st):
             comp = tr.stats['channel']
         else:
             numtrue = False
-            if tr.stats['channel'] == '001' or tr.stats['channel'] == '004' or tr.stats['channel'] == 'HH1':
+            print tr.stats['channel']
+            if tr.stats['channel'] == '001' or tr.stats['channel'] == '004' or tr.stats['channel'] == 'HH1' or tr.stats['channel'] == 'BH1':
                 o = 'E'
                 it = 'H'
                 numtrue = True
-            elif tr.stats['channel'] == '002' or tr.stats['channel'] == '005' or tr.stats['channel'] == 'HH2':
+            elif tr.stats['channel'] == '002' or tr.stats['channel'] == '005' or tr.stats['channel'] == 'HH2'or tr.stats['channel'] == 'BH2':
                 o = 'N'
                 it = 'H'
                 numtrue = True
