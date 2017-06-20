@@ -383,7 +383,31 @@ def mmi2pgm_dangkua11_ena(mmi, pgm, mag, rrup):
     
     return pgm, mmisig
     
+# do Newmark & Rosenblueth, 1971 - pgv in mm/s
+def mmi2pgv_newmark_rosenblueth(mmi):
+    from numpy import array, log2, nan
     
+    pgv = ((2**mmi) * 5./7.) / 10. # comvert from mm/s to cm/s
+    
+    return pgv
+
+# pgv in mm/s
+def pgv2mmi_newmark_rosenblueth(pgv):
+    from numpy import array, log2, nan
+    
+    mmi = log2((7./5.) * pgv)
+    
+    return mmi
+
+# do Gaull 1979 in m/s**2
+def mmi2pga_gaull(mmi):
+    from numpy import array, log2, nan
+    from scipy.constants import g
+    
+    pga = 10**((mmi / 3.1) - 2.3) * 100 # comvert from m/s**2 to cm/s**2
+    
+    return pga
+
 ##########################################################################################
 # IPEs
 ##########################################################################################

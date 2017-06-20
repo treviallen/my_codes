@@ -188,8 +188,8 @@ def get_binned_stats_mean(bins, xdat, yres):
         medx.append(nanmean(xdat[index]))
         
     idx = where(isfinite(medres))[0]
-
-    return array(medres)[idx], array(stdres)[idx], array(medx)[idx], bins[idx]
+    nperbin = 0
+    return array(medres)[idx], array(stdres)[idx], array(medx)[idx], bins[idx], nperbin
 
 # get weighted std, from http://stackoverflow.com/questions/2413522/weighted-standard-deviation-in-numpy
 def weighted_avg_and_std(values, weights):
