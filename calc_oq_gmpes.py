@@ -369,6 +369,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
     from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
+    from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
     #from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -427,12 +428,15 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = YenierAtkinson2015CEUS()
     YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    gmpe = ShahjoueiPezeshk2016()
+    SP16imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
     crust_ty = 'ena'
     
     #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
     AA13imt = []
 
-    return Tea02imt, C03imt, AB06imt, CY08imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, AA13imt, Bea14imt, YA15imt
+    return Tea02imt, C03imt, AB06imt, CY08imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, AA13imt, Bea14imt, YA15imt, SP16imt
 
 def allen2012_gsim(mag, dep, rrup):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
@@ -495,7 +499,7 @@ def gaull1990_gsim(mag, dep, rhypo):
     
     return G90WAimt, G90SEAimt, G90WA_PGVimt, G90SEA_PGVimt
     
-def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
+def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30, hdf5file):
     from openquake.hazardlib.gsim.gsim_table import GMPETable
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -518,7 +522,7 @@ def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     dists = DistancesContext()
     dists.rrup = rrup
     dists.rjb = rjb
-    dists.rhypo = rhypo
+    #dists.rhypo = rhypo
     dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
         
     gmpe = GMPETable(gmpe_table = hdf5file) # use full path
