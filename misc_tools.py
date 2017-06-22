@@ -373,6 +373,15 @@ def get_percent_chance_from_return_period(return_period, investigation_time):
 
     return percent_chance
 
+def remove_last_cmap_colour(cmap):
+    from matplotlib.colors import LinearSegmentedColormap
+    cmap_list = []
+    inc = 1. / (cmap.N-1)
+    for i in range(0, cmap.N-1):
+        cmap_list.append(cmap(i*inc))
+        
+    return LinearSegmentedColormap.from_list('cmap2', cmap_list, N=cmap.N-1)
+
 # from: http://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
