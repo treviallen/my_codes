@@ -526,14 +526,21 @@ def readseed(st):
     # first merge data gaps
     st.merge()
     
+    # get min samples
+    min_npts = 10**20
+    for tr in st:
+        if tr.stats['npts'] < min_npts:
+            min_npts = tr.stats['npts']
+    
     # populate data arrays
     for i, tr in enumerate(st):
         allsta.append(tr.stats['station'])
         alldatestr.append(tr.stats['starttime'].strftime("%Y%m%d%H%M%S"))
         allsec.append(tr.stats['starttime'].strftime("%S"))
         allsps.append(tr.stats['sampling_rate'])
-        allnsamp.append(tr.stats['npts'])
-          
+        #allnsamp.append(tr.stats['npts'])
+        allnsamp.append(min_npts)
+              
         # get channel 
         print tr
         if tr.stats['channel'] == 'HHE' or tr.stats['channel'] == 'HNE' or \
@@ -583,7 +590,7 @@ def readseed(st):
         # append comp
         comps.append(comp) 
             
-        tmpdat = tr.data
+        tmpdat = tr.data[0:min_npts]
         if i == 0:
             alldata = tmpdat.reshape(allnsamp[-1],1)
         else:
