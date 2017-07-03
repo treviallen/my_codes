@@ -53,6 +53,24 @@ def shapepoly2shapley(sf):
         
     return polygons
 
+# returns list of shapely polygons of different shape parts    
+def split_shape_parts(sf):
+    from shapely.geometry import Polygon
+    from numpy import array
+    
+    shapes = sf.shapes()
+    polygons = []
+
+    for i, shape in enumerate(shapes):
+        parts = shape.parts
+        print parts
+        parts.append(len(shape.points)-1) # adding last point
+        
+        for i in range (0, len(parts)-1):
+            polygons.append(Polygon(shape.points[parts[i]:parts[i+1]]))
+            print array(polygons[-1].bounds)
+    return polygons
+
 '''
 # get colour map and vector of colour indexes
     sf     = shapefile object
