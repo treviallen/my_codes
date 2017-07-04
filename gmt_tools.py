@@ -72,6 +72,39 @@ def gmt_grdtrack(lon, lat, grdfile):
         zval = nan
     
     return zval
+    
+# do GMT grdtrack instead
+def gmt_grdtrack_list(lons, lats, grdfile):
+    from os import system
+    from numpy import array, nan
+    
+    # frist make text
+    txt = ''
+    for lo, la in zip(lons, lats):
+        txt += ','.join((str(lo), str(la))) + '\n'
+        
+    # write lon/lat file
+    f = open('lonlats.txt', 'wb')
+    f.write(txt)
+    f.close()
+    
+    # call grdtrack
+    system('gmt grdtrack lonlats.txt -G' + grdfile + ' -N > lonlatzval.txt')
+    
+    # get zvals from file
+    zlines = open('lonlatzval.txt').readlines()
+    zvals = []
+    lons = []
+    lats = []
+    for line in zlines:        
+        if len(line) > 0:
+            zvals.append(float(line.split()[-1]))
+            lons.append(float(line.split()[0]))
+            lats.append(float(line.split()[1]))
+        else:
+            zvals.append(nan)
+    
+    return array(lons), array(lats), array(zvals)
 
 # python version of GMT grdtrack - very dodgy, but works ok
 def pygrdtk(alon, alat, **kwargs):
