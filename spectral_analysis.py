@@ -173,14 +173,22 @@ def calc_fft(data, sps):
 #    import matplotlib.pyplot as plt
     import numpy as np
 
-    n = len(data[0])
+    try:
+        n = len(data)
+        
+        # calc FFT
+        wavfft = np.fft.fft(data,n)
+        
+        # get frequencies
+        freq = np.fft.fftfreq(n, d=1./sps)
+        
+    except:
+        n = len(data[0])
+        
+        # calc FFT
+        wavfft = np.fft.fft(data[0],n)
 
-    # calc FFT
-    wavfft = np.fft.fft(data[0],n)
-
-    # get frequencies
-    freq = np.fft.fftfreq(n, d=1./sps)
-    freq = freq.reshape(1,n)
+        freq = freq.reshape(1,n)
 
     return freq, wavfft
 

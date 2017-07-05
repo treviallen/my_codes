@@ -248,6 +248,36 @@ def calc_A16(logA, rhyp, comp):
     print magstr
     
     return A16
+    
+# calc Yenier 2017
+def calc_Y17(logA, rhyp, comp):
+    from numpy import loadtxt, log10
+    
+    r1 = 100.
+    r2 = 220.
+    b1 = 1.399
+    b2 = 0.727
+    b3 = 1.806
+    c1 = 0.102
+    c2 = 4.354
+    c3 = -1.579
+    
+    if rhyp <= r1:
+        logY17 = b1*log10(rhyp) + 0.001*rhyp + c1
+    elif rhyp > r1 and rhyp <= r2:
+        logY17 = b2*log10(rhyp) + 0.001*rhyp + c2
+    elif rhyp > r2:
+        logY17 = b3*log10(rhyp) + 0.001*rhyp + c3
+
+    Y17 = logA - logY17
+    
+    magstr = 'A17:\t' + str("%0.1f" % A16)
+    if comp == 0: # if vertical
+        magstr = magstr + '*'
+    print magstr
+    
+    return Y17
+    
 
 
 def main(filename, logA, rhyp, eqdep):
