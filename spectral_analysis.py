@@ -218,6 +218,22 @@ def prep_psa(corfftr, corffti, freq, inst_ty):
 
     return pgv, iacc, ivel
     
+# this function prepares data for the response spectral calculation
+def prep_psa_simple(corfftr, corffti, freq, inst_ty):
+    import numpy as np
+    
+    # get acceleration time history
+    complex_array = corfftr + 1j*corffti
+    
+    if inst_ty != 'N': # if seismometer
+        complex_array = complex_array * (2 * np.pi * abs(freq))
+
+    n = len(corfftr)
+    iacc = np.fft.ifft(complex_array,n)
+
+    return iacc
+
+    
 # this function calculated response spectral acceleration of a SODF
 # structure with a damping of h (usually 5%)
 def calc_response_spectra(iacc, sps, h, minT, maxT):
@@ -279,4 +295,4 @@ def calc_response_spectra(iacc, sps, h, minT, maxT):
         sd[i] = maxx
         psa[i] = maxx*K
 
-    return Tstrip, psa, pga
+    return Tstrip, psa.flatten(), pga
