@@ -192,6 +192,24 @@ def calc_fft(data, sps):
 
     return freq, wavfft
 
+# return instrument corrected velocity
+def get_cor_velocity(corfftr, corffti, freq, inst_ty):
+    import numpy as np
+    
+    # get velocity time history for PGV
+    complex_array = corfftr + 1j*corffti
+    
+    if inst_ty == 'N': # if accelerometer
+        complex_array[1:] = complex_array[1:] / (2 * np.pi * abs(freq[1:]))
+        complex_array[0] = 0 + 1j*0
+        
+    n = len(corfftr)
+    ivel = np.fft.ifft(complex_array,n)
+    pgv = max(abs(ivel.real))
+    
+    return pgv, ivel
+
+
 # this function prepares data for the response spectral calculation
 def prep_psa(corfftr, corffti, freq, inst_ty):
     import numpy as np

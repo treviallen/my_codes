@@ -48,7 +48,7 @@ def get_filename(sta, recdate, chan, inst_ty, dt, sps):
 
 # this function gets text for the file header
 def get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
-                    eqmag, rhyp, pga, pgv, lofreq, hifreq, filetype):
+                    eqmag, rhyp, azim, pga, pgv, lofreq, hifreq, filetype):
     # get processing time
     import datetime as dt
     proctime = dt.datetime.now()
@@ -64,6 +64,7 @@ def get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
     teqdep = 'EQDEP:\t' + str(eqdep)  + ' km'
     teqmag = 'EQMAG:\t' + str(eqmag)
     trhyp =  'RHYP:\t' + str("%0.1f" % rhyp) + ' km'
+    tazim =  'AZIM:\t' + str("%0.1f" % azim) + ' degrees'
     if filetype == 'psa' or filetype == 'cor':
         tpga =   'PGA:\t' + str("%0.3f" % pga) + ' mm/s/s'
         tpgv =   'PGV:\t' + str("%0.3f" % pgv) + ' mm/s\n'
@@ -96,10 +97,10 @@ def get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
     header = '\n'
     if filetype == 'psa' or filetype == 'cor':
         joinstr = (tfile, tdate, tsta, tstla, tstlo, tsps, teqla, teqlo, teqdep, \
-                   teqmag, trhyp, tpga, tpgv, comm, proc, buff, units, buff)
+                   teqmag, trhyp, tazim, tpga, tpgv, comm, proc, buff, units, buff)
     else:
         joinstr = (tfile, tdate, tsta, tstla, tstlo, tsps, teqla, teqlo, teqdep, \
-                   teqmag, trhyp, comm, proc, buff, units, buff)
+                   teqmag, trhyp, tazim, comm, proc, buff, units, buff)
     header = header.join(joinstr) + '\n'
 
     return header
@@ -193,7 +194,7 @@ def write_fft(sta, evdate, sps, freq, corfftr, corffti, filename, stla, stlo, \
 
 # write output response spectra
 def write_response_spectra(sta, evdate, sps, T, psa, pga, pgv, filename, stla, stlo, \
-                          eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq):
+                          eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq):
 
     # get PGA for file header in mm/s/s
     pga *= 1000
@@ -208,7 +209,7 @@ def write_response_spectra(sta, evdate, sps, T, psa, pga, pgv, filename, stla, s
 
     # set header info
     header = get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
-                             eqmag, rhyp, pga, pgv, lofreq, hifreq, 'psa')
+                             eqmag, rhyp, azim, pga, pgv, lofreq, hifreq, 'psa')
 
     # set data array
     #psa =  psa[:,0]

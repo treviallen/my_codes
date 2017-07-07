@@ -11,6 +11,7 @@ wave file
 
 def get_response_info(sta,recdate,chan):
     import datetime as dt
+    from os import getcwd
     
     #print sta,recdate,chan
 
@@ -24,7 +25,12 @@ def get_response_info(sta,recdate,chan):
     pazfile = 'NULL' 
 
     # check if sitename in file
-    stalist = '//Users//tallen//Documents//Code//process_waves//stationlist.dat'
+    cwd = getcwd()
+    if cwd.startswith('/nas'):
+        stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'
+    else:
+        stalist = '//Users//tallen//Documents//Code//process_waves//stationlist.dat'
+        
     stlo = -12345.0
     stla = -12345.0
     stadat = open(stalist).readlines()
@@ -49,7 +55,7 @@ def get_response_info(sta,recdate,chan):
                     pazfile = tmp[13].strip()
                     
     if stlo == -12345:
-        print '\n', recdate+': Station', sta, chan, 'not found...\n'
+        print '\n', recdate,': Station', sta, chan, 'not found...\n'
 
     return nat_freq, inst_ty, damping, sen, recsen, gain, pazfile, stlo, stla, netid
 
@@ -73,10 +79,16 @@ def get_paz_list():
 def read_pazfile(pazfile):
     from os import path
     import numpy as np
-
+    from os import getcwd
+    
+    cwd = getcwd()
     # open paz file
-    pazpath = '//Users//tallen//Documents//Earthquake_Data//paz' # for bob
+    if cwd.startswith('/nas'):
+        pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute
+    else:
+        pazpath = '//Users//tallen//Documents//Earthquake_Data//paz' # for bob
     #pazpath = 'U:\\Earthquake_Data\\paz' # for PC
+    
     pazfile = path.join(pazpath, pazfile)
     paztxt = open(pazfile).readlines()
 
@@ -310,7 +322,7 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         constant *= angc**4
 
     # combine amp factors
-    print 'Norm Const:', constant
+    #print 'Norm Const:', constant
     ampfact = sen * recsen * gain * constant
 
     # if accelerometer, convert units from counts/g to counts/m/s**2
