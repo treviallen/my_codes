@@ -214,7 +214,7 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
 # calls and calculates candidate intraslab GMPEs - values returned in ln(g)
 def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
-    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SSlab, ZhaoEtAl2006SSlabCascadia 
+    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SSlab #, ZhaoEtAl2006SSlabCascadia 
     from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SSlab, AtkinsonBoore2003SSlabCascadiaNSHMP2008
     from openquake.hazardlib.gsim.youngs_1997 import YoungsEtAl1997SSlab
     from openquake.hazardlib.gsim.garcia_2005 import GarciaEtAl2005SSlab
@@ -251,8 +251,8 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = ZhaoEtAl2006SSlab()
     Zea06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
-    gmpe = ZhaoEtAl2006SSlabCascadia()
-    Zea06CISimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    #gmpe = ZhaoEtAl2006SSlabCascadia()
+    #Zea06CISimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
     gmpe = AtkinsonBoore2003SSlab()
     AB03imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
@@ -276,7 +276,7 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #repi = sqrt(rrup**2 - dep**2)
     #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
 
-    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06CISimt, MP10imt, Aea15imt #, AA13imt #, Aea15imt
+    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, MP10imt, Aea15imt #, AA13imt #, Aea15imt, Zea06CISimt, 
 
 # calls and calculates candidate interface GMPEs - values returned in ln(g)
 def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
@@ -600,3 +600,41 @@ def bssa_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
         
     return Bea14imt
+
+# reads sa data files and returns period (T) and acceleration (SA) vectors
+def read_sa(safile):
+    from numpy import array
+    from scipy.constants import g
+
+    lines = open(safile).readlines()
+    chan = lines[0].split('.')[-2]
+    datestr = lines[1].split('\t')[-1]    
+    sta = lines[2].split('\t')[-1]
+    stla = float(lines[3].split('\t')[-1])
+    stlo = float(lines[4].split('\t')[-1])
+    sr = float(lines[5].split('\t')[-1].split()[0])
+    eqla = float(lines[6].split('\t')[-1])
+    eqlo = float(lines[7].split('\t')[-1])
+    dep = float(lines[8].split('\t')[-1].split()[0])
+    mag = float(lines[9].split('\t')[-1])
+    rhyp = float(lines[10].split('\t')[-1].split()[0])
+    azim = float(lines[11].split('\t')[-1].split()[0])
+    pga = float(lines[12].split('\t')[-1].split()[0]) / (1000. * g) # convert mm/s**2 to g
+    pgv = float(lines[13].split('\t')[-1].split()[0]) / 10. # convert mm/s to cm/s
+
+    SA = []
+    T = []
+    
+    for line in lines[24:]:
+        dat = line.strip().split('\t')
+        T.append(float(dat[0]))
+        SA.append(float(dat[1]))
+    
+    T = array(T)
+    SA = array(SA) / g
+
+    rec = {'chan':chan, 'datestr':datestr, 'sta':sta, 'stla':stla, 'stlo':stlo, \
+           'sr':sr, 'eqla':eqla, 'eqlo':eqlo, 'dep':dep, 'mag':mag, 'rhyp':rhyp, \
+           'azim':azim, 'pga':pga, 'pgv':pgv, 'per':T, 'sa':SA}
+    
+    return rec

@@ -11,7 +11,7 @@ def print_functions():
             print line.strip('def ').strip('\n')
             
 # flattens a single key value from a list of dictionaries
-def dict2array(dictList, key):
+def dictlist2array(dictList, key):
     from numpy import array
     
     flatList = []

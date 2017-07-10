@@ -751,3 +751,22 @@ def parse_ggcat(ggcatcsv):
         
     return ggcat
 
+# parses USGS format web query csv
+def parse_usgs_event_query(usgscsv):
+    from obspy.core.utcdatetime import UTCDateTime
+    lines = open(usgscsv).readlines()[1:]
+    
+    # build dict
+    evdict = []
+    for line in lines:
+        dat = line.strip().split(',')
+        
+        #evdt = dt.datetime.strptime(dat[0], '%Y-%m-%dT%H:%M:%S.%fZ')
+        starttime = dat[0][:15] + '0:00.000Z'
+        tdict = {'time': UTCDateTime(dat[0]), 'lat': float(dat[1]), 'lon': float(dat[2]), \
+                 'dep': float(dat[3]), 'mag': float(dat[4]), 'magType': dat[5], \
+                 'timestr': dat[0], 'starttime': UTCDateTime(starttime)}
+                 
+        evdict.append(tdict)
+        
+    return evdict
