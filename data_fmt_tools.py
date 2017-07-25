@@ -85,6 +85,7 @@ def readGACSS(filename, **kwargs):
     # read metafile with info on single traces
     with open(filename, "rb") as fh:
         lines = fh.readlines()
+        
     basedir = os.path.dirname(filename)
     traces = []
     # read single traces
