@@ -90,6 +90,7 @@ def readGACSS(filename, **kwargs):
     # read single traces
     for line in lines:
         dat = line.strip().split()
+        print dat
         npts = int(dat[4])
         dirname = dat[14].strip().decode()
         filename = dat[15].strip().decode()
@@ -383,9 +384,10 @@ def get_iris_data(datetime, sta, net):
         print '    e.g.: python get_iris_data.py (2010,4,20,0,16) kmbl\n'
     '''
 
-def get_cwb_data(Y,m,d,H,M):
+def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
     '''
     origintime = tuple fmt (Y,m,d,H,M)
+    td_start, td_end: time deltas in seconds
     '''
     import datetime
     from os import path, makedirs
@@ -403,7 +405,6 @@ def get_cwb_data(Y,m,d,H,M):
     ##########################################################################
     # set event time
     ##########################################################################
-    print Y,m,d,H,M    
     dt = datetime.datetime(Y,m,d,H,M)
     
     print dt
@@ -413,8 +414,8 @@ def get_cwb_data(Y,m,d,H,M):
     
     ''' the time window to request the data will be 20 minutes, check maximum travel time and increase this value accordingly '''
     #end_time=start_time+960 # 16 minutes
-    start_time = dt - datetime.timedelta(seconds=60)
-    end_time   = dt + datetime.timedelta(seconds=960) # 16 minutes
+    start_time = dt + datetime.timedelta(seconds=td_start)
+    end_time   = dt + datetime.timedelta(seconds=td_end) # 16 minutes
     #end_time   = dt + datetime.timedelta(seconds=600) # 5 minutes
     
     
@@ -448,18 +449,83 @@ def get_cwb_data(Y,m,d,H,M):
         if tr.stats['sampling_rate'] < 20:
             st.remove(tr)
         
-    st.merge(1, fill_value=None) #1 method only merges overlapping or adjacent traces with same id
+    st.merge(0, fill_value='interpolate') #1 method only merges overlapping or adjacent traces with same id
     # Now sort the streams by station and channel
     st.sort()
     
     # check if waves folder exists
-    if not path.isdir('waves'):
-        makedirs('waves')
+    if not path.isdir('cwb_dump'):
+        makedirs('cwb_dump')
         
     # set mseed filename
-    msfile = path.join('waves', dt.strftime('%Y%m%d%H%M')+'.mseed')
+    msfile = path.join('cwb_dump', dt.strftime('%Y%m%d%H%M')+'.mseed')
     
     # now write streams for each event to mseed
     st.write(msfile, format="MSEED") 
     print st
+    
+def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
+    '''
+    origintime = tuple fmt (Y,m,d,H,M)
+    td_start, td_end: time deltas in seconds
+    '''
+    import datetime
+    from os import path, makedirs
+    from obspy.core import utcdatetime
+    #from obspy.core.event import Event, Magnitude, Origin
+    from obspy.clients.neic.client import Client
+    
+    ##########################################################################
+    # set constants and funcs
+    ##########################################################################
+    
+    # initialize the cwb port
+    client=Client(host='10.7.161.60',port=2061,debug=False, timeout=60)
+    
+    ##########################################################################
+    # set event time
+    ##########################################################################
+    dt = datetime.datetime(Y,m,d,H,M)
+    
+    print dt
+    
+    # convert datetime object to UTCdatetime
+    dt = utcdatetime.UTCDateTime(dt)
+    
+    ''' the time window to request the data will be 20 minutes, check maximum travel time and increase this value accordingly '''
+    #end_time=start_time+960 # 16 minutes
+    start_time = dt + datetime.timedelta(seconds=td_start)
+    end_time   = dt + datetime.timedelta(seconds=td_end) # 16 minutes
+    #end_time   = dt + datetime.timedelta(seconds=600) # 5 minutes
+    
+    
+    ''' get all waveform data available, use wildcards to reduce the data volume and speedup the process,
+    unfortunately we need to request few times for every number of characters that forms the station name '''
+    st = client.get_waveforms("AU", sta, "", "[BSEH][HN][ENZ]", start_time,end_time)
+    
+    # Cleanup duplicate traces returned by server
+     #       st.merge(-1) #-1 method only merges overlapping or adjacent traces with same i            
+    # Now sort the streams by station and channel
+    st.sort()
+    # Cleanup duplicate traces returned by server
+    for tr in st:
+        if tr.stats['sampling_rate'] < 20:
+            st.remove(tr)
+        
+    st.merge(0, fill_value='interpolate') #1 method only merges overlapping or adjacent traces with same id
+    
+    # Now sort the streams by station and channel
+    st.sort()
+    
+    # check if waves folder exists
+    if not path.isdir('cwb_dump'):
+        makedirs('cwb_dump')
+        
+    # set mseed filename
+    msfile = path.join('cwb_dump', dt.strftime('%Y-%m-%dT%H.%M')+ '.AU.' + sta + '.mseed')
+    
+    # now write streams for each event to mseed
+    if len(st) > 0:
+        st.write(msfile, format="MSEED") 
+        print st
         
