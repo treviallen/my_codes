@@ -142,8 +142,8 @@ eg:
 	yres = numpy array of y residuals
 '''
 def get_binned_stats(bins, xdat, yres):
-    from numpy import array, diff, nanstd, where, isfinite
-    from scipy.stats import nanmedian
+    from numpy import array, diff, where, isfinite
+    from scipy.stats import nanmedian, nanstd
     
     binsize = diff(bins)[0]
 
