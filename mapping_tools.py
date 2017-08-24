@@ -43,9 +43,11 @@ def get_field_data(sf, field, datatype):
             
     return data
         
-def shapepoly2shapley(sf):
+def shapepoly2shapley(shpfile):
+    import shapefile
     from shapely.geometry import Polygon    
     
+    sf = shapefile.Reader(shpfile)
     shapes = sf.shapes()
     polygons = []
     for poly in shapes:
@@ -126,7 +128,7 @@ def getshapecolour(sf, field, colmap, ncolours, **kwargs):
     return cs, ci, cmap, zmin, zmax
     
 def drawshapepoly(m, plt, sf, **kwargs):
-    from numpy import arange
+    from numpy import arange, isnan, nan
     
     # get kwargs
     ncolours = 256
@@ -162,20 +164,25 @@ def drawshapepoly(m, plt, sf, **kwargs):
             if key == 'polyline':
                 polyline = kwargs[key]
 
-
     shapes = sf.shapes()
 
     for i, shape in enumerate(shapes):
+        newfill = True
         # get colour
         try:
             cs = (cmap(arange(ncolours)))
-            col = [cs[int(cindex[i])][0],cs[int(cindex[i])][1],cs[int(cindex[i])][2]]
+            if isnan(cindex[i]) == False: 
+                col = [cs[int(cindex[i])][0],cs[int(cindex[i])][1],cs[int(cindex[i])][2]]
+            else:
+                newfill = False
+                col = 'w'
+            
         except:
             try:
                 col = col
             except:
-                col = 'k'
-
+                col = 'w'
+                
         if fillshape == True:
             fillcol = col
             linecol = 'k'
@@ -203,7 +210,7 @@ def drawshapepoly(m, plt, sf, **kwargs):
 
             # plot each polygon
             xx, yy = m(x,y)
-            if fillshape == True:
+            if fillshape == True and newfill == True:
                 plt.fill(xx,yy,color=fillcol)
             m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
 

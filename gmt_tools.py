@@ -805,3 +805,12 @@ def make_netcdf_map(ax, cnrs, ncfile, cmap, norm, vmin, vmax, mapres, grdres, gr
             polygons.append(poly)
         
     return m
+
+def remove_last_cmap_colour(cmap):
+    from matplotlib.colors import LinearSegmentedColormap
+    cmap_list = []
+    inc = 1. / (cmap.N-1)
+    for i in range(0, cmap.N-1):
+        cmap_list.append(cmap(i*inc))
+        
+    return LinearSegmentedColormap.from_list('cmap2', cmap_list, N=cmap.N-1)
