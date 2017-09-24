@@ -286,6 +286,9 @@ def fap_response(freq, nat_freq, damping, sen, recsen, gain, inst_ty):
 def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     import numpy as np
     import scipy.signal as signal
+    
+    #print 'freq', np.shape(freq)
+    #print freq
 
     # read PAZ file
     poles, zeros, constant, normf = read_pazfile(pazfile)
@@ -304,6 +307,7 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         minf = min(abs(freqdiff))
         #freqindex =[]
         freqindex = np.where((freqdiff >= minf-10e-5) & (freqdiff <= minf+10e-5))[0]
+        #print 'freqindex', freqindex
         
         '''
         for i in range(0,len(freq)/2):

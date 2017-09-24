@@ -39,7 +39,10 @@ def cosine_taper(data):
 # this function asks for and applies a 4th order bandpass Butterworth filter
 def butter_filter_user(inst_ty, sps, freq, wavfft, seltask):
     import numpy as np
+    
     filtfft = wavfft
+    #print np.shape(filtfft), 'filtfft'
+    
     # filter order
     ford = 4.0
 
@@ -68,10 +71,14 @@ def butter_filter_user(inst_ty, sps, freq, wavfft, seltask):
         hifreq = float(var)
 
     # do high pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / lofreq)**(-2*ford))
-
+    print freq, 'freq'
+    print np.shape(filtfft[1:]), 'filtfft[1:]'
+    #filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / lofreq)**(-2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / lofreq)**(-2*ford))
+    
     # do low pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / hifreq)**(2*ford))
+    #filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / hifreq)**(2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / hifreq)**(2*ford))
 
     # remover zero freq
     filtfft[0] *= 0.0
@@ -187,9 +194,9 @@ def calc_fft(data, sps):
         
         # calc FFT
         wavfft = np.fft.fft(data[0],n)
-
+        
         freq = freq.reshape(1,n)
-
+        
     return freq, wavfft
 
 # return instrument corrected velocity

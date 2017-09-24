@@ -370,7 +370,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
     from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
     from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
-    #from atkinson_adams_2013 import atkinson_adams_2013
+    from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
     
@@ -433,8 +433,8 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     
     crust_ty = 'ena'
     
-    #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
-    AA13imt = []
+    AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
+    #AA13imt = []
 
     return Tea02imt, C03imt, AB06imt, CY08imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, AA13imt, Bea14imt, YA15imt, SP16imt
 
