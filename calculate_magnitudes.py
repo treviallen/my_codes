@@ -148,7 +148,6 @@ def calc_HB87(comp, logA, rhyp):
     return HB87
 
 # Bakun & Joyner (1984) - SoCal
-
 def calc_BJ84(comp, logA, rhyp):
     logA0 = np.log10(rhyp) + 0.00301 * rhyp + 0.70
     BJ84 = logA + logA0
@@ -248,7 +247,8 @@ def calc_A16(logA, rhyp, comp):
     print magstr
     
     return A16
-    
+
+'''    
 # calc Yenier 2017
 def calc_Y17(logA, rhyp, comp):
     from numpy import loadtxt, log10
@@ -277,7 +277,7 @@ def calc_Y17(logA, rhyp, comp):
     print magstr
     
     return Y17
-    
+'''    
 
 
 def main(filename, logA, rhyp, eqdep):
