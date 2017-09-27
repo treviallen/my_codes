@@ -370,7 +370,7 @@ def common_resp(freq, nat_freq, damping, sen, recsen, gain, wavfft, inst_ty, paz
 
 
 # get Wood-Andersion instrument response and convolve with input seismogram
-def convolve_WoodAnderson(freq, corfftr, corffti):
+def convolve_WoodAnderson(freq, corfftr, corffti, inst_ty):
     import numpy as np
     import scipy.signal as signal
 
@@ -392,10 +392,17 @@ def convolve_WoodAnderson(freq, corfftr, corffti):
     waffti = (corfftr * resp.imag + corffti * resp.real)
 
     # get Wood-Anderson Displacement time history
+    '''
     n = len(wafftr[0])
     freq[0,0] = 1.0
     dispfftr = wafftr[0] / (2 * np.pi * abs(freq[0]))
     dispffti = waffti[0] / (2 * np.pi * abs(freq[0]))
+    '''
+    n = len(wafftr)
+    freq[0] = 1.0
+    dispfftr = wafftr / (2 * np.pi * abs(freq))
+    dispffti = waffti / (2 * np.pi * abs(freq))
+    
     # set zero freq to 0
     dispfftr[0] = 0
     dispffti[0] = 0

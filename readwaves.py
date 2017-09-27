@@ -64,10 +64,15 @@ def return_data(wavfile):
     else:
         '\nFile format not recognised!'
         
+    print 'return_data', alldata[:, 0]
     return allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, fmt
 
 def readeqwave(wavfile):
     # READ HEADER INFO
+    cntpvolt = 'null' 
+    sen = 'null'
+    gain = 'null'
+    
     print '\nReading header info...'
     header = open(wavfile).readlines()
 
@@ -76,6 +81,9 @@ def readeqwave(wavfile):
     i = -1
     for k in range(0,len(header)):
         line = header[k]
+        line = line.strip('\n')
+        line = line.strip('\t')
+        
         # get station name
         ind = line.find('#sitename')
         if ind >= 0:
@@ -115,6 +123,23 @@ def readeqwave(wavfile):
         if ind >= 0:
             sps = line.split('\t')
             sps = sps[0:-1]
+            sps = [round(float(x)) for x in sps]
+        
+        ind = line.find('#Counts/Volt')
+        if ind >= 0:
+            cntpvolt = line.split('\t')
+            cntpvolt = cntpvolt[0:-1]
+        
+        ind = line.find('#Volts/Unit')
+        if ind >= 0:
+            sen = line.split('\t')
+            sen = sen[0:-1]
+
+        ind = line.find('#Flat Gain')
+        if ind >= 0:
+            gain = line.split('\t')
+            gain = gain[0:-1]
+
 
         ind = line.find('#number of samples')
         if ind >= 0:
@@ -140,6 +165,7 @@ def readeqwave(wavfile):
         # this part reads in the data in raw counts
         if readdat == 1:
             i += 1
+            
             if i < maxsamp:
                 dat = (line.split('\t'))
                 for j in range(0,len(nsamp)):
@@ -147,6 +173,7 @@ def readeqwave(wavfile):
                         data[j, i] = np.nan
                     else:
                         data[j, i] = int(round(float(dat[j].strip('\n'))))
+                        
 
         ind = line.find('--------')
         if ind >= 0:
@@ -162,10 +189,17 @@ def readeqwave(wavfile):
     # assume no BB
     i = 0
     for comp in comps:
-        if comp.find('Acc') or comp.find(' a') or comp.find(' A ') \
-           or comp.find('c04') or comp.find('c05') or comp.find('c06'):
+        # not sure why this if statement is needed!
+        if comp.startswith('EH'):
+            it = 'H'
+            g = 'E'
+        
+        elif comp.find('Acc') >= 0 or comp.endswith(' a') >= 0 or comp.find(' A ') >= 0 \
+           or comp.find('c04') >= 0 or comp.find('c05') >= 0 or comp.find('c06') >= 0 \
+           or comp.find('HNZ') >= 0 or comp.find('HNE') >= 0 or comp.find('HNN') >= 0:
             it = 'N'
             g = 'H'
+            
         else:
             it = 'H'
             if int(sps[i]) > 80:
@@ -182,25 +216,28 @@ def readeqwave(wavfile):
         # now get orientation
         if comp.find('z ') >= 0 or comp.find('v ') >= 0 or comp.find('Up') >= 0 \
             or comp.find('u ') >= 0 or comp.find('U Tran') >= 0 or comp.find('Z ') >= 0 \
-            or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0:
+            or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0 \
+            or comp.find('EHZ') >= 0:
              o = 'Z'
         elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.find('East') >= 0 \
             or comp.find('E Tran') >= 0 or comp.find('E ') >= 0 or comp.find('X ') >= 0 \
-            or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0:
+            or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0 \
+            or comp.find('EHE') >= 0:
              o = 'E'
         elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.find('North') >= 0 \
             or comp.find('N Tran') >= 0 or comp.find('N ') >= 0 or comp.find('Y ') >= 0 \
-            or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0:
+            or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0 \
+            or comp.find('EHN') >= 0:
              o = 'N'
         else:
              o = 'U' # Unknown
 
         comps[i] = g + it + o
-        print comps
+        #print comps
 
         i += 1
-
-    return sta, comps, alldatestr, sec, sps, data, nsamp
+    
+    return sta, comps, alldatestr, sec, sps, data, nsamp, cntpvolt, sen, gain
 
 # this function reads nmx ascii format
 def readnmx(wavfile):
