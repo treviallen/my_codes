@@ -190,7 +190,8 @@ def readeqwave(wavfile):
     i = 0
     for comp in comps:
         # not sure why this if statement is needed!
-        if comp.startswith('EH'):
+        #print comp
+        if comp.startswith('EH') or comp.startswith('EL') or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03'):
             it = 'H'
             g = 'E'
         
@@ -217,17 +218,17 @@ def readeqwave(wavfile):
         if comp.find('z ') >= 0 or comp.find('v ') >= 0 or comp.find('Up') >= 0 \
             or comp.find('u ') >= 0 or comp.find('U Tran') >= 0 or comp.find('Z ') >= 0 \
             or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0 \
-            or comp.find('EHZ') >= 0:
+            or comp.find('EHZ') >= 0 or comp.startswith('c03'):
              o = 'Z'
         elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.find('East') >= 0 \
             or comp.find('E Tran') >= 0 or comp.find('E ') >= 0 or comp.find('X ') >= 0 \
             or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0 \
-            or comp.find('EHE') >= 0:
+            or comp.find('EHE') >= 0 or comp.startswith('c01'):
              o = 'E'
         elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.find('North') >= 0 \
             or comp.find('N Tran') >= 0 or comp.find('N ') >= 0 or comp.find('Y ') >= 0 \
             or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0 \
-            or comp.find('EHN') >= 0:
+            or comp.find('EHN') >= 0 or comp.startswith('c02'):
              o = 'N'
         else:
              o = 'U' # Unknown
