@@ -405,8 +405,9 @@ def get_oq_incrementalMFD(beta, N0, mmin, mmax, binwid):
 # use internal OQ code to return mfds
 def get_TruncatedGRMFD(min_mag, max_mag, bin_width, a_val, b_val):
     from openquake.hazardlib.mfd.truncated_gr import TruncatedGRMFD
+    
     mfd = TruncatedGRMFD(min_mag, max_mag, bin_width, a_val, b_val)
-    rates = mfd. get_annual_occurrence_rates() # returns mag and rate tuples
+    rates = mfd.get_annual_occurrence_rates() # returns mag and rate tuples
     
     return rates
 

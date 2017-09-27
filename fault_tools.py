@@ -494,7 +494,7 @@ def area2avs_L10(area, ftype):
     from numpy import log10
     # assume ss == all
     a = 0.5
-    if ftype == 'rs':
+    if ftype == 'ds':
         # first get subsurface L
         b = -4.42
     elif ftype == 'all' or ftype == 'ss':
@@ -506,7 +506,7 @@ def area2avs_L10(area, ftype):
 def area2mag_L10(area, ftype): # in km**2
     from numpy import log10
     a = 1.0
-    if ftype == 'rs':
+    if ftype == 'ds':
         b = 4.00
     elif ftype == 'ss':
         b = 3.99
@@ -517,7 +517,7 @@ def area2mag_L10(area, ftype): # in km**2
 def len2mag_L10(length, ftype): # in km
     from numpy import log10
     a = 1.67
-    if ftype == 'rs':
+    if ftype == 'ds':
         b = 4.24
     elif ftype == 'ss':
         b = 4.17
@@ -528,7 +528,7 @@ def len2mag_L10(length, ftype): # in km
 def mag2area_L10(mw, ftype): # in MW
     from numpy import log10
     a = 1.0
-    if ftype == 'rs':
+    if ftype == 'ds':
         b = 4.00
     elif ftype == 'ss':
         b = 3.99
@@ -539,7 +539,7 @@ def mag2area_L10(mw, ftype): # in MW
 def mag2len_L10(mw, ftype): # in MW
     from numpy import log10
     a = 1.67
-    if ftype == 'rs':
+    if ftype == 'ds':
         b = 4.24
     elif ftype == 'ss':
         b = 4.17
@@ -651,6 +651,39 @@ def mag2len_J94_SCR_lin(mw):
 def len2mag_J94_SCR_quad(flen):
     from numpy import log10
     return 5.22 + 0.38 * log10(flen) + 0.37 * log10(flen)**2
+    
+''' do Allen & Hayes 2017 intraslab '''
+
+# get mag 2 len in km**2
+def mag2len_AH17_other(mw, rtype):
+    b = 0.63
+    if rtype == 'intra':
+        a = -3.03
+        sig = 0.14
+    elif rtype == 'outer':
+        a = -2.87
+        sig = 0.08
+    elif rtype == 'ss':
+        a = -2.81
+        sig = 0.15
+        
+    return 10**(a + b * mw), sig
+    
+# get mag 2 area in km**2
+def mag2area_AH17_other(mw, rtype):
+    b = 0.96
+    if rtype == 'intra':
+        a = -3.89
+        sig = 0.19
+    elif rtype == 'outer':
+        a = -3.89
+        sig = 0.11
+    elif rtype == 'ss':
+        a = -4.04
+        sig = 0.20
+        
+    return 10**(a + b * mw), sig
+    
 
 ''' STOP SCALING RELATIONS '''
 
