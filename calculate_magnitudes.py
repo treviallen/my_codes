@@ -362,7 +362,7 @@ def getWAmagnification(domfreq):
     '''
     domfreq = frequency in Hz
     '''    
-    from numpy import interp, array
+    from numpy import interp, array, exp, log
     #import matplotlib.pyplot as plt
     
     freqmag = array([[0.024414063, 1.936645162],
@@ -2420,6 +2420,6 @@ def getWAmagnification(domfreq):
     plt.grid(which='both')
     plt.show()
     '''
-    return interp(domfreq, freqmag[:,0],freqmag[:,1])
+    return exp(interp(log(domfreq), log(freqmag[:,0]),log(freqmag[:,1])))
     
     
