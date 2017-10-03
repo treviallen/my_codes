@@ -64,7 +64,7 @@ def return_data(wavfile):
     else:
         '\nFile format not recognised!'
         
-    print 'return_data', alldata[:, 0]
+    #print 'return_data', alldata[:, 0]
     return allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, fmt
 
 def readeqwave(wavfile):
@@ -190,9 +190,9 @@ def readeqwave(wavfile):
     i = 0
     for comp in comps:
         # not sure why this if statement is needed!
-        #print comp
-        if comp.startswith('EH') or comp.startswith('EL') or comp.endswith(' t') or comp.startswith('SP') \
-           or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03'):
+        print comp
+        if comp.startswith('EH') or comp.startswith('v') or comp.startswith('EL') or comp.endswith(' t') or comp.endswith(' T') or comp.startswith('SP') \
+           or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03') or comp.endswith('vel'):
             it = 'H'
             g = 'E'
         
@@ -551,7 +551,7 @@ def readbkn(wavfile):
 # here we use obspy to read miniseed files
 def readseed(st):
     from sys import argv 
-    from numpy import hstack
+    from numpy import hstack, zeros_like, shape
         
     # make data arrays
     allsta = []
@@ -570,6 +570,13 @@ def readseed(st):
     for tr in st:
         if tr.stats['npts'] < min_npts:
             min_npts = tr.stats['npts']
+            
+    # get max samples
+    max_npts = 0
+    for tr in st:
+        if tr.stats['npts'] > max_npts:
+            max_npts = tr.stats['npts']
+            maxarray = tr.data
     
     # populate data arrays
     for i, tr in enumerate(st):
@@ -577,11 +584,11 @@ def readseed(st):
         alldatestr.append(tr.stats['starttime'].strftime("%Y%m%d%H%M%S"))
         allsec.append(tr.stats['starttime'].strftime("%S"))
         allsps.append(tr.stats['sampling_rate'])
-        #allnsamp.append(tr.stats['npts'])
-        allnsamp.append(min_npts)
+        allnsamp.append(tr.stats['npts'])
+        #allnsamp.append(min_npts) # not sure why this line was added!
               
         # get channel 
-        print tr
+        #print tr
         if tr.stats['channel'] == 'HHE' or tr.stats['channel'] == 'HNE' or \
            tr.stats['channel'] == 'BHE' or tr.stats['channel'] == 'ENE' or \
            tr.stats['channel'] == 'EHE' or tr.stats['channel'] == 'SHE' or \
@@ -628,13 +635,17 @@ def readseed(st):
         
         # append comp
         comps.append(comp) 
-            
-        tmpdat = tr.data[0:min_npts]
+        
+        tmpdat = zeros_like(maxarray)
+        #print tr.stats['station'], len(maxarray), tr.stats['npts']
+        tmpdat[0:tr.stats['npts']] = tr.data
+        #print len(tmpdat)
         if i == 0:
-            alldata = tmpdat.reshape(allnsamp[-1],1)
+            alldata = tmpdat.reshape(max_npts,1)
         else:
-            alldata = hstack((alldata, tmpdat.reshape(allnsamp[-1],1)))
+            alldata = hstack((alldata, tmpdat.reshape(max_npts,1)))
             
+    print shape(alldata)
     return allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp
 
 # make text to select channel

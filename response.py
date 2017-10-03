@@ -29,7 +29,7 @@ def get_response_info(sta,recdate,chan):
     if cwd.startswith('/nas'):
         stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'
     else:
-        stalist = '//Users//tallen//Documents//Code//process_waves//stationlist.dat'
+        stalist = '//Users//tallen//Documents//Code//my_codes//stationlist.dat'
         
     stlo = -12345.0
     stla = -12345.0
@@ -287,6 +287,8 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     import numpy as np
     import scipy.signal as signal
     
+    dispResp = False
+    
     #print 'freq', np.shape(freq)
     #print freq
 
@@ -306,7 +308,11 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         #freqstep = freq[1] / 2.
         minf = min(abs(freqdiff))
         #freqindex =[]
-        freqindex = np.where((freqdiff >= minf-10e-5) & (freqdiff <= minf+10e-5))[0]
+        if len(freq) < 10000:
+            freqindex = np.where((freqdiff >= minf-10e-3) & (freqdiff <= minf+10e-3))[0]
+        else:
+            freqindex = np.where((freqdiff >= minf-10e-4) & (freqdiff <= minf+10e-4))[0]
+            
         #print 'freqindex', freqindex
         
         '''
@@ -318,12 +324,22 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         # get amp at normf
         b, a = signal.ltisys.zpk2tf(zeros, poles, 1.0)
         w, resp = signal.freqs(b, a, freq * angc)
+        
+        #constant = 1. / np.absolute(np.interp(normf, freq, resp))
+        #print 'constant', constant, freqindex
+        
         constant = 1. / np.absolute(resp[freqindex[0]])
+        #print 'constant', constant, freqindex[0]
 
     # use normalizing factor from file
     else:
-        angc = 2.0 * np.pi
-        constant *= angc**4
+        constant *= angc**(len(poles)-len(zeros))
+        
+        print '\nUsing normalisation constant =', constant, '\n'
+        
+        if normf == -99.: # displacement response
+            constant *= angc
+            dispResp = True
 
     # combine amp factors
     #print 'Norm Const:', constant
@@ -336,6 +352,15 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     # get shape of response
     b, a = signal.ltisys.zpk2tf(zeros, poles, ampfact)
     w, resp = signal.freqs(b, a, freq * angc)
+    
+    # check if disp response and convert to velocity
+    '''
+    print 'disptrue', dispResp, normf
+    if dispResp == True:
+        print 'disptrue'
+        resp.real *= angc*freq
+        #resp.imag *= angc*freq
+    '''
 
     return resp.real, resp.imag
 
