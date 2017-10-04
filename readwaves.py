@@ -191,7 +191,8 @@ def readeqwave(wavfile):
     for comp in comps:
         # not sure why this if statement is needed!
         print comp
-        if comp.startswith('EH') or comp.startswith('v') or comp.startswith('EL') or comp.endswith(' t') or comp.endswith(' T') or comp.startswith('SP') \
+        if comp.startswith('EH') or comp.startswith('v') or comp.startswith('EL') or comp.endswith(' t') \
+           or comp.endswith(' T') or comp.endswith(' T 5') or comp.startswith('SP') \
            or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03') or comp.endswith('vel'):
             it = 'H'
             g = 'E'
