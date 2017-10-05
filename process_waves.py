@@ -57,7 +57,9 @@ def task_options():
 Common functions to read data file and get instrument parameters
 ****************************************************************************"""
 
-def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp):
+def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed):
+    
+    print len(alldata[:,17])
     # select component
     chan, chan_no = readwaves.select_channel(allsta, comps)
 
@@ -70,8 +72,12 @@ def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp):
     # get channel data of interest
     sta = allsta[chan_no].strip()
     sps = int(allsps[chan_no])
-    chan_dat = alldata[:,chan_no]
-    chan_dat = alldata[chan_no] # edited as of 2017-09-26 to read new eqwave
+    
+    if sacseed == True:
+        chan_dat = alldata[:,chan_no]
+    else:
+        chan_dat = alldata[chan_no] # edited as of 2017-09-26 to read new eqwave
+    
     tmprecdate = allrecdate[chan_no]
     recdate = datetime.strptime(tmprecdate, "%Y%m%d%H%M%S")
 
@@ -228,7 +234,7 @@ while continue_loop == True:
         # do common read functions
         sta, inst_ty, sps, recdate, nat_freq, damping, sen, recsen, gain, chan, \
                 chan_no, chan_dat, stlo, stla, pazfile, alldata, netid = \
-                common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp)
+                common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed)
 
         
         # do common fft functions
