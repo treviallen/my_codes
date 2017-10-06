@@ -206,12 +206,10 @@ def merge_jump_seed(seedfolder, hhmm):
     
     if not isinstance(hhmm, float):
         hhmm = float(hhmm)
-    print hhmm
     #seedfolder = '/Users/tallen/Documents/Earthquake_Data/GA_Network_Data/GHSS/2012171'
-    #hhmm = 1054
-    
-    
-    
+    #hhmm = 0246
+    #print seedfolder, hhmm
+        
     if seedfolder.endswith(sep):
         seedfolder = seedfolder[0:-1]
     

@@ -261,7 +261,7 @@ def write_WA_disp(sta, evdate, sps, wadisp, filename, stla, stlo, \
     f.close()
 
 # this function writes ML estimates to file
-def write_ML_dat(filename, rhyp, repi, logA, R35, HB87, MLM92, A10):
+def write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, MLM92, A10):
     evstacomp = filename.split('.')
     event = evstacomp[0]
     sta = evstacomp[1]
@@ -272,7 +272,7 @@ def write_ML_dat(filename, rhyp, repi, logA, R35, HB87, MLM92, A10):
     outdir = 'ml'
     outfile = os.path.join(outdir,filename)
 
-    header = 'SITE\tCOMP\tRHYP\tREPI\tLOGA\tR35\tHB87\tMLM92\tA10\n'
+    header = 'SITE\tCOMP\tRHYP\tREPI\tLOGA\tR35\tBJ84\tHB87\tMLM92\tA10\n'
     newtxt = ''
 
     # try saving to ml directory
@@ -298,7 +298,8 @@ def write_ML_dat(filename, rhyp, repi, logA, R35, HB87, MLM92, A10):
         if tmp[0] == sta and tmp[1] == comp:
             replacesta = '\t'
             joinstr = (sta, comp,str("%0.1f" % rhyp), str("%0.1f" % repi), str("%0.3f" % logA), \
-                       str("%0.1f" % R35), str("%0.1f" % HB87), str("%0.1f" % MLM92), str("%0.1f" % A10))
+                       str("%0.1f" % R35), str("%0.1f" % BJ84), str("%0.1f" % HB87), \
+                       str("%0.1f" % MLM92), str("%0.1f" % A10))
             replacesta = replacesta.join(joinstr) + '\n'
             newtxt = newtxt + replacesta
             newsta = False
@@ -309,8 +310,9 @@ def write_ML_dat(filename, rhyp, repi, logA, R35, HB87, MLM92, A10):
     # if new station, append to file
     if newsta == True:
         newstastr = '\t'
-        joinstr = (sta, comp, str("%0.1f" % rhyp), str("%0.1f" % repi), str("%0.1f" % logA), \
-                   str("%0.1f" % R35), str("%0.1f" % HB87), str("%0.1f" % MLM92), str("%0.1f" % A10))
+        joinstr = (sta, comp,str("%0.1f" % rhyp), str("%0.1f" % repi), str("%0.3f" % logA), \
+                       str("%0.1f" % R35), str("%0.1f" % BJ84), str("%0.1f" % HB87), \
+                       str("%0.1f" % MLM92), str("%0.1f" % A10))
         newstastr = newstastr.join(joinstr) + '\n'
         newtxt = newtxt + newstastr
 

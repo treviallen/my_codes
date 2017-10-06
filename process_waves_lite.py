@@ -117,8 +117,9 @@ Common FFT functions
 def common_fft(chan_dat, inst_ty, sps, seltask):
     # view wave and trim if necessary
     print chan_dat
-    start_index, stop_index = plotting.trim_wave(chan_dat, sps, inst_ty, False)
-    taper_dat = chan_dat[0,start_index:stop_index]
+    #start_index, stop_index = plotting.trim_wave(chan_dat, sps, inst_ty, False)
+    start_index = 0 
+    taper_dat = chan_dat[0,0:]
     taper_dat = taper_dat.reshape(1, len(taper_dat))
 
     # if doing FFT analysis, trim again to specify exact window
@@ -174,12 +175,7 @@ def common_resp(freq, nat_freq, damping, sen, recsen, gain, wavfft, inst_ty):
 ****************************************************************************"""
 # set boolean opperators
 continue_loop = True
-
-var = raw_input('\nPlot outputs ([y]/n)? > ')
-if var == 'y' or var == '':
-    plot_outputs = True
-elif var == 'n':
-    plot_outputs = False
+plot_outputs = True
 
 # first check to see if obspy installed
 try:
@@ -309,8 +305,8 @@ while continue_loop == True:
         calculate_magnitudes.main(filename, logA, rhyp, eqdep)
 
         # write output to file
-        write_data.write_WA_disp(sta, evdate, sps, wadisp, \
-                 filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq)
+        #write_data.write_WA_disp(sta, evdate, sps, wadisp, \
+        #         filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq)
 
     elif seltask == '6': # export as miniSEED
         print '\nModule not yet functional...'

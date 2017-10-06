@@ -302,13 +302,15 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         # if normalizing frequency also unknown, assume normf = 1.0 Hz
         if normf == -12345:
             normf = 5.0 # maybe change this to 5 Hz to be safe
+        elif normf == -99:
+            dispResp = True
 
         # now find normalizing factor at normf
         freqdiff = freq - normf
         #freqstep = freq[1] / 2.
         minf = min(abs(freqdiff))
         #freqindex =[]
-        if len(freq) < 10000:
+        if len(freq) < 25000:
             freqindex = np.where((freqdiff >= minf-10e-3) & (freqdiff <= minf+10e-3))[0]
         else:
             freqindex = np.where((freqdiff >= minf-10e-4) & (freqdiff <= minf+10e-4))[0]
@@ -329,6 +331,7 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         #print 'constant', constant, freqindex
         
         constant = 1. / np.absolute(resp[freqindex[0]])
+        #constant = 1.0
         #print 'constant', constant, freqindex[0]
 
     # use normalizing factor from file
@@ -345,7 +348,10 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         else:
             constant *= angc**(len(poles)-len(zeros))
         
-
+    print constant, sen
+    if dispResp == True:
+        sen /= angc
+    print constant, sen
     # combine amp factors
     #print 'Norm Const:', constant
     ampfact = sen * recsen * gain * constant

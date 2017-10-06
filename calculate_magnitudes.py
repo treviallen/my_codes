@@ -326,7 +326,13 @@ def main(filename, logA, rhyp, eqdep):
     # export logA values for further analysis
     
     from datetime import datetime
-    logAfile = 'log_A_values.csv'
+    from os import getcwd
+    
+    cwd = getcwd()
+    if cwd.startswith('/nas'):
+        logAfile = '//nas//users//u56903//unix//Code//my_codes//log_A_values.csv'
+    else:
+        logAfile = '//Users//tallen//Documents//Code//my_codes//log_A_values.csv'
     lines = open(logAfile).read()
 
     # append new line                      
