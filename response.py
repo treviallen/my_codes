@@ -339,8 +339,7 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         print '\nUsing normalisation constant =', constant, '\n'
         
         if normf == -99.: # displacement response
-            # because we divide by the response later, we need to get the inverse here
-            print constant, sen
+            #print constant, sen
             cal_freq = 1.0 # assumed
             #constant *= angc #* cal_freq # convert from disp to vel?
             dispResp = True
@@ -348,10 +347,10 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         else:
             constant *= angc**(len(poles)-len(zeros))
         
-    print constant, sen
+    #print constant, sen
     if dispResp == True:
         sen /= angc
-    print constant, sen
+    #print constant, sen
     # combine amp factors
     #print 'Norm Const:', constant
     ampfact = sen * recsen * gain * constant

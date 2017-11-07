@@ -10,6 +10,11 @@ def print_functions():
         if line.find('def') >= 0:
             print line.strip('def ').strip('\n')
             
+
+def load_shape(shpfile):
+    import shapefile
+    return shapefile.Reader(shpfile)
+
 def get_field_index(sf, field):
     fields = sf.fields[1:]
     for i, f in enumerate(fields):
