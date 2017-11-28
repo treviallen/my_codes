@@ -43,7 +43,8 @@ def return_annualised_haz_curves(hazcurvefile):
             imls = array([float(x.split(':')[0]) for x in header])
         except:
             imls = array([float(x.split('-')[-1]) for x in header])
-        metadata = {'imls': imls}
+            periods = array([x.split('-')[0] for x in header])
+        metadata = {'imls': imls, 'periods': periods}
         	
         # get site data
         for line in csvlines[2:]:
