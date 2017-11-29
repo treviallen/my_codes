@@ -213,11 +213,14 @@ def drawshapepoly(m, plt, sf, **kwargs):
                 if x[0] != x[-1] or y[0] != y[-1]:
                     x.append(x[0])
 
-            # plot each polygon
-            xx, yy = m(x,y)
-            if fillshape == True and newfill == True:
-                plt.fill(xx,yy,color=fillcol)
-            m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
+            try:
+              # plot each polygon
+                xx, yy = m(x,y)
+                if fillshape == True and newfill == True:
+                    plt.fill(xx,yy,color=fillcol)
+                m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
+            except:
+                print 'Skipping polygon...'
 
             x = []
             y = []
