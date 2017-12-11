@@ -326,6 +326,7 @@ def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     dists = DistancesContext()
     dists.rrup = array([rrup])
     dists.rjb = array([rjb])
+    dists.rhypo = array([rrup])
     dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
     
     gmpe = ZhaoEtAl2006SInter()
@@ -644,3 +645,66 @@ def read_sa(safile):
            'azim':azim, 'pga':pga, 'pgv':pgv, 'per':T, 'sa':SA}
     
     return rec
+
+# scrift to make gmm tables for updating GMMs
+def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriod, rtype):
+    '''
+    gmmName = OQ GMM string ('GhofraniAtkinson2014Cascadia')
+    gmmClass = model class - parsed from calling gsim2table
+    mags = numpy array of magnitudes
+    dists = numpy array of distances
+    vs30 = base vs30 (if required)
+    extrapPeriod = period to extrapolate to (in log-log space)
+    rtype = distance metric (e.g. rrup, ryhpo, rjb)
+    '''
+    
+    #eval('from openquake.hazardlib.gsim.'+gmmPy+' import '+gmmClass)
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array, sqrt, log, log10, exp
+    
+    if gmmName == 'AtkinsonMacias2009' or gmmName == 'GhofraniAtkinson2014Cascadia' \
+       or gmmName == 'ZhaoEtAl2006SInterCascadia':
+        crust_ty = 'interface'
+    elif gmmName == 'GarciaEtAl2005SSlab' or gmmName == 'ZhaoEtAl2006SSlabCascadia' \
+       or gmmName == 'AtkinsonBoore2003SSlabCascadia':
+        crust_ty = 'inslab'
+    
+    tabtxt = ''
+    for m in mags:
+        for d in distances:
+            sites = SitesContext()
+            sites.vs30 = array([float(vs30)])
+            sites.vs30measured = 0
+            #sites.z1pt0 = exp(28.5 - (3.82/8.)*log(sites.vs30**8 + 378.7**8)) # in m; from ChiouYoungs2008
+            sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
+            sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+            
+            rup = RuptureContext()
+            rup.mag = m
+            rup.hypo_depth = depth
+            #rup.dip = dip
+            #rup.rake = rake
+            #rup.ztor = rup.hypo_depth
+            #rup.width = mag2rupwid_WC94(mag, 'all') # should be checked
+            
+            # Assume all distances are equivalent - distance metric will be stored in tbale header for further interp
+            dists = DistancesContext()
+            dists.rrup = array([d])
+            dists.rjb = array([d])
+            dists.rhypo = array([d]) 
+            
+            #eval('gmpe = '+gmmClass+'()')
+            gmmDat = get_pga_sa(gmmClass, sites, rup, dists, crust_ty)
+            
+            # set text for mag/dist
+            sa = log10(exp(gmmDat['sa']))
+            sastr = ' '.join([str('%0.3f' % x) for x in sa])
+            print sastr
+            tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
+                      + str('%0.3f' % log10(exp(gmmDat['pga'][0]))) + ' '\
+                      + str('%0.3f' % log10(exp(gmmDat['pgv'][0]))) + '\n'
+    
+    f = open('test_table.txt', 'wb')
+    f.write(tabtxt)
+    f.close()
+    return tabtxt

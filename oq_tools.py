@@ -420,6 +420,10 @@ def beta2bval(beta):
     from numpy import log10, exp
     return log10(exp(beta))
 
+def bval2beta(bval):
+    from numpy import log
+    return log(10**bval)
+
 # gets incremental earthquake rates for openquake source files
 def get_oq_incrementalMFD(beta, N0, mmin, mmax, binwid):
     from numpy import arange, exp

@@ -17,6 +17,7 @@ def load_shape(shpfile):
 
 def get_field_index(sf, field):
     fields = sf.fields[1:]
+    findex = -1
     for i, f in enumerate(fields):
         if f[0] == field:
             findex = i
