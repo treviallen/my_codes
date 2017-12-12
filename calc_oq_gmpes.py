@@ -655,7 +655,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriod, rt
     dists = numpy array of distances
     vs30 = base vs30 (if required)
     extrapPeriod = period to extrapolate to (in log-log space)
-    rtype = distance metric (e.g. rrup, ryhpo, rjb)
+    rtype = distance metric string (e.g. rrup, ryhpo, rjb)
     '''
     
     #eval('from openquake.hazardlib.gsim.'+gmmPy+' import '+gmmClass)
@@ -699,12 +699,19 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriod, rt
             # set text for mag/dist
             sa = log10(exp(gmmDat['sa']))
             sastr = ' '.join([str('%0.3f' % x) for x in sa])
-            print sastr
             tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
-                      + str('%0.3f' % log10(exp(gmmDat['pga'][0]))) + ' '\
+                      + str('%0.3f' % log10(exp(gmmDat['pga'][0]))) + ' ' \
                       + str('%0.3f' % log10(exp(gmmDat['pgv'][0]))) + '\n'
+                      
+    # get header info
+    header  = ' '.join((gmmName, 'as implemented in OpenQuake, distance is', rtype+'.','Log10 hazard values in cgs units PGA 0.02 PGV 0.01\n'))
+    header += ' '.join(('         ', str(len(mags)), str(len(distances)), str(len(sa)+2), ': nmag, ndist, nperiod')) + '\n'
+    header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['per']]), '0.02 0.01')) + '\n'
+    header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['sig']]), \
+                        str('%0.3f' % gmmDat['pga'][1][0]), str('%0.3f' % gmmDat['pgv'][1][0]))) + '\n' # natural log
     
-    f = open('test_table.txt', 'wb')
-    f.write(tabtxt)
+    # write to file
+    f = open('.'.join((gmmName,'vs'+str(int(vs30)),'txt')), 'wb')
+    f.write(header+tabtxt)
     f.close()
-    return tabtxt
+    return tabtxt, gmmDat
