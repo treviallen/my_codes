@@ -543,6 +543,67 @@ def shp2gmt(shpfile, outfile, **kwargs):
     tmpfile.close()
 
 
+# writes gmt polygons to shapefile
+def gmt2shp(gmtfile, outshp):
+    import shapefile
+
+    # first parse ascii file
+    lines = open(gmtfile).readlines()
+    
+    i = 0
+    finishShape = False
+    polys = []
+    poly  = []
+    names = []
+    while i < len(lines):
+        
+        # append poly
+        if finishShape == True:
+            if len(poly) > 0:
+                polys.append(poly)
+            poly = []
+            finishShape = False
+            
+        # ignore line
+        elif lines[i].startswith('#') or len(lines[i]) == 0:
+            if lines[i].startswith('#'):
+                names.append(lines[i].strip().split()[1])
+            i += 1
+            
+        # append lat lon
+        else:
+            if lines[i].startswith('>'):
+                finishShape = True
+                
+            else:
+                lonlat = lines[i].strip().split()
+                poly.append([float(lonlat[0]), float(lonlat[1])])
+            i += 1
+    
+    # append last poly
+    polys.append(poly)
+    
+    # now write shapefile
+    w = shapefile.Writer(shapefile.POLYGON)
+    w.field('NAME','C','50')
+    
+    for i, poly in enumerate(polys):
+    
+        # set shape polygon
+        w.line(parts=[poly], shapeType=shapefile.POLYGON)
+            
+        # write new records
+        w.record(names[i])
+    
+    w.save(outshp)
+    
+    # write projection file
+    prjfile = outshp.strip().split('.shp')[0]+'.prj'
+    f = open(prjfile, 'wb')
+    f.write('GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]')
+    f.close()
+
+
 # converts shp points to psxy friently files with labels
 def shp_pt2gmt_pt(shpfile, outfile, labelfield):
     '''

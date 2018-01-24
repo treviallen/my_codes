@@ -1,3 +1,10 @@
+# converts g to cm/s**2
+def g2cgs(gin):
+    from scipy.constants import g
+    from numpy import array
+    return array(gin) * 100. * g
+
+
 # does the IM calculation given input GMPE, source and site info
 def get_pga_sa(gmpe, sites, rup, dists, crust_ty):
     from openquake.hazardlib.imt import PGA, PGV, SA
@@ -509,7 +516,7 @@ def gaull1990_gsim(mag, dep, rhypo):
     
     return G90WAimt, G90SEAimt, G90WA_PGVimt, G90SEA_PGVimt
     
-def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30, hdf5file):
+def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     from openquake.hazardlib.gsim.gsim_table import GMPETable
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -532,7 +539,7 @@ def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30, hdf5file):
     dists = DistancesContext()
     dists.rrup = rrup
     dists.rjb = rjb
-    #dists.rhypo = rhypo
+    dists.rhypo = rhypo
     dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
         
     gmpe = GMPETable(gmpe_table = hdf5file) # use full path
@@ -669,7 +676,6 @@ def get_extrap_ratio(extrapDat, targetDat, maxPer, extrapPer):
     # now return extrapolated GM
     return targetDat['sa'][-1] - logRat
 
-
 # scrift to make gmm tables for updating GMMs
 def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, rtype):
     '''
@@ -701,7 +707,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
         gmpeExtrap = AbrahamsonEtAl2015SSlab()
     
     tabtxt = ''
-    for m in mags:
+    for i, m in enumerate(mags):
         for d in distances:
             sites = SitesContext()
             sites.vs30 = array([float(vs30)])
@@ -729,12 +735,10 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
             #eval('gmpe = '+gmmClass+'()')
             gmmDat = get_pga_sa(gmmClass, sites, rup, dists, crust_ty)
             
-            # set text for mag/dist
-            sa = log10(exp(gmmDat['sa']))
-            
             # determine if extrapolation should be performed - if so extrapolate based on well-known GMMs (empeExtrap)
             for ep in extrapPeriods:
                 if ep > max(gmmDat['per']):
+                    #print maxPer, ep
                     maxPer = max(gmmDat['per'])
                     # get extrapolated sa
                     extrapDat = get_pga_sa(gmpeExtrap, sites, rup, dists, crust_ty)
@@ -742,29 +746,36 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
                     
                     gmmDat['per'].append(ep)
                     gmmDat['sa'].append(extrapSA)
-                    
-                    
+                    gmmDat['sig'].append(gmmDat['sig'][-1]) # extrapolate sigma
+            
+            # set text for mag/dist
+            # convert ln g to cm/s**2 as required for table builder
+            sa = log10(g2cgs(exp(gmmDat['sa'])))
             sastr = ' '.join([str('%0.3f' % x) for x in sa])
+            #print ' '.join([str('%0.3f' % x) for x in sa])
+            
             try:
                 doPGV = True
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
-                          + str('%0.3f' % log10(exp(gmmDat['pga'][0]))) + ' ' \
+                          + str('%0.3f' % log10(g2cgs(exp(gmmDat['pga'][0])))) + ' ' \
                           + str('%0.3f' % log10(exp(gmmDat['pgv'][0]))) + '\n'
+                
             except:
                 doPGV = False
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
-                          + str('%0.3f' % log10(exp(gmmDat['pga'][0]))) + '\n'
+                          + str('%0.3f' % log10(g2cgs(exp(gmmDat['pga'][0])))) + '\n'
                       
     # get header info
     header  = ' '.join((gmmName, 'as implemented in OpenQuake, distance is', rtype+'.','Log10 hazard values in cgs units\n'))
-    header += ' '.join(('         ', str(len(mags)), str(len(distances)), str(len(sa)+2), ': nmag, ndist, nperiod')) + '\n'
     
     if doPGV == True:
+        header += ' '.join(('         ', str(len(mags)), str(len(distances)), str(len(sa)+2), ': nmag, ndist, nperiod')) + '\n'
         header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['per']]), 'PGA PGV')) + '\n'
         header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['sig']]), \
                             str('%0.3f' % gmmDat['pga'][1][0]), str('%0.3f' % gmmDat['pgv'][1][0]))) + '\n' # natural log
                             
     else:
+        header += ' '.join(('         ', str(len(mags)), str(len(distances)), str(len(sa)+1), ': nmag, ndist, nperiod')) + '\n'
         header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['per']]), 'PGA')) + '\n'
         header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['sig']]), \
                             str('%0.3f' % gmmDat['pga'][1][0]))) + '\n' # natural log
