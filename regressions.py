@@ -3,8 +3,10 @@ import scipy.odr.odrpack as odrpack
 
 
 
-def quadratic_vertex(x, y, vertex, *kwargs):
-    
+def quadratic_vertex(x, y, vertex):
+    from scipy.odr import Data, Model, ODR, models
+    import scipy.odr.odrpack as odrpack
+
     def fit_quadratic_vertex(c, x):
     
         xx = x - vertex
