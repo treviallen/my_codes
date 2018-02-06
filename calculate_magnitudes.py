@@ -219,7 +219,13 @@ def calc_A10(comp, logA, rhyp):
     
 def calc_A16(logA, rhyp, comp):
     from numpy import loadtxt, log10
-    coeffile = '//Users//tallen//Dropbox//Magnitudes//2016_working//A16_coeffs.txt'
+    from os import getcwd
+    cwd = getcwd()
+    if cwd.startswith('/nas'):
+        coeffile = '/nas/gemd/ehp/georisk_earthquake/hazard/Magnitudes/2017_SEA_ML_working//A16_coeffs.txt'
+    else:
+        coeffile = '//Users//tallen//Dropbox//Magnitudes//2016_working//A16_coeffs.txt'
+        
     dat = loadtxt(coeffile)
     b1 = dat[0]
     b2 = dat[1]
@@ -361,7 +367,25 @@ def get_WA_amps(dism_nm, domfreq):
     
     #wa_amp = mm_vel / (2*pi*domfreq)
     
-    return wa_disp_mm
+    return wa_disp_mm, magfact
+
+# calculates MLM92 magnitude from period and amplitude data
+def calc_ML_from_ATdata(disp_nm, domT, rhyp, depth):
+    from numpy import log10, sqrt
+    
+    domfreq = 1. / domT
+    
+    repi = sqrt(rhyp**2 - depth**2)
+    
+    wa_disp_mm, magfact = get_WA_amps(disp_nm, domfreq)
+    
+    comp = 0 # assume vertical
+    
+    MLM92 = calc_MLM92(comp, log10(wa_disp_mm), rhyp)
+    R35 = calc_R35(comp, log10(wa_disp_mm), repi)
+    
+    return R35, MLM92, wa_disp_mm, magfact
+    
        
 # get Wood-Anderson magnification factor for given frequency     
 def getWAmagnification(domfreq):

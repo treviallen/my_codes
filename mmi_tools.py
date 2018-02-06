@@ -122,11 +122,11 @@ def mmi2pgm_worden12(mmi, pgm, mag, rrup):
         logpgmsig = 0.69
     
     # do calc - first calc all
-    value = [10**((mmi - c1) / c2)]
+    value = 10**((mmi - c1) / c2)
     # now check if mmi > t2
     idx = where(mmi > t2)[0]
     print idx, value, mmi
-    value[idx] = 10**(([mmi][idx] - c3) / c4)
+    value[idx] = 10**((mmi[idx] - c3) / c4)
     return value, logpgmsig
 
 # do Worden et al 2012 GMICE
