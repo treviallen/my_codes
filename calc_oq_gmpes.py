@@ -679,7 +679,7 @@ def get_extrap_ratio(extrapDat, targetDat, maxPer, extrapPer):
 # scrift to make gmm tables for updating GMMs
 def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, rtype):
     '''
-    gmmName = OQ GMM string ('GhofraniAtkinson2014Cascadia')
+    gmmName = OQ GMM string (e.g. 'GhofraniAtkinson2014Cascadia')
     gmmClass = model class - parsed from calling gsim2table
     mags = numpy array of magnitudes
     dists = numpy array of distances
@@ -690,7 +690,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
     
     #eval('from openquake.hazardlib.gsim.'+gmmPy+' import '+gmmClass)
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array, sqrt, log, log10, exp
+    from numpy import array, sqrt, log, log10, exp, interp
     
     if gmmName == 'AtkinsonMacias2009' or gmmName == 'GhofraniAtkinson2014Cascadia' \
        or gmmName == 'ZhaoEtAl2006SInterCascadia':
@@ -705,6 +705,8 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
         # import extrap GMM
         from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
         gmpeExtrap = AbrahamsonEtAl2015SSlab()
+        
+    
     
     tabtxt = ''
     for i, m in enumerate(mags):
@@ -752,7 +754,27 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
             # convert ln g to cm/s**2 as required for table builder
             sa = log10(g2cgs(exp(gmmDat['sa'])))
             sastr = ' '.join([str('%0.3f' % x) for x in sa])
-            #print ' '.join([str('%0.3f' % x) for x in sa])
+            
+            # get log10 Sa in g
+            sag = log10(exp(gmmDat['sa']))
+            
+            # estimate PGV in case needed
+            # get coefs for calculating PGV - PGV is log cm/s, Sa is log g
+            if crust_ty == 'interface':
+                # use ~2 sec
+                c0 = 0.897
+                c1 = 2.10
+                
+                sa20 = interp(2.0, log(gmmDat['per']), sag)
+                proxyPGV = c0 * sa20 + c1
+                
+            else:
+                # for other crust types based on BSSA at SA 0.5 sec
+                c0 = 1.07
+                c1 = 1.83
+                    
+                sa05 = interp(2.0, log(gmmDat['per']), sag)
+                proxyPGV = c0 * sa05 + c1
             
             try:
                 doPGV = True
@@ -762,8 +784,10 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
                 
             except:
                 doPGV = False
+                
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
-                          + str('%0.3f' % log10(g2cgs(exp(gmmDat['pga'][0])))) + '\n'
+                          + str('%0.3f' % log10(g2cgs(exp(gmmDat['pga'][0])))) + ' ' \
+                          + str('%0.3f' % proxyPGV) + '\n'
                       
     # get header info
     header  = ' '.join((gmmName, 'as implemented in OpenQuake, distance is', rtype+'.','Log10 hazard values in cgs units\n'))
@@ -776,9 +800,9 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
                             
     else:
         header += ' '.join(('         ', str(len(mags)), str(len(distances)), str(len(sa)+1), ': nmag, ndist, nperiod')) + '\n'
-        header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['per']]), 'PGA')) + '\n'
+        header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['per']]), 'PGA PGV')) + '\n'
         header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['sig']]), \
-                            str('%0.3f' % gmmDat['pga'][1][0]))) + '\n' # natural log
+                            str('%0.3f' % gmmDat['pga'][1][0]), 'PGVsig')) + '\n' # natural log
     
     # write to file
     print '\nWriting table:', '.'.join((gmmName,'vs'+str(int(vs30)),'txt'))

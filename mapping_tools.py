@@ -387,6 +387,22 @@ def labelpolygon(m, plt, sf, field, **kwargs):
                 centroidy.append(shape.points[j][1])
             tx, ty = m(mean(centroidx),mean(centroidy))
         '''
+
+def labelCentroid(plt, m, txt, fsize, xarray, yarray, xoff):
+    from shapely.geometry import Polygon
+    
+    col = 'k'
+    
+    # make pts array
+    pts = []
+    for x, y in zip(xarray, yarray):
+        pts.append([x+xoff, y])
+    
+    centroid = Polygon(pts).centroid.wkt
+    centroid = centroid.strip('PIONT').replace('(',' ').replace(')',' ').split()
+    tx, ty = m(float(centroid[0]),float(centroid[1]))
+    plt.text(tx, ty, txt, size=fsize, color=col, va='center', ha='center')
+
     
 # join two epicentres with a line
 def joinpoints(m,plt,joinfile):
