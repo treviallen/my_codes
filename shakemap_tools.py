@@ -75,7 +75,22 @@ def parse_dataxml(datxml):
             print subchild.attrib
         '''
     return stndict
+    
 
+def station_xml2csv(stationxml, stationcsv):
+    from shakemap_tools import parse_dataxml
+    
+    stadict = parse_dataxml(stationxml)
+    
+    csvtxt = 'CODE,LON,LAT,MMI,SOURCE\n'
+    for sta in stadict:
+        csvtxt += ','.join((sta['code'], str('%0.4f' % float(sta['lon'])), str('%0.4f' % float(sta['lat'])), \
+                           sta['intensity'], sta['source'])) + '\n'
+    
+    f = open(stationcsv, 'wb')
+    f.write(csvtxt)
+    f.close()
+        
 # parse fault files
 def parse_faultdat(faultfile):
     from numpy import nan
