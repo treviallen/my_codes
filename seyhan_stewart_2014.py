@@ -12,6 +12,9 @@ def seyhan_stewart_getcoefs(T):
     # coeficients from Boore etal (2014) NGA-West2 GMPE
     # fmt = T, c, Vc, Vref, f1, f3, f4, f5
     
+    for PGA, T = 0.0
+    for PGV, T = -1.0
+    
     Seyhan, E., and J. P. Stewart (2014). Semi-empirical nonlinear site 
     amplification from NGA-West 2 data and simulations, Earthq. Spectra, 
     http://dx.doi.org/10.1193/063013EQS181M.
@@ -128,8 +131,11 @@ def seyhan_stewart_getcoefs(T):
             10.   	-6.56E-01	775	760	0	0.1	0.00E+00	-1.36E-03    
             """)
             
+    
     if T == 0.0:
         ct = COEFFS[imt.PGA()]
+    elif T == -1.0:
+        ct = COEFFS[imt.PGV()]
     else:
         ct = COEFFS[imt.SA(damping=5, period=T)]
 

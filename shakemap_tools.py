@@ -102,8 +102,9 @@ def parse_faultdat(faultfile):
     faultdat = []
     for line in txt:
         if line[0].strip() != '>' and len(line[0].strip()) > 0:
-            lat.append(float(line.strip().split()[0]))
-            lon.append(float(line.strip().split()[1]))
+            
+            lat.append(float(line.strip().split()[1])) 
+            lon.append(float(line.strip().split()[0]))
             if len(line.strip().split()) > 2:
                 dep.append(float(line.strip().split()[2]))
             else:
@@ -132,7 +133,7 @@ def make_fault_mesh(faultfile, res):
     from mapping_tools import get_line_parallels, distance, reckon
     from numpy import array, arcsin, argsort, argwhere, abs, radians, arange, ceil, sqrt, unique, tan
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
+    #from mpl_toolkits.mplot3d import Axes3D
     #fig = plt.figure()
     #ax = Axes3D(fig)
     #ax.view_init(60, 210)
@@ -148,7 +149,7 @@ def make_fault_mesh(faultfile, res):
         lon = sf['lon']
         dep = sf['dep']
 
-        ax.scatter(lon, lat, -1*array(dep), marker='o', color = 'b')
+        #ax.scatter(lon, lat, -1*array(dep), marker='o', color = 'b')
 
     #    unidep = unique(dep) # not used, but will be useful
 

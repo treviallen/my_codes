@@ -520,6 +520,8 @@ def distance(lat1, lon1, lat2, lon2):
     #from obspy.core.util.geodetics import gps2DistAzimuth
     from obspy.geodetics.base import gps2dist_azimuth
     
+    #print lat1, lon1, lat2, lon2
+    
     #rngm, az, baz = gps2DistAzimuth(lat1, lon1, lat2, lon2)
     rngm, az, baz = gps2dist_azimuth(lat1, lon1, lat2, lon2)
     

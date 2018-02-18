@@ -677,13 +677,14 @@ def get_extrap_ratio(extrapDat, targetDat, maxPer, extrapPer):
     return targetDat['sa'][-1] - logRat
 
 # scrift to make gmm tables for updating GMMs
-def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, rtype):
+def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapPeriods, rtype):
     '''
     gmmName = OQ GMM string (e.g. 'GhofraniAtkinson2014Cascadia')
     gmmClass = model class - parsed from calling gsim2table
     mags = numpy array of magnitudes
     dists = numpy array of distances
-    vs30 = base vs30 (if required)
+    vs30 = target vs30 (if required)
+    vs30ref = reference vs30 for GMM - if using GMM with vs30, set vs30ref = vs30
     extrapPeriod = list of periods to extrapolate to (in log-log space)
     rtype = distance metric string (e.g. rrup, ryhpo, rjb)
     '''
@@ -691,6 +692,9 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
     #eval('from openquake.hazardlib.gsim.'+gmmPy+' import '+gmmClass)
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, log10, exp, interp
+    from seyhan_stewart_2014 import seyhan_stewart_siteamp
+    
+    ss14vsref = 760. # m/s
     
     if gmmName == 'AtkinsonMacias2009' or gmmName == 'GhofraniAtkinson2014Cascadia' \
        or gmmName == 'ZhaoEtAl2006SInterCascadia':
@@ -734,8 +738,39 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
             dists.rhypo = array([d]) 
             dists.rvolc = array([100.]) # assume backarc distance of 100 km
             
-            #eval('gmpe = '+gmmClass+'()')
+            # get SA for given mag & distance
             gmmDat = get_pga_sa(gmmClass, sites, rup, dists, crust_ty)
+            
+            #######################################################################################
+            
+            # do site class correction  if needed
+            if vs30 != vs30ref:
+                
+                # first SS14 amplification factors to correct to SS14 ref = 760 m/s
+                tmpamps = []
+                for t in gmmDat['per']:
+                    tmpamps.append(seyhan_stewart_siteamp(ss14vsref, t, exp(gmmDat['pga'][0]))[0])
+                
+                vsrefSAcorr = array(tmpamps)
+                vsrefPGAcorr = seyhan_stewart_siteamp(ss14vsref, 0.0, exp(gmmDat['pga'][0]))
+                vsrefPGVcorr = seyhan_stewart_siteamp(ss14vsref, -1.0, exp(gmmDat['pga'][0]))
+                
+                # now get SS14 amplification factors from 760 to target vs30 m/s
+                tmpamps = []
+                for t in gmmDat['per']:
+                    tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(gmmDat['pga'][0]))[0])
+                
+                
+                vstargSAcorr = array(tmpamps)
+                vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(gmmDat['pga'][0]))
+                vstargPGVcorr = seyhan_stewart_siteamp(vs30, -1.0, exp(gmmDat['pga'][0]))
+                
+                # now correct gmmDat
+                gmmDat['sa'] = list(log(exp(gmmDat['sa']) * vstargSAcorr / vsrefSAcorr))
+                gmmDat['pga'][0][0] = log(exp(gmmDat['pga'][0][0]) * vstargPGAcorr / vsrefPGAcorr)
+                gmmDat['pgv'][0][0] = log(exp(gmmDat['pgv'][0][0]) * vstargPGVcorr / vsrefPGVcorr)
+            
+            #######################################################################################
             
             # determine if extrapolation should be performed - if so extrapolate based on well-known GMMs (empeExtrap)
             for ep in extrapPeriods:
@@ -750,10 +785,14 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
                     gmmDat['sa'].append(extrapSA)
                     gmmDat['sig'].append(gmmDat['sig'][-1]) # extrapolate sigma
             
+            #######################################################################################
+            
             # set text for mag/dist
             # convert ln g to cm/s**2 as required for table builder
             sa = log10(g2cgs(exp(gmmDat['sa'])))
             sastr = ' '.join([str('%0.3f' % x) for x in sa])
+            
+            #######################################################################################
             
             # get log10 Sa in g
             sag = log10(exp(gmmDat['sa']))
@@ -765,7 +804,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
                 c0 = 0.897
                 c1 = 2.10
                 
-                sa20 = interp(2.0, log(gmmDat['per']), sag)
+                sa20 = interp(log10(2.0), log(gmmDat['per']), sag)
                 proxyPGV = c0 * sa20 + c1
                 
             else:
@@ -773,14 +812,14 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, extrapPeriods, r
                 c0 = 1.07
                 c1 = 1.83
                     
-                sa05 = interp(2.0, log(gmmDat['per']), sag)
+                sa05 = interp(log10(0.5), log(gmmDat['per']), sag)
                 proxyPGV = c0 * sa05 + c1
             
             try:
                 doPGV = True
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
                           + str('%0.3f' % log10(g2cgs(exp(gmmDat['pga'][0])))) + ' ' \
-                          + str('%0.3f' % log10(exp(gmmDat['pgv'][0]))) + '\n'
+                          + str('%0.3f' % log10(exp(gmmDat['pgv'][0][0]))) + '\n'
                 
             except:
                 doPGV = False
