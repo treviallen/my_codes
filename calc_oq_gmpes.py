@@ -290,9 +290,9 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
     # prepare Atkinson & Adams 2013
     #repi = sqrt(rrup**2 - dep**2)
-    AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
+    #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
 
-    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06CISimt, MP10imt, AA13imt, Aea15imt, Zea16imt #, AA13imt #, Aea15imt, Zea06CISimt, 
+    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06CISimt, MP10imt, Aea15imt, Zea16imt #, AA13imt #, Aea15imt, Zea06CISimt, 
 
 # calls and calculates candidate interface GMPEs - values returned in ln(g)
 def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):

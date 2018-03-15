@@ -388,6 +388,17 @@ def labelpolygon(m, plt, sf, field, **kwargs):
             tx, ty = m(mean(centroidx),mean(centroidy))
         '''
 
+# Add background to text to highlight
+def addTextOutline(textHandle, lineWidth, backColour):
+    '''
+    e.g.:
+        textHandle = plt.text(2,2,'This is a test', size=11, color='black')
+    '''
+
+    import matplotlib.patheffects as PathEffects
+    txt.set_path_effects([PathEffects.withStroke(linewidth=lineWidth, foreground=backColour)])
+
+
 def labelCentroid(plt, m, txt, fsize, xarray, yarray, xoff):
     from shapely.geometry import Polygon
     
@@ -455,6 +466,25 @@ def reckon(lat1d, lon1d, rngkm, brngd):
     lon2d = degrees(lon2r)
     
     return [lon2d, lat2d]
+
+# check to see if a point is inside a polygon
+def checkPointInPoly(shpfile, lon, lat):
+    import shapefile
+    from shapely.geometry import Point, Polygon
+
+        
+    #parese shapefile
+    sf = shapefile.Reader(shpfile)
+    shapes = sf.shapes()
+    poly = Polygon(shapes[0].points)
+    
+    pt = Point(lon, lat)
+    
+    if pt.within(poly):
+        value = True
+    else:
+        value = False
+    return value
     
 def get_line_parallels(pts, rngkm):
     from obspy.core.util.geodetics import gps2DistAzimuth
