@@ -148,7 +148,6 @@ def seyhan_stewart_siteamp(vs30, T, pgar):
     
     factor returned is in non-log units
     
-    
     '''
     from numpy import exp, log
     

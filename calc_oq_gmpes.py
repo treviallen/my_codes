@@ -90,8 +90,9 @@ def get_pga_sa(gmpe, sites, rup, dists, crust_ty):
     imt['sig'] = []
     imt['inter'] = []
     imt['intra'] = []
+    
     for p in imt['per']:
-        #print p
+        
         satmp = array([gmpe.get_mean_and_stddevs(sites, rup, dists, SA(p), [StdDev.TOTAL])[0][0]])
         '''
         try:
@@ -450,10 +451,10 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     
     crust_ty = 'ena'
     
-    AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
+    #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
     #AA13imt = []
 
-    return Tea02imt, C03imt, AB06imt, CY08imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, AA13imt, Bea14imt, YA15imt, SP16imt
+    return Tea02imt, C03imt, AB06imt, CY08imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt, YA15imt, SP16imt # AA13imt, 
 
 def allen2012_gsim(mag, dep, rrup):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
@@ -684,7 +685,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     mags = numpy array of magnitudes
     dists = numpy array of distances
     vs30 = target vs30 (if required)
-    vs30ref = reference vs30 for GMM - if using GMM with vs30, set vs30ref = vs30
+    vs30ref = reference vs30 for GMM - if using GMM with vs30 parameterisation, set vs30ref = vs30
     extrapPeriod = list of periods to extrapolate to (in log-log space)
     rtype = distance metric string (e.g. rrup, ryhpo, rjb)
     '''
@@ -693,18 +694,20 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, log10, exp, interp
     from seyhan_stewart_2014 import seyhan_stewart_siteamp
+    from atkinson_boore_site_2006 import atkinson_boore_siteamp
     
     ss14vsref = 760. # m/s
+    ab06vsref = 760. # m/s
     
     if gmmName == 'AtkinsonMacias2009' or gmmName == 'GhofraniAtkinson2014Cascadia' \
-       or gmmName == 'ZhaoEtAl2006SInterCascadia':
+       or gmmName == 'ZhaoEtAl2006SInterCascadia' or gmmName == 'AbrahamsonEtAl2015SInter':
         crust_ty = 'interface'
         # import extrap GMM
         from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SInter
         gmpeExtrap = AbrahamsonEtAl2015SInter()
         
     elif gmmName == 'GarciaEtAl2005SSlab' or gmmName == 'ZhaoEtAl2006SSlabCascadia' \
-       or gmmName == 'AtkinsonBoore2003SSlabCascadia':
+       or gmmName == 'AtkinsonBoore2003SSlabCascadia' or gmmName == 'AbrahamsonEtAl2015SSlab':
         crust_ty = 'inslab'
         # import extrap GMM
         from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
@@ -721,7 +724,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
             #sites.z1pt0 = exp(28.5 - (3.82/8.)*log(sites.vs30**8 + 378.7**8)) # in m; from ChiouYoungs2008
             sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
             sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
-            sites.backarc = [0.] # assume not backarc
+            sites.backarc = [False] # assume not backarc
             
             rup = RuptureContext()
             rup.mag = m
@@ -743,28 +746,63 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
             
             #######################################################################################
             
-            # do site class correction  if needed
+            # do site class correction if needed
+            '''
+            note: this is a simplification - to do properly where vs30ref > 760 and vs30 < vsref, 
+                  should first correct to 760 using AB06, then amplify by SS14
+            '''
             if vs30 != vs30ref:
                 
-                # first SS14 amplification factors to correct to SS14 ref = 760 m/s
-                tmpamps = []
-                for t in gmmDat['per']:
-                    tmpamps.append(seyhan_stewart_siteamp(ss14vsref, t, exp(gmmDat['pga'][0]))[0])
-                
-                vsrefSAcorr = array(tmpamps)
-                vsrefPGAcorr = seyhan_stewart_siteamp(ss14vsref, 0.0, exp(gmmDat['pga'][0]))
-                vsrefPGVcorr = seyhan_stewart_siteamp(ss14vsref, -1.0, exp(gmmDat['pga'][0]))
-                
-                # now get SS14 amplification factors from 760 to target vs30 m/s
-                tmpamps = []
-                for t in gmmDat['per']:
-                    tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(gmmDat['pga'][0]))[0])
-                
-                
-                vstargSAcorr = array(tmpamps)
-                vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(gmmDat['pga'][0]))
-                vstargPGVcorr = seyhan_stewart_siteamp(vs30, -1.0, exp(gmmDat['pga'][0]))
-                
+                if vs30 <= vs30ref:
+                    # first SS14 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
+                    tmpamps = []
+                    for t in gmmDat['per']:
+                        tmpamps.append(seyhan_stewart_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
+                    
+                    vsrefSAcorr = array(tmpamps)
+                    vsrefPGAcorr = seyhan_stewart_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
+                    vsrefPGVcorr = seyhan_stewart_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
+                    
+                    # correct PGA at GMM refernce vs30 to SS14 760 m/s
+                    refPGA_SS14 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
+                    
+                    # now get SS14 amplification factors from 760 to target vs30 m/s
+                    tmpamps = []
+                    for t in gmmDat['per']:
+                        tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_SS14))[0]) # note - may need to adjust PGA here
+                    
+                    vstargSAcorr = array(tmpamps)
+                    vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(refPGA_SS14))
+                    vstargPGVcorr = seyhan_stewart_siteamp(vs30, -1.0, exp(refPGA_SS14))
+                    
+                # else, use AB06 for harder sites
+                else:
+                    # first AB06 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
+                    tmpamps = []
+                    for t in gmmDat['per']:
+                        #print 'PGA1', t, m, d, vs30ref, vs30, gmmDat['pga'][0], atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))
+                        try:
+                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
+                        except:
+                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))) # have no idea why i have to do this!
+                    
+                    vsrefSAcorr = array(tmpamps)
+                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
+                    vsrefPGVcorr = atkinson_boore_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
+                    
+                    # correct PGA at GMM refernce vs30 to AB06 760 m/s
+                    refPGA_AB06 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
+                    
+                    # now get AB06 amplification factors from 760 to target vs30 m/s
+                    tmpamps = []
+                    for t in gmmDat['per']:
+                        #print 'PGA2', t, m, d, vs30ref, vs30, refPGA_AB06, atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06))
+                        tmpamps.append(atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06)[0]))
+                    
+                    vstargSAcorr = array(tmpamps)
+                    vstargPGAcorr = atkinson_boore_siteamp(vs30, 0.0, exp(refPGA_AB06))
+                    vstargPGVcorr = atkinson_boore_siteamp(vs30, -1.0, exp(refPGA_AB06))
+                        
                 # now correct gmmDat
                 gmmDat['sa'] = list(log(exp(gmmDat['sa']) * vstargSAcorr / vsrefSAcorr))
                 gmmDat['pga'][0][0] = log(exp(gmmDat['pga'][0][0]) * vstargPGAcorr / vsrefPGAcorr)
@@ -790,6 +828,8 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
             # set text for mag/dist
             # convert ln g to cm/s**2 as required for table builder
             sa = log10(g2cgs(exp(gmmDat['sa'])))
+            
+            #print gmmDat['sa']
             sastr = ' '.join([str('%0.3f' % x) for x in sa])
             
             #######################################################################################
@@ -844,8 +884,8 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                             str('%0.3f' % gmmDat['pga'][1][0]), 'PGVsig')) + '\n' # natural log
     
     # write to file
-    print '\nWriting table:', '.'.join((gmmName,'vs'+str(int(vs30)),'txt'))
-    f = open('.'.join((gmmName,'vs'+str(int(vs30)),'txt')), 'wb')
+    print '\nWriting table:', '.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt'))
+    f = open('.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt')), 'wb')
     f.write(header+tabtxt)
     f.close()
     return tabtxt, gmmDat
