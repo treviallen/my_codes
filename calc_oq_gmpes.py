@@ -750,6 +750,8 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
             '''
             note: this is a simplification - to do properly where vs30ref > 760 and vs30 < vsref, 
                   should first correct to 760 using AB06, then amplify by SS14
+                  
+                  I think this is now taken care of, but will need to check!
             '''
             if vs30 != vs30ref:
                 
@@ -769,7 +771,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     # now get SS14 amplification factors from 760 to target vs30 m/s
                     tmpamps = []
                     for t in gmmDat['per']:
-                        tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_SS14))[0]) # note - may need to adjust PGA here
+                        tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_SS14))[0]) 
                     
                     vstargSAcorr = array(tmpamps)
                     vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(refPGA_SS14))
