@@ -384,7 +384,12 @@ def calc_ML_from_ATdata(disp_nm, domT, rhyp, depth):
     MLM92 = calc_MLM92(comp, log10(wa_disp_mm), rhyp)
     R35 = calc_R35(comp, log10(wa_disp_mm), repi)
     
-    return R35, MLM92, wa_disp_mm, magfact
+    # try using alternative W-A factors
+    wafact = 2900./2080.
+    MLM92_oldfact = calc_MLM92(comp, log10(wa_disp_mm*wafact), rhyp)
+    R35_oldfact = calc_R35(comp, log10(wa_disp_mm*wafact), repi)
+    
+    return R35, MLM92, R35_oldfact, MLM92_oldfact, wa_disp_mm, magfact
     
        
 # get Wood-Anderson magnification factor for given frequency     

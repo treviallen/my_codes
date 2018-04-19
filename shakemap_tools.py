@@ -421,4 +421,81 @@ def make_shakemap_stationlist_xml():
     f.close()
     
             
+# this needs work!!!!
+def csv2stationlist_xml(csvfile, eqla, eqlo, dep, mag, yyyymmddHHMMSS, locstring):
+    from numpy import interp
+    from roman import toRoman
+    from mapping_tools import distance
+    from mmi_tools import mmi2pgm_worden12, cmpsps2g
+    import time
+    
+    print yyyymmddHHMMSS
+    '''
+    csvfile format with one header line:
+        LAT, LON, MMI
+    '''
+    
+    # get station data
+    lines = open(csvfile).readlines()[1:]
+    lat = []
+    lon = []
+    mmi = []
+    for line in lines:
+        dat = line.strip().split(',')
+        lat.append(dat[0]) # keep as string
+        lon.append(dat[1]) # keep as string
+        mmi.append(float(dat[2]))
+    
+    # make earthquake header
+    smtxt = '<shakemap-data code_version="4.0 GSM" map_version="1">\n'
+    earthquake = ''.join(('<earthquake id="', str(yyyymmddHHMMSS), '" lat="', str(eqla), '" lon="', \
+                           str(eqlo), '" mag="', str(mag), '" year="', str(yyyymmddHHMMSS)[0:4], '" month="', str(yyyymmddHHMMSS)[4:6], \
+                           '" day="', str(yyyymmddHHMMSS)[6:8], '" hour="', str(yyyymmddHHMMSS)[8:10], '" minute="', str(yyyymmddHHMMSS)[10:12], \
+                           '" second="', str(yyyymmddHHMMSS)[12:], '" timezone="GMT" depth="', str(dep), \
+                           '" locstring="', locstring, '" created="', str(int(time.time())), '"/>\n'))
+    
+    endtxt = '</stationlist>\n</shakemap-data>'
+    
+    smtxt += earthquake + '<stationlist created="' + str(int(time.time())) + '">\n'
+    
+    # now loop thru station data and get GM values
+    i = 0
+    # get stn loc
+    for la, lo, mi in zip(lat, lon, mmi):
+        code = 'OBS_'+str(i)
+        source = 'AU'
+        netid  = 'Intensity'
+        name = 'Unknown (Intensity ' + toRoman(round(mi)) +')'
+        
+        station = '"'.join(('<station code=', code, ' name=', name, ' insttype="Observed"', \
+                            ' lat=', la, ' lon=', lo, ' source=', source, \
+                            ' netid=', netid, ' commtype="UNK">\n'))
+
+        smtxt += station
+
+        # get distance
+        rngkm = distance(float(la), float(lo), float(eqla), float)        
+        
+        # make mmi comp
+        pga = cmpsps2g(mmi2pgm_worden12(mi, 'pga', float(mag), rngkm)[0])
+        pgv = (mmi2pgm_worden12(mi, 'pgv', mag, rngkm)[0])
+        
+        acc = str('%0.4f' % pga)
+        vel = str('%0.4f' % pgv)
+        smtxt += '"'.join(('<    comp name="DERIVED">\n        <acc value=', acc, '/>\n        <vel value=', \
+                          vel, '/>\n    </comp>\n</station>\n'))
+
+           
+        i += 1
+
+    # end text
+    smtxt += endtxt
+    
+    # write to text
+    f = open(str(yyyymmddHHMMSS)+'_dat.xml', 'wb')
+    f.write(smtxt)
+    f.close()
+    
+            
+                                      
                           
