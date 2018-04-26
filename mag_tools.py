@@ -33,7 +33,7 @@ def nsha18_ml2mw(ml):
     c = 1.39485216
     
     # get Mw
-    return = a*ml**2 + b*ml + c
+    return a*ml**2 + b*ml + c
 
 # from Mueller (pers comm) - from Sipkin SRL 2003
 def sipkin_mb2mw(mb):

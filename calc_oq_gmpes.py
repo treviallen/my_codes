@@ -753,9 +753,10 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                   
                   I think this is now taken care of, but will need to check!
             '''
+            # if vs30 == vs30ref, then using GMM-native amp factors
             if vs30 != vs30ref:
                 
-                if vs30 <= vs30ref:
+                if vs30 < vs30ref:
                     # first SS14 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
                     tmpamps = []
                     for t in gmmDat['per']:
@@ -779,7 +780,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     
                 # else, use AB06 for harder sites
                 else:
-                    # first AB06 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
+                    # first get AB06 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
                     tmpamps = []
                     for t in gmmDat['per']:
                         #print 'PGA1', t, m, d, vs30ref, vs30, gmmDat['pga'][0], atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))
@@ -792,7 +793,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
                     vsrefPGVcorr = atkinson_boore_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
                     
-                    # correct PGA at GMM refernce vs30 to AB06 760 m/s
+                    # correct PGA at given vs30 to GMM refernce vs30
                     refPGA_AB06 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
                     
                     # now get AB06 amplification factors from 760 to target vs30 m/s
@@ -849,6 +850,9 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                 sa20 = interp(log10(2.0), log(gmmDat['per']), sag)
                 proxyPGV = c0 * sa20 + c1
                 
+                # use Sa2.0 sigma as a proxy for PGV sigma (keep in ln)
+                proxyPGVsigma = interp(log10(2.0), log(gmmDat['per']), gmmDat['sig'])
+                
             else:
                 # for other crust types based on BSSA at SA 0.5 sec
                 c0 = 1.07
@@ -856,6 +860,9 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     
                 sa05 = interp(log10(0.5), log(gmmDat['per']), sag)
                 proxyPGV = c0 * sa05 + c1
+                
+                # use Sa0.5 sigma as a proxy for PGV sigma (keep in ln)
+                proxyPGVsigma = interp(log10(0.5), log(gmmDat['per']), gmmDat['sig'])
             
             try:
                 doPGV = True
@@ -883,7 +890,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
         header += ' '.join(('         ', str(len(mags)), str(len(distances)), str(len(sa)+1), ': nmag, ndist, nperiod')) + '\n'
         header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['per']]), 'PGA PGV')) + '\n'
         header += ' '.join(('         ', ' '.join([str('%0.3f' % x) for x in gmmDat['sig']]), \
-                            str('%0.3f' % gmmDat['pga'][1][0]), 'PGVsig')) + '\n' # natural log
+                            str('%0.3f' % gmmDat['pga'][1][0]), str('%0.3f' % proxyPGVsigma))) + '\n' # natural log
     
     # write to file
     print '\nWriting table:', '.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt'))
