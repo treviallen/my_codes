@@ -678,7 +678,7 @@ def get_extrap_ratio(extrapDat, targetDat, maxPer, extrapPer):
     return targetDat['sa'][-1] - logRat
 
 # scrift to make gmm tables for updating GMMs
-def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapPeriods, rtype):
+def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapPeriods, rtype, folder):
     '''
     gmmName = OQ GMM string (e.g. 'GhofraniAtkinson2014Cascadia')
     gmmClass = model class - parsed from calling gsim2table
@@ -688,6 +688,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     vs30ref = reference vs30 for GMM - if using GMM with vs30 parameterisation, set vs30ref = vs30
     extrapPeriod = list of periods to extrapolate to (in log-log space)
     rtype = distance metric string (e.g. rrup, ryhpo, rjb)
+    folder = folder in which tables are written
     '''
     
     #eval('from openquake.hazardlib.gsim.'+gmmPy+' import '+gmmClass)
@@ -695,6 +696,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     from numpy import array, sqrt, log, log10, exp, interp
     from seyhan_stewart_2014 import seyhan_stewart_siteamp
     from atkinson_boore_site_2006 import atkinson_boore_siteamp
+    from os import path
     
     ss14vsref = 760. # m/s
     ab06vsref = 760. # m/s
@@ -713,7 +715,6 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
         from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
         gmpeExtrap = AbrahamsonEtAl2015SSlab()
         
-    
     
     tabtxt = ''
     for i, m in enumerate(mags):
@@ -809,7 +810,12 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                 # now correct gmmDat
                 gmmDat['sa'] = list(log(exp(gmmDat['sa']) * vstargSAcorr / vsrefSAcorr))
                 gmmDat['pga'][0][0] = log(exp(gmmDat['pga'][0][0]) * vstargPGAcorr / vsrefPGAcorr)
-                gmmDat['pgv'][0][0] = log(exp(gmmDat['pgv'][0][0]) * vstargPGVcorr / vsrefPGVcorr)
+                
+                try:
+                    doPGV = True
+                    gmmDat['pgv'][0][0] = log(exp(gmmDat['pgv'][0][0]) * vstargPGVcorr / vsrefPGVcorr)
+                except:
+                    doPGV = False
             
             #######################################################################################
             
@@ -865,17 +871,16 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                 proxyPGVsigma = interp(log10(0.5), log(gmmDat['per']), gmmDat['sig'])
             
             try:
-                doPGV = True
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
                           + str('%0.3f' % log10(g2cgs(exp(gmmDat['pga'][0])))) + ' ' \
                           + str('%0.3f' % log10(exp(gmmDat['pgv'][0][0]))) + '\n'
+                doPGV = True
                 
             except:
-                doPGV = False
-                
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
                           + str('%0.3f' % log10(g2cgs(exp(gmmDat['pga'][0])))) + ' ' \
                           + str('%0.3f' % proxyPGV) + '\n'
+                doPGV = False
                       
     # get header info
     header  = ' '.join((gmmName, 'as implemented in OpenQuake, distance is', rtype+'.','Log10 hazard values in cgs units\n'))
@@ -894,7 +899,8 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     
     # write to file
     print '\nWriting table:', '.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt'))
-    f = open('.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt')), 'wb')
+    filename = '.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt'))
+    f = open(path.join(folder, filename), 'wb')
     f.write(header+tabtxt)
     f.close()
     return tabtxt, gmmDat

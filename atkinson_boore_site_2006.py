@@ -58,9 +58,15 @@ def atkinson_boore_siteamp(vs30, T, pgaBC):
     '''
     from numpy import exp, log
 
+    # limit amp factors to periods within AB06 range
+    if T > 5.0:
+        T = 5.0
+        
+    elif T < 0.025:
+        T = 0.025
+    
     # get coefs for period T
     coeffs = atkinson_boore_site_getcoefs(T)
-    #print T, coeffs
     
     # set constants
     vref = 760. # m/s
