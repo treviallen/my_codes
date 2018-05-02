@@ -229,9 +229,9 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SSlab, AtkinsonBoore2003SSlabCascadiaNSHMP2008
     from openquake.hazardlib.gsim.youngs_1997 import YoungsEtAl1997SSlab
     from openquake.hazardlib.gsim.garcia_2005 import GarciaEtAl2005SSlab
-    from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
+    #from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
     from openquake.hazardlib.gsim.megawati_pan_2010 import MegawatiPan2010
-    from openquake.hazardlib.gsim.zhao_2016 import ZhaoEtAl2016SSlab #, ZhaoEtAl2006SSlabCascadia 
+    #from openquake.hazardlib.gsim.zhao_2016 import ZhaoEtAl2016SSlab #, ZhaoEtAl2006SSlabCascadia 
     from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -282,18 +282,19 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = MegawatiPan2010()
     MP10imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    '''
     gmpe = AbrahamsonEtAl2015SSlab()
     Aea15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     gmpe = ZhaoEtAl2016SSlab()
     Zea16imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
-    
+    '''
 
     # prepare Atkinson & Adams 2013
     #repi = sqrt(rrup**2 - dep**2)
     #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
 
-    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06CISimt, MP10imt, Aea15imt, Zea16imt #, AA13imt #, Aea15imt, Zea06CISimt, 
+    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06CISimt, MP10imt #, Aea15imt #, Zea16imt #, AA13imt #, Aea15imt, Zea06CISimt, 
 
 # calls and calculates candidate interface GMPEs - values returned in ln(g)
 def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):

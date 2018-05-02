@@ -486,7 +486,7 @@ def reckon(lat1d, lon1d, rngkm, brngd):
     return [lon2d, lat2d]
     
 def get_line_parallels(pts, rngkm):
-    from obspy.core.util.geodetics import gps2DistAzimuth
+    from obspy.geodetics import gps2dist_azimuth
     from oq_tools import reckon
 
     # set outputs
@@ -496,17 +496,17 @@ def get_line_parallels(pts, rngkm):
     for j, pt in enumerate(pts):
         # if 1st point
         if j == 0:
-            rngm, az, baz = gps2DistAzimuth(pts[j][1], pts[j][0], \
+            rngm, az, baz = gps2dist_azimuth(pts[j][1], pts[j][0], \
                                             pts[j+1][1], pts[j+1][0])
             
         # if last point
         elif j == len(pts)-1:
-            rngm, az, baz = gps2DistAzimuth(pts[j-1][1], pts[j-1][0], \
+            rngm, az, baz = gps2dist_azimuth(pts[j-1][1], pts[j-1][0], \
                                             pts[j][1], pts[j][0])
                                            
         # use points either side (assumes evenly spaced)
         else:
-            rngm, az, baz = gps2DistAzimuth(pts[j-1][1], pts[j-1][0], \
+            rngm, az, baz = gps2dist_azimuth(pts[j-1][1], pts[j-1][0], \
                                             pts[j+1][1], pts[j+1][0])
            
         # get azimuth for new points
@@ -521,9 +521,9 @@ def get_line_parallels(pts, rngkm):
 # renames obspy tool to something I remember
 # returns rngkm (km), az, baz (degrees)
 def distance(lat1, lon1, lat2, lon2):
-    from obspy.core.util.geodetics import gps2DistAzimuth
+    from obspy.geodetics import gps2dist_azimuth
     
-    rngm, az, baz = gps2DistAzimuth(lat1, lon1, lat2, lon2)
+    rngm, az, baz = gps2dist_azimuth(lat1, lon1, lat2, lon2)
     
     rngkm = rngm / 1000.
     
