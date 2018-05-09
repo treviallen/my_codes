@@ -334,7 +334,7 @@ def eqwave2mseed(eqwfile):
     st.write(outfile, format='MSEED')
 
 
-def get_iris_data(datetime, sta, net):     
+def get_iris_data(dateTuple, sta, net):     
     from obspy.core.utcdatetime import UTCDateTime
     from obspy.clients.fdsn.client import Client
     
@@ -352,7 +352,7 @@ def get_iris_data(datetime, sta, net):
     #sta = argv[2].upper() # station code
     
     # format UTC datetime
-    dtsplit = [str(x) for x in datetime] # convert dt to string  
+    dtsplit = [str(x) for x in dateTuple] # convert dt to string  
     #print  dtsplit
     utcdt = '-'.join((dtsplit[0], dtsplit[1].zfill(2), dtsplit[2].zfill(2))) \
             + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))

@@ -679,7 +679,7 @@ def get_extrap_ratio(extrapDat, targetDat, maxPer, extrapPer):
     return targetDat['sa'][-1] - logRat
 
 # scrift to make gmm tables for updating GMMs
-def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapPeriods, rtype, folder):
+def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapPeriods, interpPeriods, rtype, folder):
     '''
     gmmName = OQ GMM string (e.g. 'GhofraniAtkinson2014Cascadia')
     gmmClass = model class - parsed from calling gsim2table
@@ -688,6 +688,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     vs30 = target vs30 (if required)
     vs30ref = reference vs30 for GMM - if using GMM with vs30 parameterisation, set vs30ref = vs30
     extrapPeriod = list of periods to extrapolate to (in log-log space)
+    interpPeriods = True/False - log-log interpolation to NBCC Periods
     rtype = distance metric string (e.g. rrup, ryhpo, rjb)
     folder = folder in which tables are written
     '''
@@ -832,7 +833,22 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     gmmDat['per'].append(ep)
                     gmmDat['sa'].append(extrapSA)
                     gmmDat['sig'].append(gmmDat['sig'][-1]) # extrapolate sigma
+                    
             
+            #######################################################################################
+            # interpolate to standard NBCC periods
+            if interpPeriods == True:
+                targetPeriods = array([0.1, 0.2, 0.3, 0.5, 1., 2., 5., 10.])
+                
+                # interpolate SA - already in natural log
+                gmmDat['sa']  = interp(log(targetPeriods), log(gmmDat['per']), gmmDat['sa'])
+                
+                # interpolate sigma - already in natural log
+                gmmDat['sig'] = interp(log(targetPeriods), log(gmmDat['per']), gmmDat['sig'])
+                
+                # now reset periods
+                gmmDat['per'] = targetPeriods
+                
             #######################################################################################
             
             # set text for mag/dist
@@ -854,22 +870,22 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                 c0 = 0.897
                 c1 = 2.10
                 
-                sa20 = interp(log10(2.0), log(gmmDat['per']), sag)
+                sa20 = interp(log10(2.0), log10(gmmDat['per']), sag)  # check logs are ok here
                 proxyPGV = c0 * sa20 + c1
                 
                 # use Sa2.0 sigma as a proxy for PGV sigma (keep in ln)
-                proxyPGVsigma = interp(log10(2.0), log(gmmDat['per']), gmmDat['sig'])
+                proxyPGVsigma = interp(log10(2.0), log10(gmmDat['per']), gmmDat['sig'])
                 
             else:
                 # for other crust types based on BSSA at SA 0.5 sec
                 c0 = 1.07
                 c1 = 1.83
                     
-                sa05 = interp(log10(0.5), log(gmmDat['per']), sag)
+                sa05 = interp(log10(0.5), log10(gmmDat['per']), sag)
                 proxyPGV = c0 * sa05 + c1
                 
                 # use Sa0.5 sigma as a proxy for PGV sigma (keep in ln)
-                proxyPGVsigma = interp(log10(0.5), log(gmmDat['per']), gmmDat['sig'])
+                proxyPGVsigma = interp(log10(0.5), log10(gmmDat['per']), gmmDat['sig'])
             
             try:
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
