@@ -2,8 +2,18 @@
 """
 Created on Mon May 07 11:42:07 2018
 
+Useful functions for interrogating hazard data
+
 @author: u56903
 """
+def beta2bval(beta):
+    from numpy import log10, exp
+    return log10(exp(beta))
+
+def bval2beta(bval):
+    from numpy import log
+    return log(10**bval)
+
 # eqns taken from: https://earthquake.usgs.gov/hazards/learn/basics.php
 def get_probability_from_percent_chance(percent_chance, investigation_time):
      from numpy import log

@@ -353,26 +353,6 @@ def dbf2csv(dbffile):
     else:
       print "Filename does not end with .dbf"
 
-# eqns taken from: https://earthquake.usgs.gov/hazards/learn/basics.php
-def get_probability_from_percent_chance(percent_chance, investigation_time):
-     from numpy import log
-
-     p0 = 1 - (percent_chance / 100.)
-     n = -log(p0)
-     probability = n / investigation_time
-     return_period = 1. / probability
-
-     return return_period, probability
-
-def get_percent_chance_from_return_period(return_period, investigation_time):
-    from numpy import exp
-
-    n = (1. / return_period) * investigation_time
-    p0 = exp(-n)
-    percent_chance = 100*(1 - p0)
-
-    return percent_chance
-
 def remove_last_cmap_colour(cmap):
     from matplotlib.colors import LinearSegmentedColormap
     cmap_list = []

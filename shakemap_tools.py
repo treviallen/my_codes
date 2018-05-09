@@ -40,8 +40,60 @@ def parse_eventxml(evxml):
 
     return event
 
-# parse data dat xml
+# parse grid.xml and return event details, grid specs and fields and data grid
 def parse_dataxml(datxml):
+    import xml.etree.ElementTree as e
+    from numpy import fromstring
+    
+    # read file
+    tree = e.parse(datxml)
+    root = tree.getroot()
+    
+    # get event details
+    for child in root.iter('{http://earthquake.usgs.gov/eqcenter/shakemap}event'):
+        event = {'event_id': child.attrib['event_id'], 
+                 'event_network': child.attrib['event_network'], 
+                 'event_timestamp': child.attrib['event_timestamp'], 
+                 'event_description':  child.attrib['event_description'], 
+                 'lon': float(child.attrib['lon']), 
+                 'lat': float(child.attrib['lat']), 
+                 'depth': float(child.attrib['depth']), 
+                 'magnitude': float(child.attrib['magnitude'])}
+        
+    # get grid specs
+    for child in root.iter('{http://earthquake.usgs.gov/eqcenter/shakemap}grid_specification'):
+        gridspec = {'lon_min': float(child.attrib['lon_min']), 
+                 'lat_min': float(child.attrib['lat_min']), 
+                 'lon_max': float(child.attrib['lon_max']), 
+                 'lat_max': float(child.attrib['lat_max']), 
+                 'nominal_lon_spacing': float(child.attrib['nominal_lon_spacing']), 
+                 'nominal_lat_spacing': float(child.attrib['nominal_lat_spacing']), 
+                 'nlon': int(child.attrib['nlon']),
+                 'nlat': int(child.attrib['nlat'])}
+    
+    # get fields
+    fields = {}
+    for i, child in enumerate(root.iter('{http://earthquake.usgs.gov/eqcenter/shakemap}grid_field')):
+        column = 'field'+child.attrib['index']
+        units  = 'units'+child.attrib['index']
+        fields[column] = child.attrib['name'].lower()
+        fields[units]  = child.attrib['units'].lower()
+    fields['cols'] = i+1
+    
+    # now get data    
+    for child in tree.iter('{http://earthquake.usgs.gov/eqcenter/shakemap}grid_data'):
+        dataStr = child.text
+        
+    # reformat text to data array
+    griddata = fromstring(dataStr.strip(), sep=' ')
+    rows = len(griddata) / fields['cols']
+    newshape = (rows, fields['cols'])
+    griddata = griddata.reshape(newshape)
+
+    return event, gridspec, fields, griddata
+
+# parse data dat xml
+def parse_gridxml(datxml):
     import xml.etree.ElementTree as e
 
     # read file
