@@ -695,7 +695,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     
     #eval('from openquake.hazardlib.gsim.'+gmmPy+' import '+gmmClass)
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array, sqrt, log, log10, exp, interp
+    from numpy import array, sqrt, log, log10, exp, interp, fliplr, hstack
     from seyhan_stewart_2014 import seyhan_stewart_siteamp
     from atkinson_boore_site_2006 import atkinson_boore_siteamp
     from os import path
@@ -810,7 +810,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     vstargPGVcorr = atkinson_boore_siteamp(vs30, -1.0, exp(refPGA_AB06))
                         
                 # now correct gmmDat
-                gmmDat['sa'] = list(log(exp(gmmDat['sa']) * vstargSAcorr / vsrefSAcorr))
+                gmmDat['sa'] = log(exp(gmmDat['sa']) * vstargSAcorr / vsrefSAcorr)
                 gmmDat['pga'][0][0] = log(exp(gmmDat['pga'][0][0]) * vstargPGAcorr / vsrefPGAcorr)
                 
                 try:
@@ -830,18 +830,17 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     extrapDat = get_pga_sa(gmpeExtrap, sites, rup, dists, crust_ty)
                     extrapSA = get_extrap_ratio(extrapDat, gmmDat, maxPer, ep)
                     
-                    gmmDat['per'].append(ep)
-                    gmmDat['sa'].append(extrapSA)
-                    gmmDat['sig'].append(gmmDat['sig'][-1]) # extrapolate sigma
+                    gmmDat['per'] = hstack((gmmDat['per'], ep))
+                    gmmDat['sa']  = hstack((gmmDat['sa'], extrapSA))
+                    gmmDat['sig'] = hstack((gmmDat['sig'], gmmDat['sig'][-1])) # extrapolate sigma
                     
-            
             #######################################################################################
             # interpolate to standard NBCC periods
             if interpPeriods == True:
                 targetPeriods = array([0.1, 0.2, 0.3, 0.5, 1., 2., 5., 10.])
                 
                 # interpolate SA - already in natural log
-                gmmDat['sa']  = interp(log(targetPeriods), log(gmmDat['per']), gmmDat['sa'])
+                gmmDat['sa'] = interp(log(targetPeriods), log(gmmDat['per']), gmmDat['sa'])
                 
                 # interpolate sigma - already in natural log
                 gmmDat['sig'] = interp(log(targetPeriods), log(gmmDat['per']), gmmDat['sig'])
@@ -850,7 +849,13 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                 gmmDat['per'] = targetPeriods
                 
             #######################################################################################
+            # invert spectra for input into hdf5 files
             
+            gmmDat['sa']  = gmmDat['sa'][::-1]
+            gmmDat['per'] = gmmDat['per'][::-1]
+            gmmDat['sig'] = gmmDat['sig'][::-1]
+            
+            #######################################################################################
             # set text for mag/dist
             # convert ln g to cm/s**2 as required for table builder
             sa = log10(g2cgs(exp(gmmDat['sa'])))
