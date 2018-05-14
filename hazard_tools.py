@@ -91,14 +91,15 @@ def get_nsha12_hazard_curve(lon, lat, spectral_period):
 
 def get_nsha12_hazard_spectra(lon, lat, return_period):
     '''
-    spectral_periods: list of strings, i.e. '0.0', '0.2'
+    return_period: list of strings, i.e. 100, 250, 500, etc
+    
     
     '''
     from os import path, system
     from numpy import array
     
     # set grid spectral periods for hazard curve
-    spectral_periods = ['0.0', '0.05', '0.1', '0.3', '0.4', '0.5', '0.6', '0.7', \
+    spectral_periods = ['0.0', '0.05', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', \
                         '0.8', '0.9', '1.0', '1.2', '1.5', '1.7', '2.0', '2.5', \
                         '3.0', '3.5', '4.0', '4.5', '5.0']
     
@@ -122,10 +123,11 @@ def get_nsha12_hazard_spectra(lon, lat, return_period):
         grdfile = ''.join(('avg_',spectral_period,'s_',return_period,'yr_180_30km_60km.grd'))
         grdpath = path.join(basepath, grdfile)
 
-        # do grdtrack to extract hazard value
-        system(''.join(('grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
-        
         try:
+            # do grdtrack to extract hazard value
+            system(''.join(('grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
+        
+        
             # parse in hazard value
             hazval = float(open('lolahaz.txt').read().strip().split('\t')[-1])
             
