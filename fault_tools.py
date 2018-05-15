@@ -652,12 +652,16 @@ def len2mag_J94_SCR_quad(flen):
     from numpy import log10
     return 5.22 + 0.38 * log10(flen) + 0.37 * log10(flen)**2
     
+
 ''' do Allen & Hayes 2017 intraslab '''
 
 # get mag 2 len in km**2
-def mag2len_AH17_other(mw, rtype):
+def mag2len_AH17(mw, rtype):
     b = 0.63
-    if rtype == 'intra':
+    if rtype == 'inter':
+        a = -2.90
+        sig = 0.182
+    elif rtype == 'intra':
         a = -3.03
         sig = 0.14
     elif rtype == 'outer':
@@ -683,6 +687,25 @@ def mag2area_AH17_other(mw, rtype):
         sig = 0.20
         
     return 10**(a + b * mw), sig
+
+# get mag 2 len in km**2
+def len2wid_AH17(length, rtype):
+    from numpy import log10
+    b = 0.74
+    if rtype == 'inter':
+        a = 0.39
+        sig = 0.15
+    elif rtype == 'intra':
+        a = 0.35
+        sig = 0.13
+    elif rtype == 'outer':
+        a = 0.04
+        sig = 0.09
+    elif rtype == 'ss':
+        a = -0.22
+        sig = 0.18
+        
+    return 10**(a + b * log10(length)), sig
     
 
 ''' STOP SCALING RELATIONS '''
