@@ -160,14 +160,14 @@ def calc_BJ84(comp, logA, rhyp):
     return BJ84
 
 # Kradolfer (1984) - SED (from Edwards etal 2015 - Seismic monitoring and analysis of deep geothermal projects in St Gallen and Basel, Switzerland)
-def calc_K84(comp, logA, rhyp):
+def calc_SED84(comp, logA, rhyp):
     '''
     Assumes W-A amplification factor of 2800
     '''    
-    from numpy import nan
+    from numpy import nan, log10
     
     # convert logA assuming W-A a,plification of 2800
-    logA2800 = 2800. * (10**logA) / 2080.
+    logA2800 = log10(2800. * (10**logA) / 2080.)
     
     # pre-allocate value
     SED84 = nan
