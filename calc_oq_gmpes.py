@@ -691,7 +691,7 @@ def get_extrap_ratio(extrapDat, targetDat, boundPer, extrapPer):
     # now return extrapolated GM
     return targetGM
 
-# scrift to make gmm tables for updating GMMs
+# script to make gmm tables for updating GMMs
 def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapPeriods, interpPeriods, rtype, folder):
     '''
     gmmName = OQ GMM string (e.g. 'GhofraniAtkinson2014Cascadia')
@@ -703,7 +703,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     extrapPeriod = list of periods to extrapolate to (in log-log space)
     interpPeriods = True/False - log-log interpolation to NBCC Periods
     rtype = distance metric string (e.g. rrup, ryhpo, rjb)
-    folder = folder in which tables are written
+    folder = folder in which tables are written (relative to cwd)
     '''
     
     #eval('from openquake.hazardlib.gsim.'+gmmPy+' import '+gmmClass)
@@ -829,8 +829,8 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                 gmmDat['pga'][0][0] = log(exp(gmmDat['pga'][0][0]) * vstargPGAcorr / vsrefPGAcorr)
                 
                 try:
-                    doPGV = True
                     gmmDat['pgv'][0][0] = log(exp(gmmDat['pgv'][0][0]) * vstargPGVcorr / vsrefPGVcorr)
+                    doPGV = True
                 except:
                     doPGV = False
             
@@ -895,31 +895,31 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
             #######################################################################################
             
             # get log10 Sa in g
-            sag = log10(exp(gmmDat['sa']))
+            log10_Sa_g = log10(exp(gmmDat['sa']))
             
             # estimate PGV in case needed
             # get coefs for calculating PGV - PGV is log cm/s, Sa is log g
             if crust_ty == 'interface':
-                # use ~2 sec
+                # use ~2 sec correlation
                 c0 = 0.897
                 c1 = 2.10
                 
-                sa20 = interp(log10(2.0), log10(gmmDat['per']), sag)  # check logs are ok here
+                sa20 = interp(log10(2.0), log10(gmmDat['per'][::-1]), log10_Sa_g[::-1])  # check logs are ok here
                 proxyPGV = c0 * sa20 + c1
                 
                 # use Sa2.0 sigma as a proxy for PGV sigma (keep in ln)
-                proxyPGVsigma = interp(log10(2.0), log10(gmmDat['per']), gmmDat['sig'])
+                proxyPGVsigma = interp(log(2.0), log(gmmDat['per'][::-1]), gmmDat['sig'][::-1])
                 
             else:
                 # for other crust types based on BSSA at SA 0.5 sec
-                c0 = 1.07
+                c0 = 1.09
                 c1 = 1.83
                     
-                sa05 = interp(log10(0.5), log10(gmmDat['per']), sag)
+                sa05 = interp(log10(0.5), log10(gmmDat['per'][::-1]), log10_Sa_g[::-1])
                 proxyPGV = c0 * sa05 + c1
                 
                 # use Sa0.5 sigma as a proxy for PGV sigma (keep in ln)
-                proxyPGVsigma = interp(log10(0.5), log10(gmmDat['per']), gmmDat['sig'])
+                proxyPGVsigma = interp(log(0.5), log(gmmDat['per'][::-1]), gmmDat['sig'][::-1])
             
             try:
                 tabtxt += ' '.join((str('%0.2f' % m), str('%0.2f' % d))) + ' ' + sastr + ' ' \
