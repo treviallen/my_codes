@@ -714,8 +714,8 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     from os import path
     from copy import deepcopy
     
-    ss14vsref = 760. # m/s
-    ab06vsref = 760. # m/s
+    # reference Vs30 for AB06 & SS14
+    ampFactFrefVs30 = 760. # m/s
     
     if gmmName == 'AtkinsonMacias2009' or gmmName == 'GhofraniAtkinson2014Cascadia' \
        or gmmName == 'ZhaoEtAl2006SInterCascadia' or gmmName == 'AbrahamsonEtAl2015SInter' \
@@ -737,7 +737,15 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
     for i, m in enumerate(mags):
         for d in distances:
             sites = SitesContext()
-            sites.vs30 = array([float(vs30)])
+            
+            # check if using GMM-native amp factors
+            if vs30 == vs30ref:
+                # vs30 to input into GMM
+                sites.vs30 = array([float(vs30)])
+            else:
+                # use amp factor reference vs30 where GMM is invarient to Vs30
+                sites.vs30 = array([ampFactFrefVs30]) # setting this won't actually do anything
+                
             sites.vs30measured = 0
             #sites.z1pt0 = exp(28.5 - (3.82/8.)*log(sites.vs30**8 + 378.7**8)) # in m; from ChiouYoungs2008
             sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
@@ -759,23 +767,21 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
             dists.rhypo = array([d]) 
             dists.rvolc = array([100.]) # assume backarc distance of 100 km
             
-            # get SA for given mag & distance
+            # get SA for given mag, distance & vs30
             gmmDat = get_pga_sa(gmmClass, sites, rup, dists, crust_ty)
             
             #######################################################################################
             
             # do site class correction if needed
-            '''
-            note: this is a simplification - to do properly where vs30ref > 760 and vs30 < vsref, 
-                  should first correct to 760 using AB06, then amplify by SS14
-                  
-                  I think this is now taken care of, but will need to check!
-            '''
+            
             # if vs30 == vs30ref, then using GMM-native amp factors
             if vs30 != vs30ref:
                 
-                if vs30 < vs30ref:
-                    # first SS14 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
+                # for GMMs with reference Vs30 <= 760 and taget Vs30 <= 760
+                if vs30 < vs30ref and vs30ref <= 760.:
+                    
+                    #######################
+                    # first SS14 amplification factors to correct to GMM vs30ref - Vs reference factor should always = 1.0 (next few lines redundant)
                     tmpamps = []
                     for t in gmmDat['per']:
                         tmpamps.append(seyhan_stewart_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
@@ -783,6 +789,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     vsrefSAcorr = array(tmpamps)
                     vsrefPGAcorr = seyhan_stewart_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
                     vsrefPGVcorr = seyhan_stewart_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
+                    #######################
                     
                     # correct PGA at GMM refernce vs30 to SS14 760 m/s
                     refPGA_SS14 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
@@ -795,8 +802,34 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     vstargSAcorr = array(tmpamps)
                     vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(refPGA_SS14))
                     vstargPGVcorr = seyhan_stewart_siteamp(vs30, -1.0, exp(refPGA_SS14))
+                
+                # for GMMs with reference Vs30 > 760 and target Vs30 <= 760
+                elif vs30 < vs30ref and vs30ref > 760.:
+                    # first AB06 amplification factors to correct to GMM vs30ref 
+                    tmpamps = []
+                    for t in gmmDat['per']:
+                        try:
+                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
+                        except:
+                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))) # have no idea why i have to do this!
                     
-                # else, use AB06 for harder sites
+                    vsrefSAcorr = array(tmpamps)
+                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
+                    vsrefPGVcorr = atkinson_boore_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
+                    
+                    # correct PGA at GMM refernce vs30 to SS14 760 m/s
+                    refPGA_AB06 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
+                    
+                    # now get SS14 amplification factors from 760 to target vs30 m/s
+                    tmpamps = []
+                    for t in gmmDat['per']:
+                        tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_AB06))[0]) 
+                    
+                    vstargSAcorr = array(tmpamps)
+                    vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(refPGA_AB06))
+                    vstargPGVcorr = seyhan_stewart_siteamp(vs30, -1.0, exp(refPGA_AB06))
+                    
+                # for any target Vs30 > 760.
                 else:
                     # first get AB06 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
                     tmpamps = []
@@ -833,7 +866,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     doPGV = True
                 except:
                     doPGV = False
-            
+                
             #######################################################################################
             
             # determine if extrapolation should be performed - if so extrapolate based on well-known GMMs (empeExtrap)
