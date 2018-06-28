@@ -782,11 +782,11 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     
                     #######################
                     # first SS14 amplification factors to correct to GMM vs30ref - Vs reference factor should always = 1.0 (next few lines redundant)
-                    tmpamps = []
+                    tmpAmpFacts = []
                     for t in gmmDat['per']:
-                        tmpamps.append(seyhan_stewart_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
+                        tmpAmpFacts.append(seyhan_stewart_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
                     
-                    vsrefSAcorr = array(tmpamps)
+                    vsrefSAcorr = array(tmpAmpFacts)
                     vsrefPGAcorr = seyhan_stewart_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
                     vsrefPGVcorr = seyhan_stewart_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
                     #######################
@@ -795,65 +795,71 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     refPGA_SS14 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
                     
                     # now get SS14 amplification factors from 760 to target vs30 m/s
-                    tmpamps = []
+                    tmpAmpFacts = []
                     for t in gmmDat['per']:
-                        tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_SS14))[0]) 
+                        tmpAmpFacts.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_SS14))[0]) 
                     
-                    vstargSAcorr = array(tmpamps)
+                    vstargSAcorr = array(tmpAmpFacts)
                     vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(refPGA_SS14))
                     vstargPGVcorr = seyhan_stewart_siteamp(vs30, -1.0, exp(refPGA_SS14))
                 
                 # for GMMs with reference Vs30 > 760 and target Vs30 <= 760
                 elif vs30 < vs30ref and vs30ref > 760.:
+                    
+                    # correct PGA at GMM refernce vs30 to AB06 760 m/s
+                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, 0.1) # use arbitrary PGA in linear range (0.1g used for 2015NBCC)
+                    refPGA_AB06 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
+                                        
                     # first AB06 amplification factors to correct to GMM vs30ref 
-                    tmpamps = []
+                    tmpAmpFacts = []
                     for t in gmmDat['per']:
                         try:
-                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
+                            tmpAmpFacts.append(atkinson_boore_siteamp(vs30ref, t, exp(refPGA_AB06))[0])
                         except:
-                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))) # have no idea why i have to do this!
+                            tmpAmpFacts.append(atkinson_boore_siteamp(vs30ref, t, exp(refPGA_AB06))) # have no idea why i have to do this!
                     
-                    vsrefSAcorr = array(tmpamps)
-                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
-                    vsrefPGVcorr = atkinson_boore_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
-                    
-                    # correct PGA at GMM refernce vs30 to SS14 760 m/s
-                    refPGA_AB06 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
+                    # get AB06 amp factors to scale to 760 m/s
+                    vsrefSAcorr = array(tmpAmpFacts)
+                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, exp(refPGA_AB06))
+                    vsrefPGVcorr = atkinson_boore_siteamp(vs30ref, -1.0, exp(refPGA_AB06))
                     
                     # now get SS14 amplification factors from 760 to target vs30 m/s
-                    tmpamps = []
+                    tmpAmpFacts = []
                     for t in gmmDat['per']:
-                        tmpamps.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_AB06))[0]) 
+                        tmpAmpFacts.append(seyhan_stewart_siteamp(vs30, t, exp(refPGA_AB06))[0]) 
                     
-                    vstargSAcorr = array(tmpamps)
+                    vstargSAcorr = array(tmpAmpFacts)
                     vstargPGAcorr = seyhan_stewart_siteamp(vs30, 0.0, exp(refPGA_AB06))
                     vstargPGVcorr = seyhan_stewart_siteamp(vs30, -1.0, exp(refPGA_AB06))
                     
                 # for any target Vs30 > 760.
                 else:
+                    
+                    # correct PGA to AB06 760 m/s
+                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, 0.1) # use arbitrary PGA in linear range (0.1g used for 2015NBCC)
+                    refPGA_AB06 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
+                    
                     # first get AB06 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
-                    tmpamps = []
+                    tmpAmpFacts = []
                     for t in gmmDat['per']:
                         #print 'PGA1', t, m, d, vs30ref, vs30, gmmDat['pga'][0], atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))
                         try:
-                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))[0])
+                            tmpAmpFacts.append(atkinson_boore_siteamp(vs30ref, t, exp(refPGA_AB06))[0])
                         except:
-                            tmpamps.append(atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))) # have no idea why i have to do this!
+                            tmpAmpFacts.append(atkinson_boore_siteamp(vs30ref, t, exp(refPGA_AB06))) # have no idea why i have to do this!
                     
-                    vsrefSAcorr = array(tmpamps)
-                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, exp(gmmDat['pga'][0]))
-                    vsrefPGVcorr = atkinson_boore_siteamp(vs30ref, -1.0, exp(gmmDat['pga'][0]))
-                    
-                    # correct PGA at given vs30 to GMM refernce vs30
-                    refPGA_AB06 = log(exp(gmmDat['pga'][0]) / vsrefPGAcorr)
+                    # get AB06 amp factors to scale to 760 m/s
+                    vsrefSAcorr = array(tmpAmpFacts)
+                    vsrefPGAcorr = atkinson_boore_siteamp(vs30ref, 0.0, exp(refPGA_AB06))
+                    vsrefPGVcorr = atkinson_boore_siteamp(vs30ref, -1.0, exp(refPGA_AB06))
                     
                     # now get AB06 amplification factors from 760 to target vs30 m/s
-                    tmpamps = []
+                    tmpAmpFacts = []
                     for t in gmmDat['per']:
                         #print 'PGA2', t, m, d, vs30ref, vs30, refPGA_AB06, atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06))
-                        tmpamps.append(atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06)[0]))
+                        tmpAmpFacts.append(atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06)[0]))
                     
-                    vstargSAcorr = array(tmpamps)
+                    vstargSAcorr = array(tmpAmpFacts)
                     vstargPGAcorr = atkinson_boore_siteamp(vs30, 0.0, exp(refPGA_AB06))
                     vstargPGVcorr = atkinson_boore_siteamp(vs30, -1.0, exp(refPGA_AB06))
                         
