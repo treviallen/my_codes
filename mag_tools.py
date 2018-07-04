@@ -34,6 +34,41 @@ def nsha18_ml2mw(ml):
     
     # get Mw
     return a*ml**2 + b*ml + c
+    
+def nsha18_bilin_ml2mw(ml):
+    from numpy import zeros_like
+    
+    # add bi-linear coefs - not used in NSHA18
+    a_bl = 0.66053496
+    b_bl = 1.20883045
+    c_bl = 0.98659071
+    hx_bl = 4.25
+    hy_bl =  a_bl * hx_bl + b_bl
+    
+    if ml <= hx_bl:
+        mw_bl = a_bl*ml + b_bl
+    else:
+        mw_bl = c_bl*(ml - hx_bl) + hy_bl
+        
+    return mw_bl
+
+def nsha18_bilin_mw2ml(mw):
+    from numpy import zeros_like
+    
+    # add bi-linear coefs - not used in NSHA18
+    a_bl = 0.66053496
+    b_bl = 1.20883045
+    c_bl = 0.98659071
+    hx_bl = 4.25
+    hy_bl =  a_bl * hx_bl + b_bl
+    
+    if mw <= hy_bl:
+        ml_bl = (mw - b_bl) / a_bl
+    else:
+        ml_bl = hx_bl + (mw - hy_bl) / c_bl
+        
+    return ml_bl
+
 
 # from Mueller (pers comm) - from Sipkin SRL 2003
 def sipkin_mb2mw(mb):
