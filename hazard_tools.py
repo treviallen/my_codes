@@ -34,6 +34,10 @@ def get_percent_chance_from_return_period(return_period, investigation_time):
 
     return percent_chance
 
+def get_probability_from_obs_and_return_period(return_period, investigation_time):
+    from numpy import exp
+    return 1 - exp(-investigation_time/return_period)
+
 
 def get_nsha12_hazard_curve(lon, lat, spectral_period):
     '''

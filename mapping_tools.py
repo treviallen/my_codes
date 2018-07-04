@@ -337,6 +337,7 @@ def labelpolygon(m, plt, sf, field, **kwargs):
     from shapely.geometry import Polygon
     from mapping_tools import get_field_index
     import matplotlib as mpl
+    import matplotlib.patheffects as path_effects
     
     mpl.rcParams['pdf.fonttype'] = 42
     
@@ -347,7 +348,8 @@ def labelpolygon(m, plt, sf, field, **kwargs):
     fstyle = 'normal'
     fweight = 'normal'
     value = None
-    for key in ('xoff', 'yoff', 'fsize', 'fweight', 'col', 'fstyle', 'value'):
+    addOutline = False
+    for key in ('xoff', 'yoff', 'fsize', 'fweight', 'col', 'fstyle', 'value', 'addOutline'):
         if key in kwargs:
             if key == 'xoff':
                 xoff = kwargs[key]
@@ -363,6 +365,8 @@ def labelpolygon(m, plt, sf, field, **kwargs):
                 col = kwargs[key]
             if key == 'value':
                 value = kwargs[key]
+            if key == 'addOutline':
+                addOutline = kwargs[key]
     
     shapes = sf.shapes()
     recs = sf.records()
@@ -376,8 +380,18 @@ def labelpolygon(m, plt, sf, field, **kwargs):
         tx, ty = m(float(centroid[0]),float(centroid[1]))
         if tx > m.xmin and tx < m.xmax and ty > m.ymin and ty < m.ymax:
             if value == None or value == recs[i][findex]:
+                
+                if addOutline == False:
+                    #path_effect=[path_effects.Normal()]
+                    path_effect=[]
+                else:
+                    lineWidth= 3.
+                    backColour = 'w'
+                    path_effect=[path_effects.withStroke(linewidth=lineWidth, foreground=backColour)]    
+                    
                 plt.text(tx + xoff, ty + yoff, recs[i][findex], size=fsize, \
-                         weight=fweight, color=col, style=fstyle, va='center', ha='center')
+                         weight=fweight, color=col, style=fstyle, va='center', \
+                         ha='center', path_effects=path_effect)
                      
         '''
         centroidx = []
@@ -396,7 +410,7 @@ def addTextOutline(textHandle, lineWidth, backColour):
     '''
 
     import matplotlib.patheffects as PathEffects
-    txt.set_path_effects([PathEffects.withStroke(linewidth=lineWidth, foreground=backColour)])
+    textHandle.set_path_effects([PathEffects.withStroke(linewidth=lineWidth, foreground=backColour)])
 
 
 def labelCentroid(plt, m, txt, fsize, xarray, yarray, xoff):
