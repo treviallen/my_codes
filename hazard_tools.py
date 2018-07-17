@@ -153,3 +153,55 @@ def get_nsha12_hazard_spectra(lon, lat, return_period):
         
     return array(periods), array(uhs)
 
+# partial pythonisation of Nico's code
+# does not do iteration - just for plotting purposes
+def calc_risk_integral(RTGM, beta, SAs, Probs):
+    from scipy.stats import norm, lognorm
+    from numpy import array, arange, exp, log, trapz, interp
+    from scipy import interpolate
+    from misc_tools import extrap1d
+    
+    FRAGILITY_AT_RTGM = 0.10 
+    BETA = 0.6
+    AFE4UHGM = - log( 1 - 0.02 )/ 50 # exceedance frequency for 1/2475 yrs
+    TARGET_RISK = - log( 1 - 0.01 ) / 50
+    
+    '''
+    SAs = array([ 0.1613, 0.1979, 0.2336, 0.3385, 0.4577, 0.5954, 0.7418, 0.7905, 0.9669, 1.1697])
+    Probs = array([0.02, 0.01375, 0.01, 0.00445, 0.0021, 0.001, 0.0005, 0.000404, 0.0002, 0.0001])
+    '''
+    # get uniform hazard at 1/2475
+    UHGM = exp((interp(log(AFE4UHGM), log(Probs[::-1]), log(SAs[::-1]))))
+    
+    # up sample hazard curve
+    UPSAMPLING_FACTOR = 1.05
+    SMALLEST_SA = min([min(SAs), UHGM/10])
+    LARGEST_SA = max([max(SAs), UHGM*10])
+    
+    
+    upSAs = exp(arange(log(SMALLEST_SA),log(LARGEST_SA),log(UPSAMPLING_FACTOR)))
+    f_i = interpolate.interp1d(log(SAs), log(Probs))
+    f_x = extrap1d(f_i)
+    upProbs = exp(f_x(log(upSAs)))
+    '''
+    upSAs = SAs
+    upProbs = Probs
+    '''
+    # get fragility curve
+    FragilityCurve = {}
+    FragilityCurve['Median'] = RTGM / exp( norm.ppf( FRAGILITY_AT_RTGM ) * BETA )  
+    FragilityCurve['PDF'] = lognorm.pdf(upSAs,BETA,scale=(FragilityCurve['Median']))
+    FragilityCurve['CDF'] = lognorm.cdf(upSAs,BETA,scale=(FragilityCurve['Median']))
+    FragilityCurve['SAs'] = upSAs
+    FragilityCurve['Beta'] = BETA 
+    
+    # do risk integral
+    Integrand = FragilityCurve['PDF'] * upProbs  
+    Risk = trapz(Integrand, upSAs)
+    
+    # calculate collapse probability
+    CollapseProb = 1 - exp(-50 * Risk)
+    
+    RiskCoefficient = RTGM / UHGM
+    
+    return upProbs, upSAs, FragilityCurve, Integrand, CollapseProb
