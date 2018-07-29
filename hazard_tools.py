@@ -152,6 +152,26 @@ def get_nsha12_hazard_spectra(lon, lat, return_period):
     f.close()    
         
     return array(periods), array(uhs)
+    
+def return_AS1170_4_shape(periods, siteclass):
+    '''
+    siteclass = A-B
+    '''
+    shp1170 = []
+    
+    if siteclass.upper() == 'B':
+        for t in periods:
+            if t <= 0.1:
+                shp1170.append(1.0 + 19.4*t)
+            elif t > 0.1 and t <= 1.5:
+                shp1170.append(min(0.88/t, 2.94))
+            else:
+                shp1170.append(1.32 / t**2)
+        
+    return array(shp1170)
+           
+
+    
 
 # partial pythonisation of Nico's code
 # does not do iteration - just for plotting purposes

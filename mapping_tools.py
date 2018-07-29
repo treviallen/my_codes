@@ -29,7 +29,7 @@ def get_field_data(sf, field, datatype):
     datatype = float, str
     '''
     from misc_tools import checkfloat, checkint    
-    #from numpy import array
+    from numpy import array
     
     # get index
     index = get_field_index(sf, field)
@@ -47,7 +47,7 @@ def get_field_data(sf, field, datatype):
         elif datatype == 'int':
             data.append(checkint(rec[index]))
             
-    return data
+    return array(data)
         
 def shapepoly2shapley(shpfile):
     import shapefile
