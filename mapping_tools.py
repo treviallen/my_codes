@@ -573,6 +573,44 @@ def distance(lat1, lon1, lat2, lon2):
     
     return rngkm, az, baz
 
+# function to get linear profile of lat/lons    
+def get_distance_locs(lat1, lon1, lat2, lon2, npts):
+    from mapping_tools import reckon, distance
+    from numpy import array
+    
+    '''
+    npts = 1 more than number of steps
+    '''
+    '''
+    lon1 = 131.0
+    lat1 = -11.5
+    lon2 = 134.5
+    lat2 = -17.0
+    '''
+    rngkm, az, baz = distance(lat1, lon1, lat2, lon2)
+    
+    # get inc distance
+    inckm = rngkm / (npts-1)
+    
+    plats = []
+    plons = []
+    csvtxt = ''
+    
+    for i in range(0, npts):
+    
+        lon2d, lat2d = reckon(lat1, lon1, i*inckm, az)
+        plats.append(lat2d)
+        plons.append(lon2d)
+        
+        csvtxt += ','.join((str('%0.4f' % lon2d), str('%0.4f' % lat2d))) + '\n'
+        
+    f = open('profile.csv', 'wb')
+    f.write(csvtxt)
+    f.close()
+    
+    return array(plons), array(plats)
+
+
 # generates a vector of distance, azimuth & back azimuth using "distance"
 # returns rngkm (km), az, baz (degrees)
 def dist_vect(lastlat, lastlon, latvect, lonvect):
