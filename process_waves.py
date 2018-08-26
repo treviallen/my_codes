@@ -24,6 +24,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import response, readwaves, spectral_analysis, plotting, write_data, spatial_tools
 from sys import argv
+from os import getcwd, path
 from datetime import datetime
 
 #*******************************************************************************
@@ -38,6 +39,10 @@ from datetime import datetime
 #*******************************************************************************
 # SET TASK
 wavfile = argv[1]
+
+# get absolute path
+cwd = getcwd()
+wavfile = path.join(cwd, wavfile)
 
 def task_options():
     tasks = '\nSelect task: \n' \

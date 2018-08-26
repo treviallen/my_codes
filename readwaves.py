@@ -27,7 +27,7 @@ def check_file_fmt(wavfile):
 
     except:
         sacseed = False
-    
+        print wavfile
         f = open(wavfile, 'r')
         firstline = f.readline()
         if firstline.find('Nanometrics') == 0:

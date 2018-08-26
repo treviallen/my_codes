@@ -485,7 +485,9 @@ def gaull1990_gsim(mag, dep, rhypo):
     from openquake_local.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
                                                     GaullEtAL1990SoutheasternAustralia, \
                                                     GaullEtAL1990PGAfromPGVWesternAustralia, \
-                                                    GaullEtAL1990PGAfromPGVSoutheasternAustralia
+                                                    GaullEtAL1990PGAfromPGVSoutheasternAustralia, \
+                                                    GaullEtAL1990Indonesia, \
+                                                    GaullEtAL1990PGAfromPGVIndonesia
     '''
     from gaull_1990 import GaullEtAL1990WesternAustralia, \
                                                     GaullEtAL1990SoutheasternAustralia, \
@@ -512,13 +514,19 @@ def gaull1990_gsim(mag, dep, rhypo):
     gmpe = GaullEtAL1990SoutheasternAustralia()
     G90SEAimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
     
+    gmpe = GaullEtAL1990Indonesia()
+    G90INDimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
+    
     gmpe = GaullEtAL1990PGAfromPGVWesternAustralia()
     G90WA_PGVimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])} 
     
     gmpe = GaullEtAL1990PGAfromPGVSoutheasternAustralia()
     G90SEA_PGVimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
     
-    return G90WAimt, G90SEAimt, G90WA_PGVimt, G90SEA_PGVimt
+    gmpe = GaullEtAL1990PGAfromPGVIndonesia()
+    G90IND_PGVimt = {'pga': gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
+    
+    return G90WAimt, G90SEAimt, G90INDimt, G90WA_PGVimt, G90SEA_PGVimt, G90IND_PGVimt
     
 def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     from openquake.hazardlib.gsim.gmpe_table import GMPETable

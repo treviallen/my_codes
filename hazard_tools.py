@@ -57,7 +57,7 @@ def get_nsha12_hazard_curve(lon, lat, spectral_period):
     f.close()
     
     # set base path for grd location on the NAS
-    basepath = '/nas/gemd/ehp/georisk_earthquake/modelling/national/Version_13/output/grd_files/combined'
+    basepath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/national/Version_13/output/grd_files/combined'
     
     hazArray = []
     probabilities = []
@@ -115,7 +115,7 @@ def get_nsha12_hazard_spectra(lon, lat, return_period):
     f.close()
     
     # set base path for grd location on the NAS
-    basepath = '/nas/gemd/ehp/georisk_earthquake/modelling/national/Version_13/output/grd_files/combined'
+    basepath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/national/Version_13/output/grd_files/combined'
     
     uhs = []
     periods = []
