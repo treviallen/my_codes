@@ -482,7 +482,7 @@ def allen2012_gsim(mag, dep, rrup):
     
 def gaull1990_gsim(mag, dep, rhypo):
     
-    from openquake_local.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
+    from openquake.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
                                                     GaullEtAL1990SoutheasternAustralia, \
                                                     GaullEtAL1990PGAfromPGVWesternAustralia, \
                                                     GaullEtAL1990PGAfromPGVSoutheasternAustralia, \
