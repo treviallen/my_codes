@@ -171,7 +171,59 @@ def return_AS1170_4_shape(periods, siteclass):
     return array(shp1170)
            
 
+# function to get hazard curves for a list of cities
+def get_nsha18_city_curve(citylist, hazcurvefile):
+    '''
+    # make path to hazcurvefile
+    #hazcurvefile = '/Users/tallen/Documents/Geoscience_Australia/NSHA2018/source_models/complete_model/final/results_fractiles/hazard_curve-mean-PGA_1.csv'
+    '''
+    from tools.oq_tools import return_annualised_haz_curves
+    from numpy import around
     
+    ##############################################################################
+    # parse site file
+    ###############################################################################
+    sitelistfile = '/Users/tallen/Documents/Geoscience_Australia/NSHA2018/shared/nsha_cities.csv'
+    lines = open(sitelistfile).readlines()
+    places = []
+    place_lat = []
+    place_lon = []
+    
+    for line in lines:
+        dat = line.strip().split(',')
+        place_lon.append(float(dat[0]))
+        place_lat.append(float(dat[1]))
+        places.append(dat[2])
+    
+    ###############################################################################
+    # parse first job file to define plotting order
+    ###############################################################################
+    
+    # get data from first job
+    siteDict, imls, investigation_time = return_annualised_haz_curves(hazcurvefile)
+    
+    # loop thru sites in first job file and fill pltDict
+    pltDict = []
+    for sd in siteDict:
+        pltTrue = False
+        
+        ###############################################################################
+        # loops thru places to get title - check if want to plot
+        ###############################################################################
+        for place, plon, plat in zip(places, place_lon, place_lat):
+            if around(plon, decimals=2) == around(sd['lon'], decimals=2) \
+               and around(plat, decimals=2) == around(sd['lat'], decimals=2):
+                
+                # now loop through places we want to plot
+                for pp in citylist:
+                    if pp == place:
+                        sd['place'] = place
+                        sd['imls'] = imls
+                        #h1 = plt.semilogy(imls, sd1['poe_probs_annual'], color=cs[p*2], lw=2.0, label=label_place+' (F)')
+                        
+                        pltDict.append(sd)
+    
+    return pltDict
 
 # partial pythonisation of Nico's code
 # does not do iteration - just for plotting purposes
