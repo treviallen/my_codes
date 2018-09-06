@@ -159,6 +159,15 @@ def return_AS1170_4_shape(periods, siteclass):
     '''
     shp1170 = []
     
+    if siteclass.upper() == 'A':
+        for t in periods:
+            if t <= 0.1:
+                shp1170.append(0.8 + 15.5*t)
+            elif t > 0.1 and t <= 1.5:
+                shp1170.append(min(0.704/t, 2.35))
+            else:
+                shp1170.append(1.056 / t**2)
+                
     if siteclass.upper() == 'B':
         for t in periods:
             if t <= 0.1:
@@ -167,7 +176,34 @@ def return_AS1170_4_shape(periods, siteclass):
                 shp1170.append(min(0.88/t, 2.94))
             else:
                 shp1170.append(1.32 / t**2)
-        
+    
+    if siteclass.upper() == 'C':
+        for t in periods:
+            if t <= 0.1:
+                shp1170.append(1.3 + 23.8*t)
+            elif t > 0.1 and t <= 1.5:
+                shp1170.append(min(1.25/t, 3.68))
+            else:
+                shp1170.append(1.874 / t**2)
+                
+    if siteclass.upper() == 'D':
+        for t in periods:
+            if t <= 0.1:
+                shp1170.append(1.1 + 25.8*t)
+            elif t > 0.1 and t <= 1.5:
+                shp1170.append(min(1.98/t, 3.68))
+            else:
+                shp1170.append(2.97 / t**2)
+                
+    if siteclass.upper() == 'E':
+        for t in periods:
+            if t <= 0.1:
+                shp1170.append(1.1 + 25.8*t)
+            elif t > 0.1 and t <= 1.5:
+                shp1170.append(min(3.08/t, 3.68))
+            else:
+                shp1170.append(4.62 / t**2)
+                
     return array(shp1170)
            
 
