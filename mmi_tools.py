@@ -615,3 +615,111 @@ def parse_usgs_dyfi_geojson(dyfifile):
                          'lat': float(centtxt[1]), 'lon': float(centtxt[0])})
     
     return dyfidict
+
+##########################################################################################
+# Parse GA MMI data
+##########################################################################################
+
+def return_au_mmi_data():
+    import shapefile
+    #from os import path
+    from numpy import array
+    import datetime as dt
+    from mapping_tools import get_field_data
+    shpfile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/MMI/data/iso_p_ASCMM.shp'
+    
+    print 'Reading MMI shapefile...'
+    sf = shapefile.Reader(shpfile)
+    
+    # get data fields
+    mmi = array(get_field_data(sf, 'INTERP_MMI', 'float'))
+    eqmag = array(get_field_data(sf, 'ML_I', 'float'))
+    mmilon = array(get_field_data(sf, 'IP_LONG', 'float'))
+    mmilat = array(get_field_data(sf, 'IP_LAT', 'float'))
+    mmisc = array(get_field_data(sf, 'WII_NEHRP', 'str'))
+    eqname = array(get_field_data(sf, 'EQ_NAME', 'str'))
+    eqlon = array(get_field_data(sf, 'EQ_LONG', 'float'))
+    eqlat = array(get_field_data(sf, 'EQ_LAT', 'float'))
+    eqdep = array(get_field_data(sf, 'DEPTH_KM', 'float'))
+    eqdate = array(get_field_data(sf, 'EQ_DATE', 'str'))
+    eqtime = array(get_field_data(sf, 'EQ_TIME', 'str'))
+    
+    eqdt = []
+    # get datetime
+    for eqd, eqt in zip(eqdate, eqtime):
+        d = '-'.join([str(eqd[0]), str('%02d' % eqd[1]), str('%02d' % eqd[2])])
+        if eqd[0] > 1800:
+            if eqt.strip() == '':
+                eqdt.append(dt.datetime.strptime(d+' 00:00:00', '%Y-%m-%d %H:%M:%S'))
+            else:
+                eqdt.append(dt.datetime.strptime(d+' '+eqt[0:8], '%Y-%m-%d %H:%M:%S'))
+        else:
+            eqdt.append(dt.datetime(2599, 1, 1, 1, 1))
+            
+    # make data dictionary
+    return {'mmi':mmi, 'mmilon':mmilon, 'mmilat':mmilat, 
+            'mmisc':mmisc, 'eqname':eqname, 'eqlon':eqlon, 'eqlat':eqlat,
+            'eqdep':eqdep, 'eqmag':eqmag, 'datetime':array(eqdt)}
+
+def export_historic_event_mmi(Y,m,d,H,M, outcsv): 
+    import datetime
+    from numpy import where, array
+    #from mmi_tools import return_au_mmi_data
+    
+    '''
+    # test 1918 Gladstone Data
+    Y = 1918
+    m = 6
+    d = 6
+    H = 18
+    M = 14
+    '''
+    dt = datetime.datetime(Y,m,d,H,M)
+    
+    mmiDat = return_au_mmi_data()
+    
+    # find data
+    idx = where((array(mmiDat['datetime']) > dt-datetime.timedelta(hours=1)) \
+                & (array(mmiDat['datetime']) < dt+datetime.timedelta(hours=1)))[0]
+    
+    # make output csv txt
+    outtxt = 'ORIGINTIME,EQLO,EQLA,EQDP,EQMAG,MMILO,MMILA,MMI,MMISC,EQNAME\n'
+    for i in idx:
+        outtxt += ','.join((mmiDat['datetime'][i].strftime('%Y%m%dT%H%M'), \
+                            str('%0.3f' % mmiDat['eqlon'][i]), \
+                            str('%0.3f' % mmiDat['eqlat'][i]), \
+                            str('%0.1f' % mmiDat['eqdep'][i]), \
+                            str('%0.1f' % mmiDat['eqmag'][i]), \
+                            str('%0.3f' % mmiDat['mmilon'][i]), \
+                            str('%0.3f' % mmiDat['mmilat'][i]), \
+                            str('%0.1f' % mmiDat['mmi'][i]), \
+                            mmiDat['mmisc'][i], \
+                            mmiDat['eqname'][i])) + '\n'
+                            
+    # write to file
+    f = open(outcsv,'wb')
+    f.write(outtxt)
+    f.close()
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
