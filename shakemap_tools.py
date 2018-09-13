@@ -127,7 +127,36 @@ def parse_gridxml(datxml):
             print subchild.attrib
         '''
     return stndict
+
+def parse_infojson(jsonFilePath):
+    import json
+    from numpy import array
     
+    jsonFilePath = 'info.json'
+    with open(jsonFilePath) as f:
+        data = json.load(f)
+    
+    # return imts
+    imts = data['output']['ground_motions'].viewkeys()
+    
+    # loop thru imts
+    bias = []
+    max_land = []
+    max_grid = []
+    units = []
+    for imt in imts:
+        # get values
+        bias.append(data['output']['ground_motions'][imt]['bias'])
+        max_land.append(data['output']['ground_motions'][imt]['max'])
+        max_grid.append(data['output']['ground_motions'][imt]['max_grid'])
+        units.append(data['output']['ground_motions'][imt]['units'])
+        
+    bias = array(bias)
+    max_land = array(max_land)
+    max_grid = array(max_grid)
+    units = array(units)
+    
+    return data, bias, max_land, max_grid, units
 
 def station_xml2csv(stationxml, stationcsv):
     from shakemap_tools import parse_dataxml
