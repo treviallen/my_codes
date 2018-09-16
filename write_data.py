@@ -107,7 +107,7 @@ def get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
 
 # write output time histories
 def write_waves(sta, evdate, sps, idisp, ivel, iacc, filename, stla, stlo, \
-                eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq):
+                eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq):
 
     # get PGA for file header in mm/s/s
     pga = max(abs(iacc))*1000
@@ -122,7 +122,7 @@ def write_waves(sta, evdate, sps, idisp, ivel, iacc, filename, stla, stlo, \
 
     # set header info
     header = get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
-                             eqmag, rhyp, pga, pgv, lofreq, hifreq, 'cor')
+                             eqmag, rhyp, azim, pga, pgv, lofreq, hifreq, 'cor')
 
     # set data array
     data = np.vstack((idisp, ivel, iacc))

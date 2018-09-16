@@ -593,12 +593,14 @@ def readseed(st):
         if tr.stats['channel'] == 'HHE' or tr.stats['channel'] == 'HNE' or \
            tr.stats['channel'] == 'BHE' or tr.stats['channel'] == 'ENE' or \
            tr.stats['channel'] == 'EHE' or tr.stats['channel'] == 'SHE' or \
-           tr.stats['channel'] == 'SNE' or tr.stats['channel'] == 'BNE':
+           tr.stats['channel'] == 'SNE' or tr.stats['channel'] == 'BNE' or \
+           tr.stats['channel'] == 'HN1':
             comp = tr.stats['channel']
         elif tr.stats['channel'] == 'HHN' or tr.stats['channel'] == 'HNN' or \
              tr.stats['channel'] == 'BHN' or tr.stats['channel'] == 'ENN' or \
              tr.stats['channel'] == 'EHN' or tr.stats['channel'] == 'SHN' or \
-             tr.stats['channel'] == 'SNN' or tr.stats['channel'] == 'BNN':
+             tr.stats['channel'] == 'SNN' or tr.stats['channel'] == 'BNN' or \
+             tr.stats['channel'] == 'HN2':
             comp = tr.stats['channel']
         elif tr.stats['channel'] == 'HHZ' or tr.stats['channel'] == 'HNZ' or \
              tr.stats['channel'] == 'BHZ' or tr.stats['channel'] == 'ENZ' or \

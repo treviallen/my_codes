@@ -256,7 +256,7 @@ while continue_loop == True:
         filename, evdate = write_data.get_filename(sta, recdate, chan, inst_ty, dt, sps)
 
         # get source-to-site distance
-        rhyp, eqla, eqlo, eqdep, eqmag, evdate = spatial_tools.get_eq_distance(stlo, stla, evdate)
+        rhyp, azim, eqla, eqlo, eqdep, eqmag, evdate = spatial_tools.get_eq_distance(stlo, stla, evdate)
 
     if seltask == '1': # plot instrument corrected time histories
         if plot_outputs == True:
@@ -273,7 +273,7 @@ while continue_loop == True:
         # write time histories to file
         write_data.write_waves(sta, evdate, sps, idisp, ivel, iacc, \
                                filename, stla, stlo, eqla, eqlo, eqdep, eqmag, \
-                               rhyp, lofreq, hifreq)
+                               rhyp, azim, lofreq, hifreq)
 
     elif seltask == '2': # calculate FFT
 
@@ -299,7 +299,7 @@ while continue_loop == True:
 
         # write output to file
         write_data.write_response_spectra(sta, evdate, sps, T, psa, pga, pgv, \
-                 filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq)
+                 filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq)
 
     elif seltask == '4': # calculate Wood-Anderson seismogram
         import calculate_magnitudes
