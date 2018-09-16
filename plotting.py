@@ -101,33 +101,54 @@ def plot_dva(freq, sps, corfftr, corffti, header, inst_ty, chan_no):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
-
+    '''
     n = len(corfftr[0])
     tvect = np.reshape(np.linspace(0,n/sps,num=n),(1,n))
+    '''
+    n = len(corfftr)
+    print n
+    tvect = np.linspace(0,n/sps,num=n)
 
     # if velocity seismometer
     if inst_ty == 'S' or inst_ty == 'B' or inst_ty == 'H' or inst_ty == 'E':
 
         # get displacement wave
+        '''
         freq[0,0] = 1.0
         dispfftr = corfftr[0] / (2 * np.pi * abs(freq[0]))
         dispffti = corffti[0] / (2 * np.pi * abs(freq[0]))
         dispfftr[0] = 0
         dispffti[0] = 0
         freq[0,0] = 0
+        '''
+        freq[0] = 1.0
+        dispfftr = corfftr / (2 * np.pi * abs(freq))
+        dispffti = corffti / (2 * np.pi * abs(freq))
+        dispfftr[0] = 0
+        dispffti[0] = 0
+        freq[0] = 0
+        
         complex_array = dispfftr + 1j*dispffti
 
         idisp = np.fft.ifft(complex_array,n)
 
         # get velocity wave
+        '''
         velfftr = corfftr[0]
         velffti = corffti[0]
+        '''
+        velfftr = corfftr
+        velffti = corffti
         complex_array = velfftr + 1j*velffti
         ivel = np.fft.ifft(complex_array,n)
 
         # get acceleration wave
+        '''
         accfftr = corfftr[0] * (2 * np.pi * abs(freq[0]))
         accffti = corffti[0] * (2 * np.pi * abs(freq[0]))
+        '''
+        accfftr = corfftr * (2 * np.pi * abs(freq))
+        accffti = corffti * (2 * np.pi * abs(freq))
         complex_array = accfftr + 1j*accffti
         iacc = np.fft.ifft(complex_array,n)
 
@@ -164,18 +185,21 @@ def plot_dva(freq, sps, corfftr, corffti, header, inst_ty, chan_no):
     fignum = 10 + chan_no
     figure = plt.figure(fignum,figsize=(16,9))
     ax = figure.add_subplot(3,1,1)
-    ax.plot(tvect[0],idisp.real * 1000,'-',color='red') # converted to mm
+    #ax.plot(tvect[0],idisp.real * 1000,'-',color='red') # converted to mm
+    ax.plot(tvect,idisp.real * 1000,'-',color='red') # converted to mm
     plt.ylabel('Displacement (mm)')
     plt.title(header)
     annotate_maxmin(plt, ax ,idisp.real * 1000)
 
     ax = figure.add_subplot(3,1,2)
-    ax.plot(tvect[0],ivel.real*1000,'-',color='green') # converted to mm/s
+    ax.plot(tvect,ivel.real*1000,'-',color='green') # converted to mm/s
+    #ax.plot(tvect[0],ivel.real*1000,'-',color='green') # converted to mm/s
     plt.ylabel('Velocity (mm/s)')
     annotate_maxmin(plt, ax ,ivel.real * 1000)
 
     ax = figure.add_subplot(3,1,3)
-    ax.plot(tvect[0],iacc.real * 100 / 9.81,'-',color='blue') # converted to %g
+    #ax.plot(tvect[0],iacc.real * 100 / 9.81,'-',color='blue') # converted to %g
+    ax.plot(tvect,iacc.real * 100 / 9.81,'-',color='blue') # converted to %g
 #    plt.ylabel(r'Acceleration (m/s$^2$)')
     plt.ylabel('Acceleration (%g)')
     plt.xlabel('Time (s)')

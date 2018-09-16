@@ -64,7 +64,7 @@ Common functions to read data file and get instrument parameters
 
 def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed):
     
-    print len(alldata[:,17])
+    #print len(alldata[:,17])
     # select component
     chan, chan_no = readwaves.select_channel(allsta, comps)
 
@@ -112,7 +112,7 @@ def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sa
         # write new data to file
         response.write_response_info(sta, inst_ty, mindate, maxdate, stlo, \
             stla, netid, nat_freq, damping, sen, recsen, gain, chan, pazfile)
-
+    
     return sta, inst_ty, sps, recdate, nat_freq, damping, sen, recsen, gain, \
            chan, chan_no, chan_dat, stlo, stla, pazfile, alldata, netid
 
@@ -123,7 +123,8 @@ def common_fft(chan_dat, inst_ty, sps, seltask):
     # view wave and trim if necessary
     print chan_dat
     start_index, stop_index = plotting.trim_wave(chan_dat, sps, inst_ty, False)
-    taper_dat = chan_dat[0,start_index:stop_index]
+    #taper_dat = chan_dat[0, start_index:stop_index]
+    taper_dat = chan_dat[start_index:stop_index]
     taper_dat = taper_dat.reshape(1, len(taper_dat))
 
     # if doing FFT analysis, trim again to specify exact window
@@ -244,6 +245,7 @@ while continue_loop == True:
 
         
         # do common fft functions
+        chan_dat = chan_dat[0]
         freq, lofreq, hifreq, wavfft, dt = common_fft(chan_dat, inst_ty, sps, seltask)
         
         # do common instrument deconvolution functions

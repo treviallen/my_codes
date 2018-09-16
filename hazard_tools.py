@@ -157,6 +157,8 @@ def return_AS1170_4_shape(periods, siteclass):
     '''
     siteclass = A-B
     '''
+    from numpy import array
+    
     shp1170 = []
     
     if siteclass.upper() == 'A':

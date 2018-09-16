@@ -646,7 +646,7 @@ def readseed(st):
         else:
             alldata = hstack((alldata, tmpdat.reshape(max_npts,1)))
             
-    print shape(alldata)
+    #print shape(alldata)
     return allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp
 
 # make text to select channel
