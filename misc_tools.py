@@ -448,3 +448,17 @@ def discrete_cmap(N, base_cmap=None):
     cmap_name = base.name + str(N)
     
     return base.from_list(cmap_name, color_list, N)
+
+# returns N x 3 RGB array
+def cmap2rgb(cmap, ncolours):
+    '''
+    ncolours = N colours in rgb array (integer)
+    '''
+    import matplotlib.pyplot as plt
+    from numpy import linspace, newaxis
+    
+    x = linspace(0.0, 1.0, ncolours)
+    
+    return plt.get_cmap(plt.get_cmap(cmap))(x)[newaxis, :, :3]
+    
+    
