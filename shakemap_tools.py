@@ -132,7 +132,7 @@ def parse_infojson(jsonFilePath):
     import json
     from numpy import array
     
-    jsonFilePath = 'info.json'
+    #jsonFilePath = 'info.json'
     with open(jsonFilePath) as f:
         data = json.load(f)
     

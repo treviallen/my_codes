@@ -389,9 +389,13 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
-    from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
-    from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
-    from atkinson_adams_2013 import atkinson_adams_2013
+    try:
+        from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
+        from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
+    except:
+        from openquake_local.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
+        from openquake_local.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
+    #from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
     
