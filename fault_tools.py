@@ -553,15 +553,16 @@ def mag2wid_L10(mw, ftype): # in MW
     flen = mag2len_L10(mw, ftype) * 1000. # in m
     
     a = 0.667
-    if ftype == 'rs':
+    if ftype == 'ds':
         b = 1.24
-        print '\n only valid for RS if GT 5.5 km\n'
+        print '\n only valid for RS if GT 5.5 km\n', b
     elif ftype == 'ss':
         b = 1.18
         print '\n only valid for SS if 3.4-45 km\n'
     elif ftype == 'scr':
         b = 1.13
         print '\n only valid for SCR if GT 2.5 km\n'
+    
     return 10**(a * log10(flen) + b) / 1000. # in km
     
 def len2wid_L10(flen, ftype): # in MW
