@@ -770,3 +770,29 @@ def parse_usgs_event_query(usgscsv):
         evdict.append(tdict)
         
     return evdict
+
+# parses csv export from GA web search - needs updating
+def parse_ga_event_query(gacsv):
+    lines = open(epifile).readlines()[3:]
+
+    lat = []
+    lon = []
+    mag = []
+    year = []
+    evdict = []
+    
+    for line in lines:
+        dat = line.strip().split(',')
+        mag.append(float(dat[27]))
+        lat.append(float(dat[13]))
+        lon.append(float(dat[14]))
+        year.append(float(dat[10].split('-')[0]))
+        
+        tdict = {'year': float(dat[10].split('-')[0]), 'lat': float(dat[13]), 'lon': float(dat[24]), \
+                 'dep': float(dat[4]), 'mag': float(dat[27]), 'magType': dat[28], \
+                 'timestr': dat[10]}
+                 	
+        evdict.append(tdict)
+        
+    return evdict
+
