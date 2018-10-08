@@ -783,16 +783,18 @@ def parse_ga_event_query(gacsv):
     
     for line in lines:
         dat = line.strip().split(',')
-        mag.append(float(dat[27]))
-        lat.append(float(dat[13]))
-        lon.append(float(dat[14]))
-        year.append(float(dat[10].split('-')[0]))
-        
-        tdict = {'year': float(dat[10].split('-')[0]), 'lat': float(dat[13]), 'lon': float(dat[24]), \
-                 'dep': float(dat[4]), 'mag': float(dat[27]), 'magType': dat[28], \
-                 'timestr': dat[10]}
-                 	
-        evdict.append(tdict)
+        if len(dat) >= 27:
+            mag.append(float(dat[27]))
+            lat.append(float(dat[13]))
+            lon.append(float(dat[14]))
+            year.append(float(dat[10].split('-')[0]))
+            
+            
+            tdict = {'year': float(dat[10].split('-')[0]), 'lat': float(dat[13]), 'lon': float(dat[24]), \
+                     'dep': float(dat[4]), 'mag': float(dat[27]), 'magType': dat[28], \
+                     'timestr': dat[10]}
+                     	
+            evdict.append(tdict)
         
     return evdict
 
