@@ -773,24 +773,31 @@ def parse_usgs_event_query(usgscsv):
 
 # parses csv export from GA web search - needs updating
 def parse_ga_event_query(gacsv):
-    lines = open(epifile).readlines()[3:]
-
-    lat = []
-    lon = []
-    mag = []
-    year = []
+    '''
+    gacsv: path to csv file downloaded from https://earthquakes.ga.gov.au/
+    '''
+    import datetime as dt
+    
+    # open and read file
+    lines = open(gacsv).readlines()[3:]
+    
+    # initiate event dictonary
     evdict = []
     
     for line in lines:
         dat = line.strip().split(',')
-        if len(dat) >= 27:
-            mag.append(float(dat[27]))
-            lat.append(float(dat[13]))
-            lon.append(float(dat[14]))
-            year.append(float(dat[10].split('-')[0]))
+        if len(dat) >= 27 and not line.startswith('"'):
             
-            
-            tdict = {'year': float(dat[10].split('-')[0]), 'lat': float(dat[13]), 'lon': float(dat[24]), \
+            try:
+                dateTime = dt.datetime.strptime(dat[10], '%Y-%m-%dT%H:%M:%S.%f')
+            except:
+                dateTime = dt.datetime.strptime(dat[10], '%Y-%m-%dT%H:%M:%S')
+                
+            tdict = {'datetime': dateTime, \
+                     'year': dateTime.year, 'month': dateTime.month, \
+                     'day': dateTime.day, 'hour': dateTime.hour, \
+                     'minute': dateTime.minute, 'second': dateTime.second, \
+                     'lat': float(dat[13]), 'lon': float(dat[14]), \
                      'dep': float(dat[4]), 'mag': float(dat[27]), 'magType': dat[28], \
                      'timestr': dat[10]}
                      	

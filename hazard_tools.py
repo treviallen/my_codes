@@ -38,6 +38,17 @@ def get_probability_from_obs_and_return_period(return_period, investigation_time
     from numpy import exp
     return 1 - exp(-investigation_time/return_period)
 
+def poe_invtime_to_annual(imtls, poe, investigation_time):
+    from numpy import array, log
+    
+    # now get annualised curves
+    P0 = 1 - array(imtls)
+    n = -1*log(P0)
+    annual_probs = n / investigation_time
+    
+    tmpdict[ut+'_probs_annual'] = annual_probs
+    tmpdict[ut+'_probs_invtime'] = hazcurve
+
 
 def get_nsha12_hazard_curve(lon, lat, spectral_period):
     '''
