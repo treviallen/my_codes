@@ -789,9 +789,9 @@ def parse_ga_event_query(gacsv):
         if len(dat) >= 27 and not line.startswith('"'):
             
             try:
-                dateTime = dt.datetime.strptime(dat[10], '%Y-%m-%dT%H:%M:%S.%f')
+                dateTime = dt.datetime.strptime(dat[24], '%Y-%m-%dT%H:%M:%S.%f')
             except:
-                dateTime = dt.datetime.strptime(dat[10], '%Y-%m-%dT%H:%M:%S')
+                dateTime = dt.datetime.strptime(dat[24], '%Y-%m-%dT%H:%M:%S')
                 
             tdict = {'datetime': dateTime, \
                      'year': dateTime.year, 'month': dateTime.month, \
@@ -799,7 +799,7 @@ def parse_ga_event_query(gacsv):
                      'minute': dateTime.minute, 'second': dateTime.second, \
                      'lat': float(dat[13]), 'lon': float(dat[14]), \
                      'dep': float(dat[4]), 'mag': float(dat[27]), 'magType': dat[28], \
-                     'timestr': dat[10]}
+                     'timestr': dat[10], 'description': dat[6]}
                      	
             evdict.append(tdict)
         
