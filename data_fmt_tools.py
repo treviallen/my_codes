@@ -528,3 +528,90 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
         st.write(msfile, format="MSEED") 
         print st
         
+    return st
+        
+# parse station data
+def get_stn_dataless_seed(network):
+    from obspy.io.xseed import Parser
+    from os import path, getcwd
+    
+    
+    # set dataless path
+    if getcwd().startswith('/nas'):
+        print path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.dataless')
+        dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.dataless'))
+        
+    return dataless
+
+def get_station_distance(st, dataless, eqlo, eqla):
+    '''
+    st = station miniseed stream
+    dataless = dataless seed volume    
+    '''
+    
+    from mapping_tools import distance
+    from numpy import array
+    
+    # set arrays to return
+    channel = []
+    repi = []
+    azim = []
+    stations = []
+    stalocs = []
+    
+    for tr in st:
+        seedid=tr.get_id()
+        channel.append(tr.stats.channel)
+        stations.append(tr.stats.station)
+        
+        start_time = tr.stats.starttime
+        
+        #paz = dataless.get_paz(seedid,start_time)
+        staloc = dataless.get_coordinates(seedid,start_time)
+        stalocs.append(staloc)
+        
+        repi.append(distance(eqla, eqlo, staloc['latitude'], staloc['longitude'])[0])
+        azim.append(distance(eqla, eqlo, staloc['latitude'], staloc['longitude'])[1])
+               
+    return stalocs, array(stations), array(channel), array(repi), array(azim)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+        
