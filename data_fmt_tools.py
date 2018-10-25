@@ -530,7 +530,7 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
         
     return st
         
-# parse station data
+# parse station dataless seed
 def get_stn_dataless_seed(network):
     from obspy.io.xseed import Parser
     from os import path, getcwd
@@ -538,11 +538,11 @@ def get_stn_dataless_seed(network):
     
     # set dataless path
     if getcwd().startswith('/nas'):
-        print path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.dataless')
         dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.dataless'))
         
     return dataless
 
+# gets station distance from dataless seed volume
 def get_station_distance(st, dataless, eqlo, eqla):
     '''
     st = station miniseed stream
