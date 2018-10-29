@@ -528,7 +528,7 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
         st.write(msfile, format="MSEED") 
         print st
         
-    return st
+    return st, msfile
         
 # parse station dataless seed
 def get_stn_dataless_seed(network):
