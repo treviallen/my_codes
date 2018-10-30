@@ -68,7 +68,8 @@ def get_nsha12_hazard_curve(lon, lat, spectral_period):
     f.close()
     
     # set base path for grd location on the NAS
-    basepath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/national/Version_13/output/grd_files/combined'
+    basepath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/national/Version_13/output/grd_files/combined' # not sure where this went!
+    basepath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Hazard/National_Map_2012/final_eq_hazard_grd_files'
     
     hazArray = []
     probabilities = []
@@ -79,7 +80,7 @@ def get_nsha12_hazard_curve(lon, lat, spectral_period):
         grdpath = path.join(basepath, grdfile)
 
         # do grdtrack to extract hazard value
-        system(''.join(('grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
+        system(''.join(('gmt grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
         
         try:
             # parse in hazard value
@@ -127,6 +128,7 @@ def get_nsha12_hazard_spectra(lon, lat, return_period):
     
     # set base path for grd location on the NAS
     basepath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/national/Version_13/output/grd_files/combined'
+    basepath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Hazard/National_Map_2012/final_eq_hazard_grd_files'
     
     uhs = []
     periods = []
@@ -140,7 +142,7 @@ def get_nsha12_hazard_spectra(lon, lat, return_period):
 
         try:
             # do grdtrack to extract hazard value
-            system(''.join(('grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
+            system(''.join(('gmt grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
         
         
             # parse in hazard value
