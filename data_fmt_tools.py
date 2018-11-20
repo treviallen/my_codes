@@ -1,8 +1,14 @@
 # converts css to mseed
-def css2mseed(cssfile):
+def css2mseed(cssfile, mseedpath):
+    '''
+    cssfile = wfdisc file in
+    mseedfile = path to mseed out file 
+    '''
+    
     #from obspy.css.core import readCSS
     from obspy import read
     from data_fmt_tools import readGACSS
+    from os import path
     
     #cssfile = 'moe_4.4/TOO/TOO_2012202.wfdisc'
     
@@ -14,13 +20,16 @@ def css2mseed(cssfile):
         st = readGACSS(cssfile)
     
     # make outfile
-    outfile = '.'.join((st[0].stats['starttime'].strftime('%Y%m%d%H%M'), st[0].stats['station'],'mseed'))
+    outfile = '.'.join((st[0].stats['starttime'].strftime('%Y-%m-%dT%H.%M'), 'AU', st[0].stats['station'],'mseed'))
+    outpath = path.join(mseedpath, outfile)
     
     # make sure data type ok
     for s in st:
         s.data = 1. * s.data
         
-    st.write(outfile, format="MSEED")
+    st.write(outpath, format="MSEED")
+    
+    return st, outpath    
     
 import numpy as np
 DTYPE = {
