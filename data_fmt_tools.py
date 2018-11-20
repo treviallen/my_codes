@@ -1,13 +1,16 @@
 # converts css to mseed
 def css2mseed(cssfile):
-    from obspy.css.core import readCSS
+    #from obspy.css.core import readCSS
+    from obspy import read
     from data_fmt_tools import readGACSS
     
     #cssfile = 'moe_4.4/TOO/TOO_2012202.wfdisc'
     
     try:
-        st = readCSS(cssfile)
+        #st = readCSS(cssfile)
+        st = read(cssfile)
     except:
+        print 'Using GA format CSS'
         st = readGACSS(cssfile)
     
     # make outfile
@@ -68,7 +71,7 @@ def readGACSS(filename, **kwargs):
     import os
 
     from obspy import Stream, Trace, UTCDateTime
-    from obspy.core.compatibility import frombuffer
+    from obspy.core.compatibility import from_buffer
 
     """
     Reads a CSS waveform file and returns a Stream object.
@@ -107,7 +110,7 @@ def readGACSS(filename, **kwargs):
         with open(filename, "rb") as fh:
             fh.seek(offset)
             data = fh.read(read_fmt.itemsize * npts)
-            data = frombuffer(data, dtype=read_fmt)
+            data = from_buffer(data, dtype=read_fmt)
             data = np.require(data, dtype=fmt)
         header = {}
         header['station'] = dat[2].strip().decode()
@@ -337,6 +340,7 @@ def eqwave2mseed(eqwfile):
 def get_iris_data(dateTuple, sta, net):     
     from obspy.core.utcdatetime import UTCDateTime
     from obspy.clients.fdsn.client import Client
+    from os import path, makedirs
     
     '''
     Code to extract IRIS data, one station at a time.  Exports mseed file to 
@@ -358,30 +362,42 @@ def get_iris_data(dateTuple, sta, net):
             + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))
     
     client = Client("IRIS")
-    t1 = UTCDateTime(utcdt)
-    t2 = t1 + 900
+    t1 = UTCDateTime(utcdt) - 120
+    t2 = t1 + 1500
     t3 = t1 + 3
     
     bulk = [(net.upper(), sta.upper(), "*", "*", t1, t2),
             ("AU", "AFI", "1?", "BHE", t1, t3)]
+    
+    try:        
+        st = client.get_waveforms_bulk(bulk)
+        
+        # save out to file
+        tr = st[0]
+        
+        trname = path.join('iris_dump', \
+                           '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                           tr.stats['network'], tr.stats['station'], 'mseed')))
+        
+        # check if waves folder exists
+        if not path.isdir('iris_dump'):
+            makedirs('iris_dump')
             
-    st = client.get_waveforms_bulk(bulk)
-    
-    # save out to file
-    tr = st[0]
-    #for tr in st:
-    trname = '.'.join((tr.stats.starttime.strftime('%Y%m%d%H%M'), \
-                       tr.stats['station'], \
-                       tr.stats['network'],'mseed'))
-    
-    print 'Writing file:', trname                   
-    st.write(trname, format="MSEED")
+        print 'Writing file:', trname                   
+        st.write(trname, format="MSEED")
+    except:
+        print 'Data not available:', sta.upper()
+        # dummy data returned
+        st = 0
+        trname='null'
     '''
     except:
         print '\nUsage: \n    python get_iris_data.py <datetime tuple> <station code>\n'
         
         print '    e.g.: python get_iris_data.py (2010,4,20,0,16) kmbl\n'
     '''
+    
+    return st, trname
 
 def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
     '''
@@ -534,11 +550,21 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
 def get_stn_dataless_seed(network):
     from obspy.io.xseed import Parser
     from os import path, getcwd
-    
-    
+        
     # set dataless path
     if getcwd().startswith('/nas'):
         dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.dataless'))
+        
+    return dataless
+
+# parse station dataless seed
+def get_iris_stn_dataless_seed(network):
+    from obspy.io.xseed import Parser
+    from os import path, getcwd
+        
+    # set dataless path
+    if getcwd().startswith('/nas'):
+        dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.IRIS.dataless'))
         
     return dataless
 
