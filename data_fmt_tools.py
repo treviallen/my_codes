@@ -103,13 +103,27 @@ def readGACSS(filename, **kwargs):
     # read single traces
     for line in lines:
         dat = line.strip().split()
-        print dat
-        npts = int(dat[4])
-        dirname = dat[14].strip().decode()
-        filename = dat[15].strip().decode()
+        
+        # format 1
+        try:
+            offset = int(dat[16])
+            npts = int(dat[4])
+            dirname = dat[14].strip().decode()
+            filename = dat[15].strip().decode()
+            dtype = DTYPE[dat[10]]
+            fmt1 = True
+        
+        # format 2
+        except:
+            offset = int(dat[17])
+            npts = int(dat[7])
+            dirname = dat[15].strip().decode()
+            filename = dat[16].strip().decode()
+            dtype = DTYPE[dat[13]]
+            fmt1 = False
+        
         filename = os.path.join(basedir, dirname, filename)
-        offset = int(dat[16])
-        dtype = DTYPE[dat[10]]
+            
         if isinstance(dtype, tuple):
             read_fmt = np.dtype(dtype[0])
             fmt = dtype[1]
@@ -122,12 +136,22 @@ def readGACSS(filename, **kwargs):
             data = from_buffer(data, dtype=read_fmt)
             data = np.require(data, dtype=fmt)
         header = {}
-        header['station'] = dat[2].strip().decode()
-        header['channel'] = get_ga_channel(dat[3]).strip().decode()
-        header['starttime'] = UTCDateTime(float(dat[1]))
-        header['sampling_rate'] = float(dat[5])
-        header['calib'] = float(dat[12])
-        header['calper'] = float(dat[13])
+        
+        if fmt1 == True:
+            header['station'] = dat[2].strip().decode()
+            header['channel'] = get_ga_channel(dat[3]).strip().decode()
+            header['starttime'] = UTCDateTime(float(dat[1]))
+            header['sampling_rate'] = float(dat[5])
+            header['calib'] = float(dat[12])
+            header['calper'] = float(dat[13])
+        else:
+            header['station'] = dat[0].strip().decode()
+            header['channel'] = get_ga_channel(dat[1]).strip().decode()
+            header['starttime'] = UTCDateTime(float(dat[2])) # ok?
+            header['sampling_rate'] = float(dat[8])
+            header['calib'] = float(dat[2])
+            header['calper'] = float(dat[10])
+        
         tr = Trace(data, header=header)
         traces.append(tr)
     return Stream(traces=traces)
