@@ -74,7 +74,8 @@ def get_ga_channel(chin):
         return 'HNN'
     elif chin == 'ge':
         return 'HNE'
-
+    else:
+        return chin
 # hacked version of obspy core to read old GA files
 def readGACSS(filename, **kwargs):
     import os
