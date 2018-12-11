@@ -48,7 +48,8 @@ def return_data(wavfile):
     fmt = check_file_fmt(wavfile)
     if fmt == 'eqw':
         # read the eqWave text file
-        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readeqwave(wavfile)
+        #allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readeqwave(wavfile)
+        allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp, cntpvolt, sen, gain = readeqwave(wavfile)
     elif fmt == 'nmx':
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readnmx(wavfile)
     elif fmt == 'tspair':
@@ -56,7 +57,7 @@ def return_data(wavfile):
     elif fmt == 'sm':
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readseismac(wavfile)
     elif fmt == 'bkn':
-        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readbkn(wavfile)
+        allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp, cntpvolt, sen, gain, instrument, secoffset = readbkn(wavfile)
     elif fmt == 'mseed':
         from obspy.core import read
         st = read(wavfile)
@@ -73,7 +74,7 @@ def readeqwave(wavfile):
     sen = 'null'
     gain = 'null'
     
-    print '\nReading header info...'
+    #print '\nReading header info...'
     header = open(wavfile).readlines()
 
     readdat = 0
@@ -83,6 +84,7 @@ def readeqwave(wavfile):
         line = header[k]
         line = line.strip('\n')
         line = line.strip('\t')
+        line = line.replace('\t\t','\t')
         
         # get station name
         ind = line.find('#sitename')
@@ -124,6 +126,7 @@ def readeqwave(wavfile):
             sps = line.split('\t')
             sps = sps[0:-1]
             sps = [round(float(x)) for x in sps]
+            print sps
         
         ind = line.find('#Counts/Volt')
         if ind >= 0:
@@ -178,19 +181,20 @@ def readeqwave(wavfile):
         ind = line.find('--------')
         if ind >= 0:
             readdat = 1
-            print 'Reading data...'
+            #print 'Reading data...'
 
     # make date array
     alldatestr = []
     for j in range(0,len(sec)):
-        alldatestr.append(ymd[j]+hhmm[j]+intsec[j])
+        #alldatestr.append(ymd[j]+hhmm[j]+intsec[j])
+        alldatestr.append(ymd[j]+hhmm[j])
 
     # reformat kelunji components
     # assume no BB
     i = 0
     for comp in comps:
         # not sure why this if statement is needed!
-        print comp
+        #print comp
         if comp.startswith('EH') or comp.startswith('v') or comp.startswith('EL') or comp.endswith(' t') \
            or comp.endswith(' T') or comp.endswith(' T 5') or comp.startswith('SP') \
            or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03') or comp.endswith('vel'):
@@ -304,7 +308,7 @@ def readnmx(wavfile):
         ind = line.find('Format Version: 5.0')
         if ind >= 0:
             readdat = 1
-            print 'Reading data...'
+            #print 'Reading data...'
 
     return sta, comps, datestr, sec, sps, data, nsamp
 
@@ -495,7 +499,7 @@ def readseismac(wavfile):
 
 # read data from BKN deployement
 def readbkn(wavfile):
-    from numpy import ones_like, zeros
+    from numpy import ones_like, zeros, array
     
     # for testing
     # bknfile = 'U:\\Geoscience_Australia\\eqSource\\Waves\\2002\\03\\05_0147\\BK1_02064_0147.G'
@@ -512,28 +516,73 @@ def readbkn(wavfile):
     sta = dat[1]
     
     # get n samples and sps
-    dat = lines[12].strip().split()
-    nsamp = int(dat[0])
-    sps = int(dat[3])
-    
-    # get comps
-    dat = lines[16].strip().split()
-    comps = dat[2:]
+    try:
+        dat = lines[12].strip().split()
+        nsamp = int(dat[0])
+        sps = int(dat[3])
+        
+        # get comps
+        dat = lines[16].strip().split()
+        comps = dat[2:]
+    except:
+        dat = lines[7].strip().split()
+        nsamp = int(dat[0])
+        sps = int(dat[3])
+        
+        # get comps
+        dat = lines[11].strip().split()
+        comps = dat[2:]    
+
+    # finish comps    
     for i, comp in enumerate(comps):
-        if comp[0] == 'G':
+        if comp[0] == 'G' or sta == 'GOK' or sta == 'CMC' or sta == 'KOO1' \
+           or sta == 'KOO2':
             comps[i] = 'HN' + comp[-1]
             #print sta, 'Acc', comp, comps[i], wavfile
         elif comp[0] == 'S' and sps > 80:
             comps[i] = 'EH' + comp[-1]
             #print sta, 'Vel', comp, comps[i], wavfile
+            
+    # get sensitivity
+    gain = 1.0
+    cntpvolt = 1.0
+    instrument = lines[6].split()[-1]
+    try:
+        try:
+            zsen = 1.0 / (float(lines[7].split()[1]) * 1E-9)
+            esen = 1.0 / (float(lines[11].split()[1]) * 1E-9)
+            nsen = 1.0 / (float(lines[9].split()[1]) * 1E-9)
+            sen = array([esen, nsen, zsen])
+            
+        except:
+            sen = array([1.0, 1.0, 1.0])
+    
+    # for 2004 GOK and CMC
+    except:
+        sen = array([1.0, 1.0, 1.0])
+        
     
     # now get data
+    readdat = False
+    i = 0
     data = zeros((len(comps), nsamp))
-    for i, line in enumerate(lines[18:]):
-        dat = line.strip().split()
-        data[0,i] = float(dat[1])
-        data[1,i] = float(dat[2])
-        data[2,i] = float(dat[3])
+    
+    for line in lines:
+        if readdat == True:
+            dat = line.strip().split()
+            data[0,i] = float(dat[1])
+            data[1,i] = float(dat[2])
+            data[2,i] = float(dat[3])
+            
+            # get second offset
+            if i == 0:
+                secoffset = float(dat[0])
+
+            i += 1
+        else:
+            #print line
+            if line.startswith('--------------'):
+                readdat = True
         
     # now make lists
     allsta = []
@@ -547,7 +596,7 @@ def readbkn(wavfile):
     sps = ones_like(allnsamp) * sps
     allsec = ones_like(allnsamp) * sec
     
-    return allsta, comps, alldatestr, allsec, sps, data, allnsamp
+    return allsta, comps, alldatestr, allsec, sps, data, allnsamp, cntpvolt, sen, gain, instrument, secoffset
 
 # here we use obspy to read miniseed files
 def readseed(st):
