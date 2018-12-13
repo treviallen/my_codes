@@ -635,7 +635,43 @@ def get_station_distance(st, dataless, eqlo, eqla):
                
     return stalocs, array(stations), array(channel), array(repi), array(azim)
     
+def return_all_au_station_data():
+    from datetime import datetime
     
+    au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/sandpits/tallen/NSHA2018/catalogue/data/au_station_data.dat'
+    
+    lines = open(au_station_file).readlines()
+    
+    sta_dict = []
+    
+    for line in lines:
+        dat = line.strip().split('\t')
+        #print line
+        
+        if int(dat[5]) < 1:
+            dat[5] = 1
+        if int(dat[7]) < 1:
+            dat[7] = 1
+            
+        tmp = {'sta':dat[0], 'stlo':float(dat[1]), 'stla':float(dat[2]), 
+               'startdate':datetime(int(dat[4]),int(dat[5]),1), 
+               'enddate':datetime(int(dat[6]),int(dat[7]),1)}
+        
+        # append to sta_dict
+        sta_dict.append(tmp)
+        
+    return sta_dict
+
+# get single station data
+def return_sta_data(sta):
+    
+    sta_dict = return_all_au_station_data()
+    
+    for sd in sta_dict:
+        if sd['sta'] == sta:
+            sta_data = sd
+            
+    return sta_data
     
     
     
