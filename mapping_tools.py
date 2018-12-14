@@ -573,6 +573,11 @@ def distance(lat1, lon1, lat2, lon2):
     
     return rngkm, az, baz
 
+def km2deg(rngkm):
+    from obspy.geodetics.base import kilometer2degrees
+    
+    return kilometer2degrees(rngkm, radius=6371.)
+
 # function to get linear profile of lat/lons    
 def get_distance_locs(lat1, lon1, lat2, lon2, npts):
     from mapping_tools import reckon, distance

@@ -55,27 +55,36 @@ DTYPE = {
     b'b#': (b'S24', np.float64),
 }
 
-def get_ga_channel(chin):
+def get_ga_channel(chin, sensor):
+    chin = chin.strip().decode()
     if chin == 'ez':
-        return 'EHZ'
+        chin_return = 'HHZ'
     elif chin == 'en':
-        return 'EHN'
+        chin_return = 'HHN'
     elif chin == 'ee':
-        return 'EHE'
+        chin_return = 'HHE'
     elif chin == 'sz':
-        return 'SHZ'
+        chin_return = 'BHZ'
     elif chin == 'sn':
-        return 'SHN'
+        chin_return = 'BHN'
     elif chin == 'se':
-        return 'SHE'
+        chin_return = 'BHE'
     elif chin == 'gz':
-        return 'HNZ'
+        chin_return = 'HNZ'
     elif chin == 'gn':
-        return 'HNN'
+        chin_return = 'HNN'
     elif chin == 'ge':
-        return 'HNE'
+        chin_return = 'HNE'
     else:
-        return chin
+        chin_return = chin
+        
+    if sensor == 'CMG40T' and chin_return.startswith('HH'):
+        chin_return.replace('HH', 'EH')
+    elif sensor == 'CMG40T' and chin_return.startswith('BH'):
+        chin_return.replace('BH', 'SH')
+        
+    return chin_return
+
 # hacked version of obspy core to read old GA files
 def readGACSS(filename, **kwargs):
     import os
@@ -140,14 +149,14 @@ def readGACSS(filename, **kwargs):
         
         if fmt1 == True:
             header['station'] = dat[2].strip().decode()
-            header['channel'] = get_ga_channel(dat[3]).strip().decode()
+            header['channel'] = get_ga_channel(dat[3], dat[8])
             header['starttime'] = UTCDateTime(float(dat[1]))
             header['sampling_rate'] = float(dat[5])
             header['calib'] = float(dat[12])
             header['calper'] = float(dat[13])
         else:
             header['station'] = dat[0].strip().decode()
-            header['channel'] = get_ga_channel(dat[1]).strip().decode()
+            header['channel'] = get_ga_channel(dat[1], '')
             header['starttime'] = UTCDateTime(float(dat[2])) # ok?
             header['sampling_rate'] = float(dat[8])
             header['calib'] = float(dat[2])
@@ -220,18 +229,86 @@ def merge_seed(mseedfiles):
     from misc_tools import doy2ymd
     
     st = Stream()
-    for wave in mseedfiles:
+    for i, wave in enumerate(mseedfiles):
         st += read(wave)
         
         # now merge
         st.merge(method=0, fill_value=0)
+        
+        # set starttime for file name
+        if i == 0:
+            starttime = st[0].stats['starttime'].strftime('%Y-%m-%dT%H.%M')
     
-    sta = st[0].stats['station']
-    tmpname = mseedfiles[0].strip('.mseed').split('_')
-    print tmpname
-    ymdhmd = doy2ymd(tmpname[0][0:4], tmpname[0][4:]) + str('%04d' % float(tmpname[1]))
-    outfile = '.'.join((ymdhmd,sta,'mrg.mseed'))
-    print outfile
+    #tmpname = mseedfiles[0].strip('.mseed').split('_')
+    #print tmpname
+    #ymdhmd = doy2ymd(tmpname[0][0:4], tmpname[0][4:]) + str('%04d' % float(tmpname[1]))
+    outfile = '.'.join((starttime, 'AU', st[0].stats['station'],'mrg','mseed'))
+    #outfile = '.'.join((ymdhmd,sta,'mrg.mseed'))
+    print 'Merged file:', outfile
+    st.write(outfile, format='MSEED')
+    
+# merge mseed files with a given file prefix
+# mseedfiles = tuple of files
+def merge_seed_prefix(folder, file_prefix, station):
+    from obspy.core import read, Stream
+    from misc_tools import listdir_file_prefix
+    from os import path
+    
+    # get file list
+    mseedfiles = listdir_file_prefix(folder, file_prefix)
+    
+    st = Stream()
+    i = 0
+    for wave in mseedfiles:
+        st_tmp = read(path.join(folder, wave))
+        if st_tmp[0].stats.station == station:
+            st += st_tmp
+            
+            # now merge
+            st.merge(method=0, fill_value=0)
+            
+            # set starttime for file name
+            if i == 0:
+                starttime = st[0].stats['starttime'].strftime('%Y-%m-%dT%H.%M')
+            
+            i += 1
+    
+    outfile = path.join(folder, '.'.join((starttime, 'AU', st[0].stats['station'],'mrg','mseed')))
+    print 'Merged file:', outfile
+    st.write(outfile, format='MSEED')
+
+def merge_seed_extract_centaur(folder, file_prefix, station, eventDateTime):
+    from obspy.core import read, Stream, UTCDateTime
+    from misc_tools import listdir_file_prefix
+    from os import path
+    
+    '''
+    eventDateTime: event origintime to nearest minute
+    '''
+    
+    # get file list
+    mseedfiles = listdir_file_prefix(folder, file_prefix)
+    
+    st = Stream()
+    for wave in mseedfiles:
+        st_tmp = read(path.join(folder, wave))
+        if st_tmp[0].stats.station == station:
+            st += st_tmp
+            
+            # now merge
+            st.merge(method=0, fill_value=0)
+    
+    st.plot()                    
+    # now cut to starttime
+    starttime = UTCDateTime(eventDateTime.year, eventDateTime.month, eventDateTime.day, eventDateTime.hour, eventDateTime.minute) - 120
+    endtime = starttime + 1200
+    
+    # now trim
+    st_trim = st.trim(starttime, endtime)
+    st_trim.plot()
+    
+    outfile = '.'.join((starttime.strftime('%Y-%m-%dT%H.%M'), 'AU', st_trim[0].stats['station'],'mseed'))
+    print 'Merged file:', outfile
     st.write(outfile, format='MSEED')
 
 # merge jump seed files to one

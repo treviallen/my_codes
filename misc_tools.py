@@ -304,6 +304,19 @@ def listdir_extension(folder, extension):
     files.append([each for each in listdir(folder) if each.endswith('.'+extension)])
     
     return files[0]
+
+# list files with a common file prefix
+def listdir_file_prefix(folder, file_prefix):
+    from os import listdir
+    
+    files = []
+    #extension = extension.strip('.')
+    files.append([each for each in listdir(folder) if each.startswith(file_prefix)])
+    
+    for f in files[0]:
+        print f
+    
+    return files[0]
     
 # for getting log xy plotting locations
 def get_log_xy_locs(lims, percent_loc):
