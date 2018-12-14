@@ -283,7 +283,10 @@ def merge_seed_extract_centaur(folder, file_prefix, station, eventDateTime):
     from os import path
     
     '''
-    eventDateTime: event origintime to nearest minute
+    folder: folder in which mseed files are located
+    file_prefix: text string common to all files we want to merge
+    station: station code 
+    eventDateTime: event origintime to nearest minute, e.g. datetime.datetime(2018,12,1,13,27)
     '''
     
     # get file list
@@ -298,14 +301,12 @@ def merge_seed_extract_centaur(folder, file_prefix, station, eventDateTime):
             # now merge
             st.merge(method=0, fill_value=0)
     
-    st.plot()                    
     # now cut to starttime
     starttime = UTCDateTime(eventDateTime.year, eventDateTime.month, eventDateTime.day, eventDateTime.hour, eventDateTime.minute) - 120
     endtime = starttime + 1200
     
     # now trim
     st_trim = st.trim(starttime, endtime)
-    st_trim.plot()
     
     outfile = '.'.join((starttime.strftime('%Y-%m-%dT%H.%M'), 'AU', st_trim[0].stats['station'],'mseed'))
     print 'Merged file:', outfile
