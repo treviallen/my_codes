@@ -37,7 +37,7 @@ def trim_wave(data, sps, inst_ty, fftanal):
         tvect = np.linspace(0, nsamp/sps, num=nsamp)
         
         ax = figure.add_subplot(3,1,1)
-        ax.plot(tvect, data,'-',color='orange')
+        ax.plot(tvect, data,'-', lw=0.5,color='orange')
     
     # do stupid way!
     except:
@@ -47,7 +47,7 @@ def trim_wave(data, sps, inst_ty, fftanal):
         tvect = np.reshape(np.linspace(0,nsamp/sps,num=nsamp),(1,nsamp))
     
         ax = figure.add_subplot(3,1,1)
-        ax.plot(tvect[0],data[0],'-',color='orange')
+        ax.plot(tvect[0],data[0],'-', lw=0.5, color='orange')
     
     if fftanal == False:
         plt.title('Select by clicking twice about time window of interest' + '\n' \
@@ -81,10 +81,10 @@ def trim_wave(data, sps, inst_ty, fftanal):
     ax = figure.add_subplot(3,1,3)
     plt.title('Trimmed Time History')
     try:
-        ax.plot(tvect[x1:x2],data[x1:x2],'-',color='green')
+        ax.plot(tvect[x1:x2],data[x1:x2],'-', lw=0.5,color='green')
         annotate_maxmin(plt, ax ,data[x1:x2])
     except:
-        ax.plot(tvect[0,x1:x2],data[0,x1:x2],'-',color='green')
+        ax.plot(tvect[0,x1:x2],data[0,x1:x2],'-', lw=0.5,color='green')
         annotate_maxmin(plt, ax ,data[0,x1:x2])
     
     plt.ylabel('Velocity (Counts)')
@@ -186,13 +186,13 @@ def plot_dva(freq, sps, corfftr, corffti, header, inst_ty, chan_no):
     figure = plt.figure(fignum,figsize=(16,9))
     ax = figure.add_subplot(3,1,1)
     #ax.plot(tvect[0],idisp.real * 1000,'-',color='red') # converted to mm
-    ax.plot(tvect,idisp.real * 1000,'-',color='red') # converted to mm
+    ax.plot(tvect,idisp.real * 1000,'-', lw=0.5,color='red') # converted to mm
     plt.ylabel('Displacement (mm)')
     plt.title(header)
     annotate_maxmin(plt, ax ,idisp.real * 1000)
 
     ax = figure.add_subplot(3,1,2)
-    ax.plot(tvect,ivel.real*1000,'-',color='green') # converted to mm/s
+    ax.plot(tvect,ivel.real*1000,'-', lw=0.5,color='green') # converted to mm/s
     #ax.plot(tvect[0],ivel.real*1000,'-',color='green') # converted to mm/s
     plt.ylabel('Velocity (mm/s)')
     annotate_maxmin(plt, ax ,ivel.real * 1000)
@@ -230,7 +230,7 @@ def plot_WoodAnderson(wadisp, sps, header, chan_no):
     fignum = 40 + chan_no
     figure = plt.figure(fignum,figsize=(16,9))
     ax = figure.add_subplot(3,1,1)
-    ax.plot(tvect[0],wadisp,'-',color='orange')
+    ax.plot(tvect[0],wadisp,'-', lw=0.5,color='orange')
     plt.ylabel('WA Displacement (mm)')
     plt.xlabel('Time (s)')
     plt.title(header)
@@ -249,7 +249,7 @@ def plot_WoodAnderson(wadisp, sps, header, chan_no):
     # replot trimmed wave
     print np.shape(wadisp)
     ax = figure.add_subplot(3,1,3)
-    ax.plot(tvect[0,x1:x2],wadisp[x1:x2],'-',color='green')
+    ax.plot(tvect[0,x1:x2],wadisp[x1:x2],'-', lw=0.5,color='green')
     plt.ylabel('WA Displacement (mm)')
     plt.xlabel('Time (s)')
     plt.title(header)

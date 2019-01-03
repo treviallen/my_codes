@@ -676,7 +676,10 @@ def readseed(st):
                 if tr.stats['channel'].startswith('H'):
                     g = 'H'
             else:
-                g = 'S'
+                if tr.stats['channel'].startswith('B'):
+                    g = 'B'
+                else:
+                    g = 'S'
                 
             if numtrue == True:
                 if int(tr.stats['channel'][2]) > 3:

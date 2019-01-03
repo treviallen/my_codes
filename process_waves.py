@@ -181,12 +181,14 @@ def common_resp(freq, nat_freq, damping, sen, recsen, gain, wavfft, inst_ty):
 # set boolean opperators
 continue_loop = True
 
+plot_outputs = True
+'''
 var = raw_input('\nPlot outputs ([y]/n)? > ')
 if var == 'y' or var == '':
     plot_outputs = True
 elif var == 'n':
     plot_outputs = False
-
+'''
 # first check to see if obspy installed
 try:
     # try importing obspy modules
