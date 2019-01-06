@@ -793,13 +793,13 @@ def remove_low_sample_data(st):
         
         idx = where(channels == uc)[0]
         maxSR = max(sampling_rates[idx])
-        print uc, idx, maxSR
+        #print uc, idx, maxSR
         
         for i in idx:
             if not sampling_rates[i] == maxSR:
                 delidx[i] = 1.
     
-    print delidx            
+    #print delidx            
     # now purge channels
     for tr, di in zip(st, delidx):
         if di == 1.:
