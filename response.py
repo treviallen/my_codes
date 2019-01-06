@@ -299,40 +299,19 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     # if constant unknown, get nearest freq to normalising frequency
     
     if constant == -12345:
-        # if normalizing frequency also unknown, assume normf = 1.0 Hz
+        # if normalizing frequency also unknown, assume normf = 5.0 Hz
         if normf == -12345:
             normf = 5.0 # maybe change this to 5 Hz to be safe
         elif normf == -99:
             dispResp = True
-
-        # now find normalizing factor at normf
-        freqdiff = freq - normf
-        #freqstep = freq[1] / 2.
-        minf = min(abs(freqdiff))
-        #freqindex =[]
-        if len(freq) < 25000:
-            freqindex = np.where((freqdiff >= minf-10e-3) & (freqdiff <= minf+10e-3))[0]
-        else:
-            freqindex = np.where((freqdiff >= minf-10e-4) & (freqdiff <= minf+10e-4))[0]
-            
-        #print 'freqindex', freqindex
         
-        '''
-        for i in range(0,len(freq)/2):
-            if freqdiff[i] > minf-freqstep and freqdiff[i] < minf+freqstep:
-                freqindex.append(i)
-        '''
-        
-        # get amp at normf
+        # get amp at normf - updated 2019-01-04
         b, a = signal.ltisys.zpk2tf(zeros, poles, 1.0)
         w, resp = signal.freqs(b, a, freq * angc)
         
-        #constant = 1. / np.absolute(np.interp(normf, freq, resp))
-        #print 'constant', constant, freqindex
+        cal_resp = abs(np.exp(np.interp(np.log(normf), np.log(freq), np.log(abs(resp)))))
+        constant = 1. / cal_resp
         
-        constant = 1. / np.absolute(resp[freqindex[0]])
-        #constant = 1.0
-        #print 'constant', constant, freqindex[0]
 
     # use normalizing factor from file
     else:
@@ -347,7 +326,7 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         else:
             constant *= angc**(len(poles)-len(zeros))
         
-    #print constant, sen
+    #print constant, sen, dispResp
     if dispResp == True:
         sen /= angc
     #print constant, sen

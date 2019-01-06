@@ -254,6 +254,11 @@ def merge_seed_prefix(folder, file_prefix, station):
     from misc_tools import listdir_file_prefix
     from os import path
     
+    '''
+    Usage, e.g.:
+         merge_seed_prefix('../mseed_dump/', '2004-03-05T00.', 'MEEK')
+    '''
+    
     # get file list
     mseedfiles = listdir_file_prefix(folder, file_prefix)
     
@@ -724,7 +729,6 @@ def return_all_au_station_data():
     
     for line in lines:
         dat = line.strip().split('\t')
-        #print line
         
         if int(dat[5]) < 1:
             dat[5] = 1
@@ -750,6 +754,56 @@ def return_sta_data(sta):
             sta_data = sd
             
     return sta_data
+
+def remove_low_sample_data(st):
+    from numpy import array, unique, zeros_like, where
+    
+    rmlsr = False
+    for tr in st:
+        if tr.stats.sampling_rate >= 80:
+            rmlsr = True
+            
+        # remove junk stations
+        if tr.stats.channel.encode('ascii','ignore').startswith('L') \
+            or tr.stats.channel.encode('ascii','ignore').startswith('V'):
+            st = st.remove(tr)
+                
+    # now strip low sample data from stream
+    if rmlsr == True:
+        for tr in st:
+            if tr.stats.sampling_rate < 80:
+                st = st.remove(tr)
+                
+    # now look for dupicate station codes with different sampling rates
+    channels = []
+    sampling_rates = []
+    for tr in st:
+        channels.append(tr.stats.channel.encode('ascii','ignore'))
+        sampling_rates.append(tr.stats.sampling_rate)
+    
+    channels = array(channels)
+    sampling_rates = array(sampling_rates)
+    delidx = zeros_like(sampling_rates)
+    
+    unique_channels = unique(array(channels))
+    
+    for uc in unique_channels:
+        
+        idx = where(channels == uc)[0]
+        maxSR = max(sampling_rates[idx])
+        print uc, idx, maxSR
+        
+        for i in idx:
+            if not sampling_rates[i] == maxSR:
+                delidx[i] = 1.
+    
+    print delidx            
+    # now purge channels
+    for tr, di in zip(st, delidx):
+        if di == 1.:
+            st = st.remove(tr)
+                       
+    return st
     
     
     
