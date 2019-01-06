@@ -765,7 +765,8 @@ def remove_low_sample_data(st):
             
         # remove junk stations
         if tr.stats.channel.encode('ascii','ignore').startswith('L') \
-            or tr.stats.channel.encode('ascii','ignore').startswith('V'):
+            or tr.stats.channel.encode('ascii','ignore').startswith('V') \
+            or tr.stats.channel.encode('ascii','ignore').startswith('U'):
             st = st.remove(tr)
                 
     # now strip low sample data from stream
@@ -787,6 +788,7 @@ def remove_low_sample_data(st):
     
     unique_channels = unique(array(channels))
     
+    # loop thru unique channels and remove lsr duplicates
     for uc in unique_channels:
         
         idx = where(channels == uc)[0]
