@@ -27,16 +27,20 @@ def get_response_info(sta,recdate,chan):
     # check if sitename in file
     cwd = getcwd()
     if cwd.startswith('/nas'):
-        try:
-            stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'
-        except:
-            stalist = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/stationlist.dat'    
+        stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'        
     else:
         stalist = '//Users//tallen//Documents//Code//my_codes//stationlist.dat'
         
     stlo = -12345.0
-    stla = -12345.0
-    stadat = open(stalist).readlines()
+    stla = -12345.0]
+    try:
+        stadat = open(stalist).readlines()
+    
+    # reset stalist to local drives on rhe-compute
+    except:
+        stalist = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/stationlist.dat'   
+        stadat = open(stalist).readlines()
+        
     for line in stadat:
         # skip first row
         if line[0:3] != 'STA' and line != '\n':
@@ -87,17 +91,18 @@ def read_pazfile(pazfile):
     cwd = getcwd()
     # open paz file
     if cwd.startswith('/nas'):
-        try:
-            pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute
-        except:
-            pazpath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/paz'
+        pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute        
     else:
         pazpath = '//Users//tallen//Documents//Earthquake_Data//paz' # for bob
-    #pazpath = 'U:\\Earthquake_Data\\paz' # for PC
     
-    pazfile = path.join(pazpath, pazfile)
-    paztxt = open(pazfile).readlines()
-
+    try:
+        pazfile = path.join(pazpath, pazfile)
+        paztxt = open(pazfile).readlines()
+    except:
+        pazpath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/paz'
+        pazfile = path.join(pazpath, pazfile)
+        paztxt = open(pazfile).readlines()
+        
     # get zeros first
     zeros = []
     num = paztxt[0].split('\t')

@@ -758,6 +758,9 @@ def return_sta_data(sta):
 def remove_low_sample_data(st):
     from numpy import array, unique, zeros_like, where
     
+    # first split the 
+    st = st.split()
+    
     rmlsr = False
     for tr in st:
         if tr.stats.sampling_rate >= 80:
