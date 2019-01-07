@@ -27,7 +27,10 @@ def get_response_info(sta,recdate,chan):
     # check if sitename in file
     cwd = getcwd()
     if cwd.startswith('/nas'):
-        stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'
+        try:
+            stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'
+        except:
+            stalist = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/stationlist.dat'    
     else:
         stalist = '//Users//tallen//Documents//Code//my_codes//stationlist.dat'
         
@@ -55,7 +58,7 @@ def get_response_info(sta,recdate,chan):
                     pazfile = tmp[13].strip()
                     
     if stlo == -12345:
-        print '\n', recdate,': Station', sta, chan, 'not found...\n'
+        print recdate,': Station', sta, chan, 'not found...'
 
     return nat_freq, inst_ty, damping, sen, recsen, gain, pazfile, stlo, stla, netid
 
