@@ -179,12 +179,11 @@ def acausal_butter_filter(inst_ty, sps, data, seltask):
 def calc_fft(data, sps):
 #    import matplotlib.pyplot as plt
     import numpy as np
-
     try:
         n = len(data)
-        
+    
         # calc FFT
-        wavfft = np.fft.fft(data,n)
+        wavfft = np.fft.fft(data, n)
         
         # get frequencies
         freq = np.fft.fftfreq(n, d=1./sps)

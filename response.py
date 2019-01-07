@@ -87,7 +87,10 @@ def read_pazfile(pazfile):
     cwd = getcwd()
     # open paz file
     if cwd.startswith('/nas'):
-        pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute
+        try:
+            pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute
+        except:
+            pazpath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/paz'
     else:
         pazpath = '//Users//tallen//Documents//Earthquake_Data//paz' # for bob
     #pazpath = 'U:\\Earthquake_Data\\paz' # for PC

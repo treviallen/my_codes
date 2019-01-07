@@ -804,6 +804,9 @@ def remove_low_sample_data(st):
     for tr, di in zip(st, delidx):
         if di == 1.:
             st = st.remove(tr)
+            
+    # finally, if duplicates
+    st.merge()
                        
     return st
     
