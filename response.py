@@ -32,7 +32,7 @@ def get_response_info(sta,recdate,chan):
         stalist = '//Users//tallen//Documents//Code//my_codes//stationlist.dat'
         
     stlo = -12345.0
-    stla = -12345.0]
+    stla = -12345.0
     try:
         stadat = open(stalist).readlines()
     
