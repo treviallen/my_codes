@@ -83,7 +83,7 @@ def get_paz_list():
     return pazfile
 
 # this function reads PAZ files
-def read_pazfile(pazfile):
+def read_pazfile(in_pazfile):
     from os import path
     import numpy as np
     from os import getcwd
@@ -96,11 +96,11 @@ def read_pazfile(pazfile):
         pazpath = '//Users//tallen//Documents//Earthquake_Data//paz' # for bob
     
     try:
-        pazfile = path.join(pazpath, pazfile)
+        pazfile = path.join(pazpath, in_pazfile)
         paztxt = open(pazfile).readlines()
     except:
         pazpath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/paz'
-        pazfile = path.join(pazpath, pazfile)
+        pazfile = path.join(pazpath, in_pazfile)
         paztxt = open(pazfile).readlines()
         
     # get zeros first

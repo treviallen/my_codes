@@ -758,8 +758,8 @@ def return_sta_data(sta):
 def remove_low_sample_data(st):
     from numpy import array, unique, zeros_like, where
     
-    # first split the 
-    st = st.split()
+    # first split the stream and remerge
+    st = st.split().split().merge(method=1, fill_value=0)
     
     rmlsr = False
     for tr in st:
