@@ -117,7 +117,7 @@ def calc_R35(comp, logA, repi):
 
     R35 = logA + logA0
 
-    magstr = 'R35:\t' + str("%0.1f" % R35)
+    magstr = 'R35:\t' + str("%0.2f" % R35)
     if comp == 0: # if vertical
         magstr = magstr + '*'
     #print magstr
@@ -128,7 +128,7 @@ def calc_R35(comp, logA, repi):
 def calc_GS86(comp, logA, repi):
     GS86 = 0.7 + logA + 1.10 * np.log10(repi) + 0.0013 * repi
 
-    magstr = 'GS86:\t' + str("%0.1f" % GS86)
+    magstr = 'GS86:\t' + str("%0.2f" % GS86)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
     print magstr
@@ -140,7 +140,7 @@ def calc_HB87(comp, logA, rhyp):
     logA0 = 1.11 * np.log10(rhyp / 100.) + 0.00189 * (rhyp - 100) + 3.0
     HB87 = logA + logA0
 
-    magstr = 'HB87:\t' + str("%0.1f" % HB87)
+    magstr = 'HB87:\t' + str("%0.2f" % HB87)
     if comp == 0: # if vertical
         magstr = magstr + '*'
     print magstr
@@ -152,7 +152,7 @@ def calc_BJ84(comp, logA, rhyp):
     logA0 = np.log10(rhyp) + 0.00301 * rhyp + 0.70
     BJ84 = logA + logA0
 
-    magstr = 'HB87:\t' + str("%0.1f" % BJ84)
+    magstr = 'HB87:\t' + str("%0.2f" % BJ84)
     if comp == 0: # if vertical
         magstr = magstr + '*'
     print magstr
@@ -180,7 +180,7 @@ def calc_SED84(comp, logA, rhyp):
         
         SED84 = logA2800 + Cd + Ce
             
-    magstr = 'SED84:\t' + str("%0.1f" % SED84)
+    magstr = 'SED84:\t' + str("%0.2f" % SED84)
     print magstr
 
     return SED84
@@ -189,7 +189,7 @@ def calc_SED84(comp, logA, rhyp):
 def calc_GG91(comp, logA, rhyp):
     GG91 = logA + 1.137 * np.log10(rhyp) + 0.000657 * rhyp + 0.66
     
-    magstr = 'GG91:\t' + str("%0.1f" % GG91)
+    magstr = 'GG91:\t' + str("%0.2f" % GG91)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
     print magstr
@@ -204,7 +204,7 @@ def calc_MLM92(comp, logA, rhyp):
     elif comp == 1: # if horizontal
         MLM92 = logA + 1.34 * np.log10(rhyp / 100.) + 0.00055 * (rhyp - 100) + 3.0
 
-    magstr = 'MLM92:\t' + str("%0.1f" % MLM92)
+    magstr = 'MLM92:\t' + str("%0.2f" % MLM92)
     print magstr
 
     return MLM92
@@ -213,7 +213,7 @@ def calc_MLM92(comp, logA, rhyp):
 def calc_WGW96(comp, logA, rhyp):
     WGW96 = logA + 0.75 + np.log10(rhyp) + 0.0056*rhyp*np.exp(-0.0013*rhyp)
     
-    magstr = 'WGW96:\t' + str("%0.1f" % WGW96)
+    magstr = 'WGW96:\t' + str("%0.2f" % WGW96)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
     print magstr
@@ -236,7 +236,7 @@ def calc_A10(comp, logA, rhyp):
 
     A10 = logA - (logASEA + 0.0619)
     
-    magstr = 'A10:\t' + str("%0.1f" % A10)
+    magstr = 'A10:\t' + str("%0.2f" % A10)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
     print magstr
@@ -273,7 +273,7 @@ def calc_A16(logA, rhyp, comp):
     #A16 = logA - logASEA + c1 # constant H/V
     A16 = logA - logASEA + (c1l * log10(rhyp) + c2l) # linear H/V
     
-    magstr = 'A16:\t' + str("%0.1f" % A16)
+    magstr = 'A16:\t' + str("%0.2f" % A16)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
     print magstr
@@ -322,7 +322,7 @@ def main(filename, logA, rhyp, eqdep):
 
     # header text
     print '\nML calculated from record: ' + filename \
-        + ' at Rhyp = ' + str("%0.1f" % rhyp) + ' km'
+        + ' at Rhyp = ' + str("%0.2f" % rhyp) + ' km'
 
     # get Richer (1935; 1958), extended by Eiby & Muir (1968)
     R35 = calc_R35(comp, logA, repi)

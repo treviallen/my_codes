@@ -812,8 +812,29 @@ def remove_low_sample_data(st):
     st.merge()
                        
     return st
+ 
+def return_trace_datetime_array(tr):
+    from datetime import timedelta
     
+    # get times array
+    times = tr.times()
     
+    dt_times = []
+    for time in times:
+    	dt_times.append(tr.stats.starttime.datetime + timedelta(seconds=time))
+        
+    return dt_times
+
+# reformates date strings from obspy plotting
+def reformat_trace_mpl_labels(ax):
+    import matplotlib as mpl 
+    
+    ticks = ax.get_xticks()
+
+    ticklabels = [mpl.dates.num2date(t).strftime('%H:%M:%S') for t in ticks]
+    ax.set_xticklabels(ticklabels)
+    
+    return ticklabels
     
     
     

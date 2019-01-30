@@ -423,10 +423,17 @@ def convolve_WoodAnderson(freq, corfftr, corffti, inst_ty):
     dispfftr = wafftr[0] / (2 * np.pi * abs(freq[0]))
     dispffti = waffti[0] / (2 * np.pi * abs(freq[0]))
     '''
-    n = len(wafftr)
-    freq[0] = 1.0
-    dispfftr = wafftr / (2 * np.pi * abs(freq))
-    dispffti = waffti / (2 * np.pi * abs(freq))
+    
+    if inst_ty == 'N':
+        n = len(wafftr)
+        freq[0] = 1.0
+        dispfftr = wafftr / (2 * np.pi * abs(freq))**2
+        dispffti = waffti / (2 * np.pi * abs(freq))**2
+    else:
+        n = len(wafftr)
+        freq[0] = 1.0
+        dispfftr = wafftr / (2 * np.pi * abs(freq))
+        dispffti = waffti / (2 * np.pi * abs(freq))
     
     # set zero freq to 0
     dispfftr[0] = 0

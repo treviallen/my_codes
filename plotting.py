@@ -23,10 +23,11 @@ def annotate_maxmin(plt, ax ,data):
 def trim_wave(data, sps, inst_ty, fftanal):
     import numpy as np
     import matplotlib.pyplot as plt
+    plt.ion()
 
     # clear & initialize figure
-    figure = plt.figure(6,figsize=(16,9))
-    plt.close()
+    #figure = plt.figure(6,figsize=(16,9))
+    #plt.close(figure)
     figure = plt.figure(6,figsize=(16,9))
      
     # do smart way
@@ -91,7 +92,8 @@ def trim_wave(data, sps, inst_ty, fftanal):
     plt.xlabel('Time (s)')
     
 #    figure.savefig('trim_example.png', format='png')
-    plt.show()
+    plt.close(figure)
+    #plt.show()
 
     return x1, x2
 
@@ -156,28 +158,28 @@ def plot_dva(freq, sps, corfftr, corffti, header, inst_ty, chan_no):
     elif inst_ty == 'N':
 
         # get displacement wave
-        freq[0,0] = 1.0
-        dispfftr = corfftr[0] / (2 * np.pi * abs(freq[0]))**2
-        dispffti = corffti[0] / (2 * np.pi * abs(freq[0]))**2
-        dispfftr[0] = 0
-        dispffti[0] = 0
+        freq[0] = 1.0
+        dispfftr = corfftr / (2 * np.pi * abs(freq))**2
+        dispffti = corffti / (2 * np.pi * abs(freq))**2
+        dispfftr[0] = 0.
+        dispffti[0] = 0.
 
         complex_array = dispfftr + 1j*dispffti
 
         idisp = np.fft.ifft(complex_array,n)
 
         # get velocity wave
-        velfftr = corfftr[0] / (2 * np.pi * abs(freq[0]))
-        velffti = corffti[0] / (2 * np.pi * abs(freq[0]))
-        freq[0,0] = 0
-        velfftr[0] = 0
-        velffti[0] = 0
+        velfftr = corfftr / (2 * np.pi * abs(freq))
+        velffti = corffti / (2 * np.pi * abs(freq))
+        freq[0] = 0.
+        velfftr[0] = 0.
+        velffti[0] = 0.
         complex_array = velfftr + 1j*velffti
         ivel = np.fft.ifft(complex_array,n)
 
         # get acceleration wave
-        accfftr = corfftr[0]
-        accffti = corffti[0]
+        accfftr = corfftr
+        accffti = corffti
         complex_array = accfftr + 1j*accffti
         iacc = np.fft.ifft(complex_array,n)
 
@@ -199,7 +201,7 @@ def plot_dva(freq, sps, corfftr, corffti, header, inst_ty, chan_no):
 
     ax = figure.add_subplot(3,1,3)
     #ax.plot(tvect[0],iacc.real * 100 / 9.81,'-',color='blue') # converted to %g
-    ax.plot(tvect,iacc.real * 100 / 9.81,'-',color='blue') # converted to %g
+    ax.plot(tvect,iacc.real * 100 / 9.81,'-', lw=0.5,color='blue') # converted to %g
 #    plt.ylabel(r'Acceleration (m/s$^2$)')
     plt.ylabel('Acceleration (%g)')
     plt.xlabel('Time (s)')
@@ -222,6 +224,7 @@ def plot_dva(freq, sps, corfftr, corffti, header, inst_ty, chan_no):
 def plot_WoodAnderson(wadisp, sps, header, chan_no):
     import numpy as np
     import matplotlib.pyplot as plt
+    plt.ion()
 
     n = len(wadisp)
     tvect = np.reshape(np.linspace(0,n/sps,num=n),(1,n))
@@ -256,7 +259,8 @@ def plot_WoodAnderson(wadisp, sps, header, chan_no):
     annotate_maxmin(plt, ax ,wadisp)
 #    figure.savefig('wa_example.png', format='png')
 
-    plt.show()
+    plt.close(figure)
+    #plt.show()
 
     return wadisp[x1:x2]
 

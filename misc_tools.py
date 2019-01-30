@@ -142,7 +142,16 @@ eg:
 	yres = numpy array of y residuals
 '''
 def get_binned_stats(bins, xdat, yres):
-    from numpy import array, diff, where, isfinite, nanmedian, nanstd
+    #from numpy import array, diff, where, isfinite, nanmedian, nanstd, isnan
+    from numpy import array, diff, where, isfinite, median, std, isnan, delete
+    
+    yres = array(yres)
+    xdat = array(xdat)
+    
+    # strip nan values
+    idx = where(isnan(yres))[0]
+    yres = delete(yres, idx)
+    xdat = delete(xdat, idx)
     
     binsize = diff(bins)[0]
 
@@ -151,15 +160,16 @@ def get_binned_stats(bins, xdat, yres):
     medx = []
     nperbin = []
 
-    yres = array(yres)
-
     halfbin = binsize / 2.0
 
     for bin in bins:
         index = array(where((xdat >= bin-halfbin) & (xdat < bin+halfbin))[0])
-        medres.append(nanmedian(yres[index]))
-        stdres.append(nanstd(yres[index]))
-        medx.append(nanmedian(xdat[index]))
+        #medres.append(nanmedian(yres[index]))
+        #stdres.append(nanstd(yres[index]))
+        #medx.append(nanmedian(xdat[index]))
+        medres.append(median(yres[index]))
+        stdres.append(std(yres[index]))
+        medx.append(median(xdat[index]))
         nperbin.append(len(index))
         
     idx = where(isfinite(medres))[0]
@@ -167,27 +177,37 @@ def get_binned_stats(bins, xdat, yres):
     return array(medres)[idx], array(stdres)[idx], array(medx)[idx], bins[idx], array(nperbin)[idx]
 
 def get_binned_stats_mean(bins, xdat, yres):
-    from numpy import array, diff, nanstd, where, isfinite, nanmean
+    #from numpy import array, diff, nanstd, where, isfinite, nanmean, isnan
+    from numpy import array, diff, std, where, isfinite, mean, isnan
     
+    yres = array(yres)
+    xdat = array(xdat)
+    
+    # strip nan values
+    idx = where(isnan(yres))[0]
+    yres = delete(yres, idx)
+    xdat = delete(xdat, idx)   
     binsize = diff(bins)[0]
 
     medres = []
     stdres = []
     medx = []
-
-    yres = array(yres)
+    nperbin = []
 
     halfbin = binsize / 2.0
 
     for bin in bins:
         index = array(where((xdat >= bin-halfbin) & (xdat < bin+halfbin))[0])
-        medres.append(nanmean(yres[index]))
-        stdres.append(nanstd(yres[index]))
-        medx.append(nanmean(xdat[index]))
+        #medres.append(nanmean(yres[index]))
+        #stdres.append(nanstd(yres[index]))
+        #medx.append(nanmean(xdat[index]))
+        medres.append(mean(yres[index]))
+        stdres.append(std(yres[index]))
+        medx.append(mean(xdat[index]))
+        nperbin.append(len(index))
         
     idx = where(isfinite(medres))[0]
-    nperbin = 0
-    return array(medres)[idx], array(stdres)[idx], array(medx)[idx], bins[idx], nperbin
+    return array(medres)[idx], array(stdres)[idx], array(medx)[idx], bins[idx], array(nperbin)[idx]
 
 # get weighted std, from http://stackoverflow.com/questions/2413522/weighted-standard-deviation-in-numpy
 def weighted_avg_and_std(values, weights):

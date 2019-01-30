@@ -602,6 +602,9 @@ def readbkn(wavfile):
 def readseed(st):
     from sys import argv 
     from numpy import hstack, zeros_like, shape
+    from data_fmt_tools import remove_low_sample_data
+    
+    st = remove_low_sample_data(st)
         
     # make data arrays
     allsta = []
