@@ -676,6 +676,51 @@ def read_sa(safile):
     
     return rec
 
+# script to adjust gmm to given site class/vs30
+# uses Seyhan & Stewart 2014
+def adjust_gmm_with_SS14(inIMT, hostVS, targetVS):
+    from seyhan_stewart_2014 import seyhan_stewart_siteamp
+    from numpy import array, exp
+    
+    # first correct to reference vs30
+    refT = 0.0 # i.e. PGA
+    print 'PGA amp:', seyhan_stewart_siteamp(hostVS, refT, exp(inIMT['pga']))
+    # correct PGA to 760
+    pga_BC = exp(inIMT['pga']) / seyhan_stewart_siteamp(hostVS, refT, exp(inIMT['pga'])) # correct from host VS to B/C
+    
+    # correct spectra to B/C
+    sa_BC = []
+    for t, sa in zip(inIMT['per'], inIMT['sa']):
+        sa_BC.append(exp(sa) / seyhan_stewart_siteamp(hostVS, t, exp(inIMT['pga'])))
+        
+    # now correct PGA to target site class
+    pga_target = pga_BC / seyhan_stewart_siteamp(targetVS, refT, pga_BC)
+    
+    # correct spectra to target site class
+    sa_target = []
+    for t, sa in zip(inIMT['per'], inIMT['sa']):
+        sa_target.append(exp(sa) / seyhan_stewart_siteamp(hostVS, t, exp(inIMT['pga'])))
+        
+    # make new data struct
+    return {'per':inIMT['per'], 'pga':pga_target, 'sa': array(sa_target)}
+
+# returns preferred site vs30
+def return_site_vs30_info(sta):
+    '''
+    ufile = 'au_station_data_usgs_vs30.gmt'
+
+    lines = open(ufile).readlines()
+    
+    usta = []
+    uvs30 = []
+    
+    for line in lines:
+        raw = line.strip().split('\t')
+        usta.append(raw[2])
+        uvs30.append(float(raw[3]))
+    '''
+    
+
 # script to find extrapolation ratio based on input gmm
 def get_extrap_ratio(extrapDat, targetDat, boundPer, extrapPer):
     '''

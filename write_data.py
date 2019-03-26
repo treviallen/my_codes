@@ -26,14 +26,14 @@ def get_filename(sta, recdate, chan, inst_ty, dt, sps):
     if chan.find('z ') >= 0 or chan.find('v ') >= 0 or chan.find('Up') >= 0 \
        or chan.find('u ') >= 0 or chan.find('BHZ') >= 0 or chan.find('SHZ') >= 0  \
        or chan.find('EHZ') >= 0 or chan.find('HNZ') >= 0 or chan.find('HHZ') >= 0 \
-       or chan.find('U Tran') >= 0:
+       or chan.find('U Tran') >= 0 or chan.endswith('Z'):
         orient = 'Z'
     elif chan.find('x ') >= 0 or chan.find('e ') >= 0 or chan.find('East') >= 0 \
-       or chan.find('BHE') >= 0 or chan.find('SHE') >= 0  \
+       or chan.find('BHE') >= 0 or chan.find('SHE') >= 0 or chan.endswith('E')  \
        or chan.find('EHE') >= 0 or chan.find('HNE') >= 0 or chan.find('HHE') >= 0:
         orient = 'E'
     elif chan.find('y ') >= 0 or chan.find('n ') >= 0 or chan.find('North') >= 0 \
-       or chan.find('BHN') >= 0 or chan.find('SHN') >= 0  \
+       or chan.find('BHN') >= 0 or chan.find('SHN') >= 0 or chan.endswith('N') \
        or chan.find('EHN') >= 0 or chan.find('HNN') >= 0 or chan.find('HHN') >= 0:
         orient = 'N'
     else:
@@ -241,6 +241,10 @@ def write_WA_disp(sta, evdate, sps, wadisp, filename, stla, stlo, \
     outfile = os.path.join(outdir,filename)
 
     # set header info
+    '''
+    filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
+                             eqmag, rhyp, azim, pga, pgv, lofreq, hifreq,
+    '''                             
     header = get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
                              eqmag, rhyp, 0, 0, lofreq, hifreq, 'wa')
 

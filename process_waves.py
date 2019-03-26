@@ -245,7 +245,7 @@ while continue_loop == True:
                 chan_no, chan_dat, stlo, stla, pazfile, alldata, netid = \
                 common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed)
 
-        
+        print chan
         # do common fft functions
         chan_dat = chan_dat[0]
         freq, lofreq, hifreq, wavfft, dt = common_fft(chan_dat, inst_ty, sps, seltask)
@@ -314,6 +314,7 @@ while continue_loop == True:
         watrim = plotting.plot_WoodAnderson(wadisp, sps, filename, chan_no)
 
         # calculate magnitudes
+        print filename
         logA = np.log10(max(abs(watrim)))
         calculate_magnitudes.main(filename, logA, rhyp, eqdep)
 

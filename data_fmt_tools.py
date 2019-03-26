@@ -374,6 +374,43 @@ def merge_jump_seed(seedfolder, hhmm):
     for tmpfile in mrgfiles:
         remove(tmpfile)
     
+# trims segment from larger mseed file
+def trim_seed(eventDateTuple, mseedFile):
+    from obspy import read, UTCDateTime
+    from os import path
+    
+    # format UTC datetime
+    dtsplit = [str(x) for x in eventDateTuple] # convert dt to string  
+    #print  dtsplit
+    utcdt = '-'.join((dtsplit[0], dtsplit[1].zfill(2), dtsplit[2].zfill(2))) \
+            + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))
+    
+    satrttime = UTCDateTime(utcdt) - 120
+    endtime = satrttime + 1500
+    
+    # read trace
+    st = read(mseedFile)
+    tr = st[0]
+    
+    # check end times
+    if endtime > tr.stats['endtime']:
+        endtime = tr.stats['endtime']
+    
+    # copy trace
+    st_trim = st.copy()
+    
+    # trim trace
+    st_trim = st_trim.trim(starttime=satrttime, endtime=endtime)
+    trt = st_trim[0]
+    # make output file
+    
+    outfile = '.'.join((trt.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                        trt.stats['network'], trt.stats['station'], 'mseed'))
+    
+    print 'Writing', outfile
+    st.write(outfile, format='MSEED')
+    
+    return st_trim
 
 
 # REMOVE DC OFFSET
