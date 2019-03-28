@@ -680,30 +680,67 @@ def read_sa(safile):
 # uses Seyhan & Stewart 2014
 def adjust_gmm_with_SS14(inIMT, hostVS, targetVS):
     from seyhan_stewart_2014 import seyhan_stewart_siteamp
-    from numpy import array, exp
+    from numpy import array, exp, log
+    
+    '''
+    inIMT    = imt as calculated via OpenQuake
+    hostVS   = Default vs30 for given GMM
+    targetVS = Target vs30 of site
+    '''
     
     # first correct to reference vs30
     refT = 0.0 # i.e. PGA
-    print 'PGA amp:', seyhan_stewart_siteamp(hostVS, refT, exp(inIMT['pga']))
-    # correct PGA to 760
-    pga_BC = exp(inIMT['pga']) / seyhan_stewart_siteamp(hostVS, refT, exp(inIMT['pga'])) # correct from host VS to B/C
+    
+    # correct PGA to SS14 reference of 760 m/s
+    pga_BC = exp(inIMT['pga'][0][0]) / seyhan_stewart_siteamp(hostVS, refT, exp(inIMT['pga'][0][0])) # correct from host VS to B/C
     
     # correct spectra to B/C
     sa_BC = []
     for t, sa in zip(inIMT['per'], inIMT['sa']):
-        sa_BC.append(exp(sa) / seyhan_stewart_siteamp(hostVS, t, exp(inIMT['pga'])))
+        sa_BC.append(log(exp(sa) / seyhan_stewart_siteamp(hostVS, t, exp(inIMT['pga'][0][0]))))
         
     # now correct PGA to target site class
-    pga_target = pga_BC / seyhan_stewart_siteamp(targetVS, refT, pga_BC)
+    pga_target = log(pga_BC * seyhan_stewart_siteamp(targetVS, refT, pga_BC))
     
     # correct spectra to target site class
     sa_target = []
-    for t, sa in zip(inIMT['per'], inIMT['sa']):
-        sa_target.append(exp(sa) / seyhan_stewart_siteamp(hostVS, t, exp(inIMT['pga'])))
+    for t, sa in zip(inIMT['per'], sa_BC):
+        sa_target.append(log(exp(sa) * seyhan_stewart_siteamp(targetVS, t, exp(inIMT['pga'][0][0]))))
         
     # make new data struct
     return {'per':inIMT['per'], 'pga':pga_target, 'sa': array(sa_target)}
 
+def get_station_vs30(sta):
+    '''
+    sta = station code
+    '''
+    from os import getcwd
+    from numpy import isnan, mean, nan
+    
+    cwd = getcwd()
+    if cwd.startswith('/nas'):
+        vs30file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Site_Class_Model/au_station_vs30.csv'
+        
+    # parse vs30 file
+    lines = open(vs30file).readlines()[1:]
+    
+    vs30 = nan
+    for line in lines:
+        dat = line.strip().split(',')
+        
+        if dat[0] == sta:
+            
+            # check Kayen Vs30
+            kvs = float(dat[6])            
+            if not isnan(kvs):
+                vs30 = kvs
+            
+            # if nan, take mean of ASSCM and USGS
+            else:
+                vs30 = mean([float(dat[5]), float(dat[7])])
+      
+    return vs30          
+    
 # returns preferred site vs30
 def return_site_vs30_info(sta):
     '''
