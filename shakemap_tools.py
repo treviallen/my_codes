@@ -576,7 +576,26 @@ def csv2stationlist_xml(csvfile, eqla, eqlo, dep, mag, yyyymmddHHMMSS, locstring
     f = open(str(yyyymmddHHMMSS)+'_dat.xml', 'wb')
     f.write(smtxt)
     f.close()
+
+# script to parse and simplify dyfi data in dictonary format
+def parse_dyfi_geojson(jsonFilePath):  
+    import json
+    from numpy import array
     
-            
+    #jsonFilePath = 'aggregation/canberra_1_1.geojson'
+    with open(jsonFilePath) as f:
+        data = json.load(f)
+    
+    dyfi_dict = []
+    for feature in data['features']:
+        tmp = {'geomerty':feature['geometry']['coordinates'][0],
+               'centroid':feature['properties']['center']['coordinates'],
+               'intensity':feature['properties']['intensityFine'],
+               'nresp':feature['properties']['nresp']}
+        
+        # append to list
+        dyfi_dict.append(tmp)
+        
+    return dyfi_dict            
                                       
                           

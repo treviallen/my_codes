@@ -112,7 +112,7 @@ def makesubplt(i, fig, plt, sta, sps, mag, dep, ztor, dip, rake, rhyp):
     rjb = sqrt(rrup**2 - dep**2) # assume point source; i.e. repi = rjb
     
     # get station vs30
-    vs30 = get_station_vs30(sta.split('.')[0])
+    vs30, isproxy = get_station_vs30(sta.split('.')[0])
     
     # get ground motion estimates from GMPEs
     Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt, YA15imt, SP16imt \
@@ -156,6 +156,7 @@ def makesubplt(i, fig, plt, sta, sps, mag, dep, ztor, dip, rake, rhyp):
         plt.ylabel('Spectral Acceleration (g)', fontsize=9)
         
     plt.xlim([0.02, 5])
+    plt.xlim([0.02, 5])
     #plt.title(' '.join((sta+'; MW =',str("%0.1f" % mag)+'; Rrup =',str(rrup),'km')), fontsize=9)
     plt.title(sta, fontsize=9)
     plt.grid(which='both', color='0.5')
@@ -167,6 +168,8 @@ def makesubplt(i, fig, plt, sta, sps, mag, dep, ztor, dip, rake, rhyp):
     xloc = get_log_xy_locs(lims, 0.96)
     
     txt = 'Rhyp = '+str(rrup)+' km\n'+'Vs30 = '+str('%0.0f' % vs30)+' m/s'
+    if isproxy == True:
+        txt += '*'
     txth = plt.text(xloc, yloc, txt, ha='right', va='bottom', fontsize=8)
     txth.set_path_effects([PathEffects.withStroke(linewidth=4, foreground='w')])
 

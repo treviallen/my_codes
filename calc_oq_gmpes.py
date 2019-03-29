@@ -720,7 +720,10 @@ def get_station_vs30(sta):
     cwd = getcwd()
     if cwd.startswith('/nas'):
         vs30file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Site_Class_Model/au_station_vs30.csv'
-        
+    
+    # assume that vs30 is based on proxy estimates
+    isproxy = True
+    
     # parse vs30 file
     lines = open(vs30file).readlines()[1:]
     
@@ -734,12 +737,13 @@ def get_station_vs30(sta):
             kvs = float(dat[6])            
             if not isnan(kvs):
                 vs30 = kvs
+                proxy = False
             
             # if nan, take mean of ASSCM and USGS
             else:
                 vs30 = mean([float(dat[5]), float(dat[7])])
       
-    return vs30          
+    return vs30, isproxy      
     
 # returns preferred site vs30
 def return_site_vs30_info(sta):
