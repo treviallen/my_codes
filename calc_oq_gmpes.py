@@ -737,7 +737,7 @@ def get_station_vs30(sta):
             kvs = float(dat[6])            
             if not isnan(kvs):
                 vs30 = kvs
-                proxy = False
+                isproxy = False
             
             # if nan, take mean of ASSCM and USGS
             else:

@@ -202,6 +202,28 @@ def srl2mag_WC94(srl, ftype):
         b = 1.32
     return a + b * log10(srl) # in mw
 
+# srl is in km
+def mag2srl_WC94(mw, ftype):
+    from numpy import log10
+    if ftype == 'all':
+        a = -3.22
+        b = 0.69
+        sig = 0.22
+    elif ftype == 'ss':
+        a = -3.55
+        b = 0.74
+        sig = 0.23
+    elif ftype == 'rs':
+        a = -2.86
+        b = 0.63
+        sig = 0.20
+    elif ftype == 'ns':
+        a = -2.01
+        b = 0.5
+        sig = 0.21
+    return 10**(a + b*mw), sig # in mw
+
+
 # area is in km**2
 def area2mag_WC94(area, ftype):
     from numpy import log10

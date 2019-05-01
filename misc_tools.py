@@ -178,7 +178,7 @@ def get_binned_stats(bins, xdat, yres):
 
 def get_binned_stats_mean(bins, xdat, yres):
     #from numpy import array, diff, nanstd, where, isfinite, nanmean, isnan
-    from numpy import array, diff, std, where, isfinite, mean, isnan
+    from numpy import array, diff, std, where, isfinite, mean, isnan, delete
     
     yres = array(yres)
     xdat = array(xdat)
