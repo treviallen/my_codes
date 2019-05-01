@@ -16,7 +16,7 @@ def css2mseed(cssfile, mseedpath):
         #st = readCSS(cssfile)
         st = read(cssfile)
     except:
-        print 'Using GA format CSS'
+        print('Using GA format CSS')
         st = readGACSS(cssfile)
     
     # make outfile
@@ -174,7 +174,7 @@ def append_seed(mseedfiles, outfile):
     mseedfiles = tuple of filenames
     '''
     
-    from obspy.core import read
+    from obspy import read
     
     #mseedfiles = ('2012171_105400_0a903_2_1.seed', '2012171_105600_0a903_2_1.seed')
     #outfile = '201210191054.GEES.EHE.seed'
@@ -240,11 +240,11 @@ def merge_seed(mseedfiles):
             starttime = st[0].stats['starttime'].strftime('%Y-%m-%dT%H.%M')
     
     #tmpname = mseedfiles[0].strip('.mseed').split('_')
-    #print tmpname
+    #print(tmpname
     #ymdhmd = doy2ymd(tmpname[0][0:4], tmpname[0][4:]) + str('%04d' % float(tmpname[1]))
     outfile = '.'.join((starttime, 'AU', st[0].stats['station'],'mrg','mseed'))
     #outfile = '.'.join((ymdhmd,sta,'mrg.mseed'))
-    print 'Merged file:', outfile
+    print('Merged file:', outfile)
     st.write(outfile, format='MSEED')
     
 # merge mseed files with a given file prefix
@@ -279,7 +279,7 @@ def merge_seed_prefix(folder, file_prefix, station):
             i += 1
     
     outfile = path.join(folder, '.'.join((starttime, 'AU', st[0].stats['station'],'mrg','mseed')))
-    print 'Merged file:', outfile
+    print('Merged file:', outfile)
     st.write(outfile, format='MSEED')
 
 def merge_seed_extract_centaur(folder, file_prefix, station, eventDateTime):
@@ -314,7 +314,7 @@ def merge_seed_extract_centaur(folder, file_prefix, station, eventDateTime):
     st_trim = st.trim(starttime, endtime)
     
     outfile = '.'.join((starttime.strftime('%Y-%m-%dT%H.%M'), 'AU', st_trim[0].stats['station'],'mseed'))
-    print 'Merged file:', outfile
+    print('Merged file:', outfile)
     st.write(outfile, format='MSEED')
 
 # merge jump seed files to one
@@ -328,7 +328,7 @@ def merge_jump_seed(seedfolder, hhmm):
         hhmm = float(hhmm)
     #seedfolder = '/Users/tallen/Documents/Earthquake_Data/GA_Network_Data/GHSS/2012171'
     #hhmm = 0246
-    #print seedfolder, hhmm
+    #print(seedfolder, hhmm
         
     if seedfolder.endswith(sep):
         seedfolder = seedfolder[0:-1]
@@ -341,7 +341,7 @@ def merge_jump_seed(seedfolder, hhmm):
     
     # look for seed files
     seedfiles = listdir_extension(seedfolder, 'seed')
-    #print seedfiles
+    #print(seedfiles
     
     # first, append files with similar timestamp
     quitAppend = False
@@ -350,7 +350,7 @@ def merge_jump_seed(seedfolder, hhmm):
     while quitAppend == False:
         appendfiles = []
         for file in seedfiles:
-            #print '_'.join((yyyydoy, str('%04d' % (hhmm+inc)))), hhmm
+            #print('_'.join((yyyydoy, str('%04d' % (hhmm+inc)))), hhmm
             if file.startswith('_'.join((yyyydoy, str('%04d' % (hhmm+inc))))):
             
                 appendfiles.append(path.join(seedfolder,file))
@@ -367,7 +367,7 @@ def merge_jump_seed(seedfolder, hhmm):
             mrgfiles.append(outseed)
             
     # now merge into one seed file
-    print mrgfiles
+    print(mrgfiles)
     merge_seed(mrgfiles)
     
     # remove tmp files
@@ -381,7 +381,7 @@ def trim_seed(eventDateTuple, mseedFile):
     
     # format UTC datetime
     dtsplit = [str(x) for x in eventDateTuple] # convert dt to string  
-    #print  dtsplit
+    #print( dtsplit
     utcdt = '-'.join((dtsplit[0], dtsplit[1].zfill(2), dtsplit[2].zfill(2))) \
             + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))
     
@@ -407,7 +407,7 @@ def trim_seed(eventDateTuple, mseedFile):
     outfile = '.'.join((trt.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
                         trt.stats['network'], trt.stats['station'], 'mseed'))
     
-    print 'Writing', outfile
+    print('Writing', outfile)
     st.write(outfile, format='MSEED')
     
     return st_trim
@@ -479,7 +479,7 @@ def eqwave2mseed(eqwfile):
         hhmm = allrecdate[i][8:]
         stats['starttime'] = UTCDateTime(int(allrecdate[i][0:4]), int(allrecdate[i][4:6]), int(allrecdate[i][6:8]), \
         	                               int(allrecdate[i][8:10]), int(allrecdate[i][10:12]), float(allsec[i]))
-        print stats['starttime']
+        print(stats['starttime'])
         tr = Trace(data=data, header=stats)
             
         # fill stream
@@ -511,7 +511,7 @@ def get_iris_data(dateTuple, sta, net):
     
     # format UTC datetime
     dtsplit = [str(x) for x in dateTuple] # convert dt to string  
-    #print  dtsplit
+    #print( dtsplit
     utcdt = '-'.join((dtsplit[0], dtsplit[1].zfill(2), dtsplit[2].zfill(2))) \
             + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))
     
@@ -537,18 +537,18 @@ def get_iris_data(dateTuple, sta, net):
         if not path.isdir('iris_dump'):
             makedirs('iris_dump')
             
-        print 'Writing file:', trname                   
+        print('Writing file:', trname)
         st.write(trname, format="MSEED")
     except:
-        print 'Data not available:', sta.upper()
+        print('Data not available:', sta.upper())
         # dummy data returned
         st = 0
         trname='null'
     '''
     except:
-        print '\nUsage: \n    python get_iris_data.py <datetime tuple> <station code>\n'
+        print('\nUsage: \n    python get_iris_data.py <datetime tuple> <station code>\n'
         
-        print '    e.g.: python get_iris_data.py (2010,4,20,0,16) kmbl\n'
+        print('    e.g.: python get_iris_data.py (2010,4,20,0,16) kmbl\n'
     '''
     
     return st, trname
@@ -576,7 +576,7 @@ def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
     ##########################################################################
     dt = datetime.datetime(Y,m,d,H,M)
     
-    print dt
+    print(dt)
     
     # convert datetime object to UTCdatetime
     dt = utcdatetime.UTCDateTime(dt)
@@ -592,7 +592,7 @@ def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
     unfortunately we need to request few times for every number of characters that forms the station name '''
     # kluge to fix non-retrieval of data  - loop through alphabet integers
     for ch in range(ord('A'), ord('Z')+1):
-        print 'Stations beginning with ', chr(ch)
+        print('Stations beginning with ', chr(ch))
     #    st_3 = client.get_waveforms("AU", chr(ch)+"??", "", "[BSEH]?[ENZ]", start_time,end_time)
     #    st_4 = client.get_waveforms("AU", chr(ch)+"???", "", "[BSEH]?[ENZ]", start_time,end_time)
         st_3 = client.get_waveforms("AU", chr(ch)+"??", "", "[BSEH][HN][ENZ]", start_time,end_time)
@@ -631,7 +631,7 @@ def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
     
     # now write streams for each event to mseed
     st.write(msfile, format="MSEED") 
-    print st
+    print(st)
     
 def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
     '''
@@ -656,7 +656,7 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
     ##########################################################################
     dt = datetime.datetime(Y,m,d,H,M)
     
-    print dt
+    print(dt)
     
     # convert datetime object to UTCdatetime
     dt = utcdatetime.UTCDateTime(dt)
@@ -696,7 +696,7 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
     # now write streams for each event to mseed
     if len(st) > 0:
         st.write(msfile, format="MSEED") 
-        print st
+        print(st)
         
     return st, msfile
         
@@ -833,13 +833,13 @@ def remove_low_sample_data(st):
         
         idx = where(channels == uc)[0]
         maxSR = max(sampling_rates[idx])
-        #print uc, idx, maxSR
+        #print(uc, idx, maxSR
         
         for i in idx:
             if not sampling_rates[i] == maxSR:
                 delidx[i] = 1.
     
-    #print delidx            
+    #print(delidx            
     # now purge channels
     for tr, di in zip(st, delidx):
         if di == 1.:
