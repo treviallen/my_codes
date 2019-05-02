@@ -19,7 +19,7 @@ def get_pga_sa(gmpe, sites, rup, dists, crust_ty):
     ###########################################################################
     '''
         
-    #print gmpe.imls.keys()
+    #print(gmpe.imls.keys()
     
     # get gmpe periods
     if crust_ty == 'wcrust':
@@ -99,7 +99,7 @@ def get_pga_sa(gmpe, sites, rup, dists, crust_ty):
         try:
             satmp = array([gmpe.get_mean_and_stddevs(sites, rup, dists, SA(p), [StdDev.TOTAL])[0][0]])
         except:
-            print gmpe.get_mean_and_stddevs(sites, rup, dists, SA(p), [StdDev.TOTAL])
+            print(gmpe.get_mean_and_stddevs(sites, rup, dists, SA(p), [StdDev.TOTAL])
         '''
 
         try:
@@ -216,7 +216,7 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     
     # prepare Atkinson & Adams 2013
     repi = sqrt(rrup**2 - dep**2) # not correct if rrup != rhypo
-    #print 'crust', mag, dists.rjb[0]
+    #print('crust', mag, dists.rjb[0]
     AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty) # assume Rjb = Repi
     '''
     return Bea97imt, Zea06imt, CB08imt, CY08imt, Bea11imt, BA11imt, AA13imt, Aea14imt, Bea14imt, CY14imt, \
@@ -260,7 +260,7 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     dists.rjb = array([rjb])
     dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
     dists.rvolc = array([100.])
-    #print dists.rrup
+    #print(dists.rrup
 
     gmpe = ZhaoEtAl2006SSlab()
     Zea06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
@@ -373,7 +373,7 @@ def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     GA14CISimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     # prepare Atkinson & Adams 2013
-    #print 'interface',  mag, dists.rjb[0]
+    #print('interface',  mag, dists.rjb[0]
     #AA13imt = atkinson_adams_2013(mag, dists.rrup[0], crust_ty = crust_ty) # note AA13 model uses Rrup
     
     return Yea97imt, AB03imt, Zea06imt, Zea06CISimt, AM09imt, MP10imt, GA14imt, GA14CISimt, Aea15imt
@@ -783,7 +783,7 @@ def get_extrap_ratio(extrapDat, targetDat, boundPer, extrapPer):
     # assume extrapolation to shorter T
     if boundPer < 1.0:
         targetGM = targetDat['sa'][0] - logRat
-        #print boundPer, extrapPer, logRat, boundGM, extrapGM
+        #print(boundPer, extrapPer, logRat, boundGM, extrapGM
     
     # assume extrapolation to longer T
     else:
@@ -944,7 +944,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     # first get AB06 amplification factors to correct to GMM vs30ref - assume no more than 1100 m/s
                     tmpAmpFacts = []
                     for t in gmmDat['per']:
-                        #print 'PGA1', t, m, d, vs30ref, vs30, gmmDat['pga'][0], atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))
+                        #print('PGA1', t, m, d, vs30ref, vs30, gmmDat['pga'][0], atkinson_boore_siteamp(vs30ref, t, exp(gmmDat['pga'][0]))
                         try:
                             tmpAmpFacts.append(atkinson_boore_siteamp(vs30ref, t, exp(refPGA_AB06))[0])
                         except:
@@ -958,7 +958,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                     # now get AB06 amplification factors from 760 to target vs30 m/s
                     tmpAmpFacts = []
                     for t in gmmDat['per']:
-                        #print 'PGA2', t, m, d, vs30ref, vs30, refPGA_AB06, atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06))
+                        #print('PGA2', t, m, d, vs30ref, vs30, refPGA_AB06, atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06))
                         tmpAmpFacts.append(atkinson_boore_siteamp(vs30, t, exp(refPGA_AB06)[0]))
                     
                     vstargSAcorr = array(tmpAmpFacts)
@@ -1030,7 +1030,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
             # convert ln g to cm/s**2 as required for table builder
             sa = log10(g2cgs(exp(gmmDat['sa'])))
             
-            #print gmmDat['sa']
+            #print(gmmDat['sa']
             sastr = ' '.join([str('%0.3f' % x) for x in sa])
             
             #######################################################################################
@@ -1090,7 +1090,7 @@ def gsim2table(gmmClass, gmmName, mags, distances, depth, vs30, vs30ref, extrapP
                             str('%0.3f' % gmmDat['pga'][1][0]), str('%0.3f' % proxyPGVsigma))) + '\n' # natural log
     
     # write to file
-    print '\nWriting table:', '.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt'))
+    print('\nWriting table:', '.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt')))
     filename = '.'.join((gmmName,'vs'+str(int(vs30)),'h'+str(int(depth)),'txt'))
     f = open(path.join(folder, filename), 'wb')
     f.write(header+tabtxt)
