@@ -8,7 +8,7 @@ def print_functions():
     txt = open('U:/Code/pycode/fault_tools.py').readlines()
     for line in txt:
         if line.find('def') >= 0:
-            print line.strip('def ').strip('\n')
+            print(line.strip('def ').strip('\n'))
             
 # flattens a single key value from a list of dictionaries
 def dictlist2array(dictList, key):
@@ -250,7 +250,7 @@ def extrap1d(interpolator):
     f_i = interp1d(x, y)
     f_x = extrap1d(f_i)
     
-    print f_x([9,10])
+    print(f_x([9,10])
     '''
     
     from scipy.interpolate import interp1d
@@ -334,7 +334,7 @@ def listdir_file_prefix(folder, file_prefix):
     files.append([each for each in listdir(folder) if each.startswith(file_prefix)])
     
     for f in files[0]:
-        print f
+        print(f)
     
     return files[0]
     
@@ -368,7 +368,7 @@ def dbf2csv(dbffile):
     
     filename = sys.argv[1]
     if filename.endswith('.dbf'):
-        print "Converting %s to csv" % filename
+        print("Converting %s to csv" % filename)
         csv_fn = filename[:-4]+ ".csv"
         with open(csv_fn,'wb') as csvfile:
             in_db = dbf.Dbf(filename)
@@ -380,9 +380,9 @@ def dbf2csv(dbffile):
             for rec in in_db:
                 out_csv.writerow(rec.fieldData)
             in_db.close()
-            print "Done..."
+            print("Done...")
     else:
-      print "Filename does not end with .dbf"
+      print("Filename does not end with .dbf")
 
 def remove_last_cmap_colour(cmap):
     from matplotlib.colors import LinearSegmentedColormap
@@ -448,7 +448,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     try:
         window_size = np.abs(np.int(window_size))
         order = np.abs(np.int(order))
-    except ValueError, msg:
+    except(ValueError, msg):
         raise ValueError("window_size and order have to be of type int")
     if window_size % 2 != 1 or window_size < 1:
         raise TypeError("window_size size must be a positive odd number")
@@ -502,10 +502,10 @@ def smooth(x,window_len=11,window='hanning'):
     """
 
     if x.ndim != 1:
-        raise ValueError, "smooth only accepts 1 dimension arrays."
+        raise(ValueError, "smooth only accepts 1 dimension arrays.")
 
     if x.size < window_len:
-        raise ValueError, "Input vector needs to be bigger than window size."
+        raise(ValueError, "Input vector needs to be bigger than window size.")
 
 
     if window_len<3:
@@ -513,7 +513,7 @@ def smooth(x,window_len=11,window='hanning'):
 
 
     if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+        raise(ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
 
 
     s=numpy.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
