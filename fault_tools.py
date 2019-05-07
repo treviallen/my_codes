@@ -14,7 +14,7 @@ def print_functions():
     txt = open('U:/Code/pycode/fault_tools.py').readlines()
     for line in txt:
         if line.find('def') >= 0:
-            print line.strip('def ').strip('\n')
+            print(line.strip('def ').strip('\n'))
 
 
 def beta2bval(beta):
@@ -91,7 +91,7 @@ def mag2avs_WC94(mw, ftype):
         a = -0.74
         b = 0.08
         sig = 0.38
-        print '\nNote: WC94 poorly constrained for reverse faulting events\n'
+        print('\nNote: WC94 poorly constrained for reverse faulting events\n')
     elif ftype == 'ns':
         a = -4.45
         b = 0.63
@@ -158,7 +158,7 @@ def mag2maxs_WC94(mw, ftype):
         a = -1.84
         b = 0.29
         sig = 0.42
-        print '\nNote: WC94 poorly constrained for reverse faulting events\n'
+        print('\nNote: WC94 poorly constrained for reverse faulting events\n')
     elif ftype == 'ns':
         a = -5.90
         b = 0.89
@@ -178,7 +178,7 @@ def mag2disp_WC94(mw, ftype):
         a = -0.74
         b = 0.08
         sig = 0.38
-        print '\nNote: WC94 poorly constrained for reverse faulting events\n'
+        print('\nNote: WC94 poorly constrained for reverse faulting events\n')
     elif ftype == 'ns':
         a = -4.45
         b = 0.63
@@ -248,7 +248,7 @@ def area2mag_WC94(area, ftype):
 
 '''do Hanks & Bakun, 2002 - Only for SS'''
 def area2mag_HB02(area):
-    print '\nNote: Hanks & Bakun, 2002 only appropriate for strike-slip events\n'
+    print('\nNote: Hanks & Bakun, 2002 only appropriate for strike-slip events\n')
     from numpy import log10
     if area <= 537.:
         mw = log10(area) + 3.98
@@ -261,7 +261,7 @@ def area2mag_HB02(area):
 
 '''do Ellsworth-B, 2003 - Only for SS'''
 def area2mag_E03(area):
-    print '\nNote: Ellsworth-B, 2003 only appropriate for strike-slip events\n'
+    print('\nNote: Ellsworth-B, 2003 only appropriate for strike-slip events\n')
     from numpy import log10
     mw = log10(area) + 4.20
     sig = 0.10 # after OpenSHA: http://www.opensha.org/glossary-magScalingRelation
@@ -270,7 +270,7 @@ def area2mag_E03(area):
 
 '''do Shaw 2009 - Only for SS'''
 def area2mag_Sh09(area):
-    print '\nNote: Shaw, 2009 only appropriate for strike-slip events\n'
+    print('\nNote: Shaw, 2009 only appropriate for strike-slip events\n')
     from numpy import log10, sqrt
     b = 6.9
     c = 3.98
@@ -319,7 +319,7 @@ def srl2mag_St10intra(srl):
     a = 4.725
     b = 1.445
     sig = 0.234
-#    print a, b
+#    print(a, b
     return a + b * log10(srl), sig # in mw
 
 def mag2srl_St10inter(mag):
@@ -577,13 +577,13 @@ def mag2wid_L10(mw, ftype): # in MW
     a = 0.667
     if ftype == 'ds':
         b = 1.24
-        print '\n only valid for RS if GT 5.5 km\n', b
+        print('\n only valid for RS if GT 5.5 km\n', b)
     elif ftype == 'ss':
         b = 1.18
-        print '\n only valid for SS if 3.4-45 km\n'
+        print('\n only valid for SS if 3.4-45 km\n')
     elif ftype == 'scr':
         b = 1.13
-        print '\n only valid for SCR if GT 2.5 km\n'
+        print('\n only valid for SCR if GT 2.5 km\n')
     
     return 10**(a * log10(flen) + b) / 1000. # in km
     
@@ -594,13 +594,13 @@ def len2wid_L10(flen, ftype): # in MW
     a = 0.667
     if ftype == 'rs':
         b = 1.24
-        print '\n only valid for RS if GT 5.5 km\n'
+        print('\n only valid for RS if GT 5.5 km\n')
     elif ftype == 'ss':
         b = 1.18
-        print '\n only valid for SS if 3.4-45 km\n'
+        print('\n only valid for SS if 3.4-45 km\n')
     elif ftype == 'scr':
         b = 1.13
-        print '\n only valid for SCR if GT 2.5 km\n'
+        print('\n only valid for SCR if GT 2.5 km\n')
     return 10**(a * log10(flen) + b) / 1000. # in km
 
 
@@ -834,13 +834,13 @@ def characteristic_mag_rec(m_char, sliprate, **kwargs):
 
     # get average displacement for m_char
     disp = mag2disp(m_char, model=model, ftype=ftype)
-    print '\nAverage displacement for characteristic earthquake: ', \
-          str("%0.1f" % disp),'m'
+    print('\nAverage displacement for characteristic earthquake: ', \
+          str("%0.1f" % disp),'m')
 
     # get years per characteristic earthquake
     srm = mm2m(sliprate) # in m / year
     avrec = disp / srm
-    print 'Average recurrence: ',str("%0.0f" % avrec),'years\n'
+    print('Average recurrence: ',str("%0.0f" % avrec),'years\n')
     return avrec
 
 '''
@@ -906,7 +906,7 @@ def bounded_mag_rec_from_slip(sliprate, mu, bval, mchar, mmin, **kwargs):
         return A0, mmax
 
     except:
-        print "\nRequires kwargs 'area' or 'crust_thikness\n"
+        print("\nRequires kwargs 'area' or 'crust_thikness\n")
 
 def characteristic_mag_rec_from_slip(sliprate, mu, bval, mmin, mchar, **kwargs):
     from numpy import log10, nan, isnan, exp
@@ -970,14 +970,14 @@ def characteristic_mag_rec_from_slip(sliprate, mu, bval, mmin, mchar, **kwargs):
         return A0, mmax, n_min_mag, n_char_mag
 
     except:
-        print "\nRequires kwargs 'area' or 'crust_thikness\n"
+        print("\nRequires kwargs 'area' or 'crust_thikness\n")
 
 #def truncated_mag_rec(M0r, cmb, mmax, bval):
 #    return log10(M0r * cmb) - (cmb * mmax) - log10(bval) - d
 
 def solve_A0(Ai, mmin, mmax, bval, M0r):
     from numpy import arange
-#    print Ai, mmin, mmax, bval, M0r
+#    print(Ai, mmin, mmax, bval, M0r
     c = 1.5 # Hanks & Kanamori - logM0 = 1.5 Mw + 9.05 (M0 in N-m)
     d = 9.05
     m0rate = []
@@ -991,7 +991,7 @@ def solve_A0(Ai, mmin, mmax, bval, M0r):
         N.append(tmpN[0])
         m0 = 10**(c*mw + d)
         m0rate.append(tmpN[0] * m0)
-#    print N
+#    print(N
 
     return abs(M0r - sum(m0rate))
 
@@ -1037,7 +1037,7 @@ def truncated_mag_rec_from_slip(sliprate, mu, bval, mmin, mchar, **kwargs):
 
         return A0[0], mchar # return mchar as mmax
     except:
-        print "\nRequires kwargs 'area' or 'crust_thikness\n"
+        print("\nRequires kwargs 'area' or 'crust_thikness\n")
 
 def get_cummulative_stats(A0, bval, mc, curvetype, mrange, n_char_mag, name, **kwargs):
     from numpy import round
@@ -1089,7 +1089,7 @@ def get_cummulative_stats(A0, bval, mc, curvetype, mrange, n_char_mag, name, **k
                 slip_per_mag.append(mag2disp_L10(mw, 'ss') * 1000 * mrate[k])
         k += 1
 
-    #print name, curvetype, str(sum(slip_per_mag)), 'mm/yr'
+    #print(name, curvetype, str(sum(slip_per_mag)), 'mm/yr'
 
     return mrate, slip_per_mag, cumrate
 

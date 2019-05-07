@@ -125,7 +125,7 @@ def mmi2pgm_worden12(mmi, pgm, mag, rrup):
     value = 10**((mmi - c1) / c2)
     # now check if mmi > t2
     idx = where(mmi > t2)[0]
-    print idx, value, mmi
+    print(idx, value, mmi)
     value[idx] = 10**((mmi[idx] - c3) / c4)
     return value, logpgmsig
 
@@ -628,7 +628,7 @@ def return_au_mmi_data():
     from mapping_tools import get_field_data
     shpfile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/MMI/data/iso_p_ASCMM.shp'
     
-    print 'Reading MMI shapefile...'
+    print('Reading MMI shapefile...')
     sf = shapefile.Reader(shpfile)
     
     # get data fields

@@ -8,7 +8,7 @@ def print_functions():
     txt = open('U:/Code/pycode/mapping_tools.py').readlines()
     for line in txt:
         if line.find('def') >= 0:
-            print line.strip('def ').strip('\n')
+            print(line.strip('def ').strip('\n'))
             
 
 def load_shape(shpfile):
@@ -71,12 +71,12 @@ def split_shape_parts(sf):
 
     for i, shape in enumerate(shapes):
         parts = shape.parts
-        print parts
+        print(parts)
         parts.append(len(shape.points)-1) # adding last point
         
         for i in range (0, len(parts)-1):
             polygons.append(Polygon(shape.points[parts[i]:parts[i+1]]))
-            print array(polygons[-1].bounds)
+            print(array(polygons[-1].bounds))
     return polygons
 
 '''
@@ -128,7 +128,7 @@ def getshapecolour(sf, field, colmap, ncolours, **kwargs):
     # get colour index
     ci = []
     for f in fvect:
-        print f
+        print(f)
         ci.append(round((ncolours-1.) / zrng * (f-zmin)))
         
     return cs, ci, cmap, zmin, zmax
@@ -221,7 +221,7 @@ def drawshapepoly(m, plt, sf, **kwargs):
                     plt.fill(xx,yy,color=fillcol)
                 m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
             except:
-                print 'Skipping polygon...'
+                print('Skipping polygon...')
 
             x = []
             y = []
@@ -274,10 +274,10 @@ def drawoneshapepoly(m, plt, sf, field, value, **kwargs):
     
     # get field index
     findex = get_field_index(sf, field)
-    #print 'findex', findex
+    #print('findex', findex)
 
     for i, shape in enumerate(shapes):
-        #print 'i', i
+        #print('i', i)
         if recs[i][findex] == value:
             # get colour
             try:
@@ -564,7 +564,7 @@ def distance(lat1, lon1, lat2, lon2):
     #from obspy.core.util.geodetics import gps2DistAzimuth
     from obspy.geodetics.base import gps2dist_azimuth
     
-    #print lat1, lon1, lat2, lon2
+    #print(lat1, lon1, lat2, lon2)
     
     #rngm, az, baz = gps2DistAzimuth(lat1, lon1, lat2, lon2)
     rngm, az, baz = gps2dist_azimuth(lat1, lon1, lat2, lon2)
@@ -780,9 +780,9 @@ def mask_outside_polygon(poly_verts, facecolor, plt):
     # A series of codes (1 and 2) to tell matplotlib whether to draw a line or 
     # move the "pen" (So that there's no connecting line)
     bound_codes = [mpath.Path.MOVETO] + (len(bound_verts) - 1) * [mpath.Path.LINETO]
-    print bound_codes
+    print(bound_codes)
     poly_codes = [mpath.Path.MOVETO] + (len(poly_verts) - 1) * [mpath.Path.LINETO]
-    print poly_codes
+    print(poly_codes)
     
     # Plot the masking patch
     path = mpath.Path(bound_verts + poly_verts, bound_codes + poly_codes)
@@ -864,8 +864,8 @@ def get_WGS84_area(geom):
                 lat2=geom.bounds[3])),
         geom)
     
-    # Print the area in km^2
-    #print geom_area.area / 1000000.
+    # print(the area in km^2)
+    #print(geom_area.area / 1000000.
     
     return geom_area.area / 1000000.
     
@@ -891,7 +891,7 @@ def cpt2colormap(fileName, ncolours, **kwargs):
     try:
         f = open(fileName)
     except:
-        print "file ",fileName, "not found"
+        print("file ",fileName, "not found")
         return None
 
     lines = f.readlines()
@@ -992,11 +992,11 @@ wgs84=pyproj.Proj("+init=EPSG:4326") # LatLon with WGS84 datum used by GPS units
 #NAD83=pyproj.Proj("+init=EPSG:3347") # NAD83 / Statistics Canada Lambert
 
 # get lat/lon for each point:
-print 'Converting to lon/lat...'
+print('Converting to lon/lat...')
 xx, yy = meshgrid(eastings, northings)
 lons, lats = pyproj.transform(nad1983, wgs84, xx.flatten(), yy.flatten())
 
-print 'Looping thru pop data...'
+print('Looping thru pop data...')
 # write population file for grdtrack
 pop = []
 plo = []

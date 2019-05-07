@@ -442,11 +442,11 @@ def xyz2shp(xyzfile, headerlines, shpfile, shptype):
     import re
 
     # now parse ceef
-    print 'Reading xyz...'
+    print('Reading xyz...')
     data = open(xyzfile).readlines()[headerlines:]
 
     # now output shapefile
-    print 'Making shapefile...'
+    print('Making shapefile...')
     if shptype == 'polyline':
         w = shapefile.Writer(shapefile.POLYLINE)
     else:
@@ -457,11 +457,11 @@ def xyz2shp(xyzfile, headerlines, shpfile, shptype):
 
     # now loop through points
     for line in data:
-        print line
+        print(line)
         # split space, tab or comma delimitered
         #dat = re.split('\s+', line.strip())
         dat = line.strip().split(',')
-        print dat
+        print(dat)
         if len(dat) != 3:
             dat = dat.split('\t')
         if len(dat) != 3:
@@ -470,7 +470,7 @@ def xyz2shp(xyzfile, headerlines, shpfile, shptype):
         w.point(float(dat[0]), float(dat[1]))
         w.record(float(dat[0]), float(dat[1]), float(dat[2]))
 
-    print 'Writing shapefile...'
+    print('Writing shapefile...')
     w.save(shpfile)
 
 # converts grd file to point shapefile
@@ -479,11 +479,11 @@ def grd2shp(grdfile, shpfile):
     try:
         # first output to tmp xyz file
         system('grd2xyz '+grdfile+' > tmp.xyz')
-        print '\nWriting file: ', shpfile
+        print('\nWriting file: ', shpfile)
         xyz2shp('tmp.xyz', shpfile)
         remove('tmp.xyz')
     except:
-        print '\nGMT module not found\n'
+        print('\nGMT module not found\n')
 
 # converts shp polygons or lines to GMT-friendly file
 def shp2gmt(shpfile, outfile, **kwargs):
@@ -496,7 +496,7 @@ def shp2gmt(shpfile, outfile, **kwargs):
 
     import shapefile
 
-    print 'Reading shapefile...'
+    print('Reading shapefile...')
     sf = shapefile.Reader(shpfile)
     shapes = sf.shapes()
     records = sf.records()
@@ -538,7 +538,7 @@ def shp2gmt(shpfile, outfile, **kwargs):
                 all_str = all_str + pt_str
                 tmpfile.write(all_str)
 
-    print 'Writing to file...'
+    print('Writing to file...')
 
     tmpfile.close()
 
@@ -616,7 +616,7 @@ def shp_pt2gmt_pt(shpfile, outfile, labelfield):
     import shapefile
     from mapping_tools import get_field_data
 
-    print 'Reading shapefile...'
+    print('Reading shapefile...')
     sf = shapefile.Reader(shpfile)
 
     # get labels
@@ -633,7 +633,7 @@ def shp_pt2gmt_pt(shpfile, outfile, labelfield):
                   str("%0.5f" % shapes[i].points[0][1]), '11', '0', '1', 'ML', \
                   labels[i])) + '\n'
 
-    print 'Writing to psxy file...'
+    print('Writing to psxy file...')
     f = open(outfile,'wb')
     f.write(all_str)
     f.close()
@@ -660,7 +660,7 @@ def cpt2colormap(fileName, ncolours, **kwargs):
     try:
         f = open(fileName)
     except:
-        print "file ",fileName, "not found"
+        print("file ",fileName, "not found")
         return None
 
     lines = f.readlines()
@@ -819,8 +819,8 @@ def make_netcdf_map(ax, cnrs, ncfile, cmap, norm, vmin, vmax, mapres, grdres, gr
     # plot grids
     ##########################################################################################
     
-    print 'Reading netCDF file...'
-    print ncfile
+    print('Reading netCDF file...')
+    print(ncfile)
     nc = NetCDFFile(ncfile)
     
     data = nc.variables['z'][:] #/ zscale
@@ -839,7 +839,7 @@ def make_netcdf_map(ax, cnrs, ncfile, cmap, norm, vmin, vmax, mapres, grdres, gr
     
     
     # make shading
-    print 'Making map...'
+    print('Making map...')
     if lightsource == True:
         from matplotlib.colors import LightSource
         ls = LightSource(azdeg = 180, altdeg = 45)

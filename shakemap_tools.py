@@ -124,7 +124,7 @@ def parse_gridxml(datxml):
         '''
         # note, this works - but not needed
         for subchild in child.iter('code'):
-            print subchild.attrib
+            print(subchild.attrib
         '''
     return stndict
 
@@ -510,7 +510,7 @@ def csv2stationlist_xml(csvfile, eqla, eqlo, dep, mag, yyyymmddHHMMSS, locstring
     from mmi_tools import mmi2pgm_worden12, cmpsps2g
     import time
     
-    print yyyymmddHHMMSS
+    print(yyyymmddHHMMSS)
     '''
     csvfile format with one header line:
         LAT, LON, MMI
