@@ -9,7 +9,7 @@ def print_functions():
     txt = open('U:/Code/pycode/mag_tools.py').readlines()
     for line in txt:
         if line.find('def') >= 0:
-            print line.strip('def ').strip('\n')
+            print(line.strip('def ').strip('\n'))
 
 # calculate seismic moment (in N-m) from mw
 def mw2m0(mw):

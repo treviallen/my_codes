@@ -49,6 +49,61 @@ def poe_invtime_to_annual(imtls, poe, investigation_time):
     tmpdict[ut+'_probs_annual'] = annual_probs
     tmpdict[ut+'_probs_invtime'] = hazcurve
 
+def parse_oq_xml_poes(xmlfile):
+    import xml.etree.ElementTree as ET
+    from numpy import array, vstack, log
+    
+    
+    #xmlfile='out/hazard_curve-mean_718-PGA.xml'
+    
+    tree = ET.parse(xmlfile)
+    root = tree.getroot()
+    
+    for child in root:
+        print(child.tag, child.attrib)
+        calcDetails = {'IMT': child.attrib['IMT'], 'investigationTime': child.attrib['investigationTime']}
+        
+        if child.attrib['IMT'] == 'SA':
+            calcDetails['saPeriod'] = child.attrib['saPeriod']
+           
+    # do things old fashioned way
+    lines = open(xmlfile).readlines()
+    
+    lats = []
+    lons = []
+    imls = []
+    poes = []
+    apoes = [] # annuaulised poes
+    
+    for i, line in enumerate(lines):
+        if line.strip().endswith('<IMLs>'):
+            imlstxt = lines[i+1].strip().split()
+            imls = array([float(x) for x in imlstxt])
+            
+        if line.strip().endswith('<gml:pos>'):
+            postxt = lines[i+1].strip().split()
+            lons.append(float(postxt[0]))
+            lats.append(float(postxt[1]))
+            
+        if line.strip().endswith('<poEs>'):
+            poestxt = lines[i+1].strip().split()
+            tmppoes = array([float(x) for x in poestxt])
+            
+            # get annualised poes
+            P0 = 1 - array(imls)
+            n = -1*log(P0)
+            tmpapoes = n / calcDetails['investigationTime']
+            
+            if poes == []:
+                poes = array([tmppoes])
+                apoes = array([tmpapoes])
+            else:
+                poes = vstack((poes, tmppoes))
+                apoes = vstack((apoes, tmpapoes))
+                
+    calcDat = {'lats':lats, 'lons':lons, 'imls':imls, 'poes':poes, 'annual_poes':apoes}
+    
+    return calcDetails, calcDat
 
 def get_nsha12_hazard_curve(lon, lat, spectral_period):
     '''

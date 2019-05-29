@@ -537,9 +537,12 @@ def gaull1990_gsim(mag, dep, rhypo):
     return G90WAimt, G90SEAimt, G90INDimt, G90WA_PGVimt, G90SEA_PGVimt, G90IND_PGVimt
     
 def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
-    from openquake.hazardlib.gsim.gmpe_table import GMPETable
+    #from openquake.hazardlib.gsim.gmpe_table import GMPETable
+    from gsim_table import GMPETable
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
+    from openquake.hazardlib.imt import PGA, PGV, SA
+    from openquake.hazardlib.const import StdDev
 
     crust_ty = 'gmpetable'
     
@@ -563,9 +566,11 @@ def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
         
     gmpe = GMPETable(gmpe_table = hdf5file) # use full path
+    #imt = gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])
     hdf5imt = get_pga_sa_gmpe(gmpe, sites, rup, dists, crust_ty)
     
     return hdf5imt
+    #return imt
 
 def aa13_gsims(mag, dep, rrup, rjb, rhypo, vs30):
     from openquake.hazardlib.gsim.gsim_table import GMPETable

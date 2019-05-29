@@ -86,8 +86,9 @@ def parse_dataxml(datxml):
         
     # reformat text to data array
     griddata = fromstring(dataStr.strip(), sep=' ')
-    rows = len(griddata) / fields['cols']
+    rows = int(len(griddata) / fields['cols'])
     newshape = (rows, fields['cols'])
+    print(rows, fields['cols'], newshape)
     griddata = griddata.reshape(newshape)
 
     return event, gridspec, fields, griddata
