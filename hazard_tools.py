@@ -61,7 +61,7 @@ def parse_oq_xml_poes(xmlfile):
     
     for child in root:
         print(child.tag, child.attrib)
-        calcDetails = {'IMT': child.attrib['IMT'], 'investigationTime': child.attrib['investigationTime']}
+        calcDetails = {'IMT': child.attrib['IMT'], 'investigationTime': float(child.attrib['investigationTime'])}
         
         if child.attrib['IMT'] == 'SA':
             calcDetails['saPeriod'] = child.attrib['saPeriod']
@@ -90,7 +90,7 @@ def parse_oq_xml_poes(xmlfile):
             tmppoes = array([float(x) for x in poestxt])
             
             # get annualised poes
-            P0 = 1 - array(imls)
+            P0 = 1 - array(tmppoes)
             n = -1*log(P0)
             tmpapoes = n / calcDetails['investigationTime']
             
@@ -115,7 +115,7 @@ def get_nsha12_hazard_curve(lon, lat, spectral_period):
     
     # provide warning if lon is negative
     if lon < 0:
-        print '!!! CHECK LAT LON ORDER !!!
+        print('!!! CHECK LAT LON ORDER !!!')
         
     # set grid return periods for hazard curve
     return_periods = ['100', '250', '500', '800', '1000', '1500', '2000', '2500', \
@@ -159,7 +159,7 @@ def get_nsha12_hazard_curve(lon, lat, spectral_period):
             exceedances.append(percent_chance)
             
         except:
-            print 'File not found:', grdpath
+            print('File not found:', grdpath)
             
         
     return array(hazArray), array(return_period_nums), array(exceedances)
@@ -174,7 +174,7 @@ def get_nsha12_hazard_spectra(lon, lat, return_period, place):
     
     # provide warning if lon is negative
     if lon < 0:
-        print '!!! CHECK LAT LON ORDER !!!
+        print('!!! CHECK LAT LON ORDER !!!')
     
     # set grid spectral periods for hazard curve
     spectral_periods = ['0.0', '0.05', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', \
@@ -204,7 +204,7 @@ def get_nsha12_hazard_spectra(lon, lat, return_period, place):
 
         try:
             # do grdtrack to extract hazard value
-            print ''.join(('gmt grdtrack lola.txt -G', grdpath, ' > lolahaz.txt'))
+            print(''.join(('gmt grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
             system(''.join(('gmt grdtrack lola.txt -G', grdpath, ' > lolahaz.txt')))
         
         
@@ -219,7 +219,7 @@ def get_nsha12_hazard_spectra(lon, lat, return_period, place):
             uhstxt += ','.join((spectral_period, str('%0.4f' % hazval))) + '\n'
             
         except:
-            print 'File not found:', grdpath
+            print('File not found:', grdpath)
             
     # write to file
     uhsFile = '_'.join(('NSHM12_UHS',place,return_period,str(lon),str(lat)))+'.csv'
