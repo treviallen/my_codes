@@ -1,4 +1,3 @@
-e09
 # -*- coding: utf-8 -*-
 """
 Created on Thu May 16 12:02:57 2013
@@ -780,7 +779,7 @@ def parse_ga_event_query(gacsv):
     import datetime as dt
     
     # open and read file
-    lines = open(gacsv).readlines()[3:]
+    lines = open(gacsv).readlines()[1:]
     
     # initiate event dictonary
     evdict = []

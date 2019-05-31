@@ -605,21 +605,56 @@ def len2wid_L10(flen, ftype): # in MW
 
 
 '''do Leonard 2014 - SCR'''
-def mag2len_L14(mw, ftype): # in MW - not sure if correct
+def mag2lsr_L14(mw, ftype): # in MW - not sure if correct
+    from mag_tools import mw2m0
+    from numpy import log10
+    
+    logM0 = log10(mw2m0(mw))
+    print logM0
     # assume mw is a list
     if ftype == 'scrrs':
-        b = 0.953
-        a = 5.12
-        lsr = 10**((mw - a) / b)
+        b = 1.43
+        a = 12.55
+        lsr = 10**((logM0 - a) / b) / 1000.
+        print lsr
         
         idx = lsr > 15.
-        b = 1.667
-        a = 4.32
-        lsr[idx] = 10**((mw[idx] - a) / b)
+        b = 2.5
+        a = 8.08
+        lsr[idx] = 10**((logM0[idx] - a) / b) / 1000.
     
     return lsr # in km
+
+# for full rupture length   
+def mag2len_L14(mw, ftype): # in MW - not sure if correct
+    # assume mw is a list
+    from mag_tools import mw2m0
+    from numpy import log10
     
-def len2mag_L14(lsr, ftype): # in km
+    logM0 = log10(mw2m0(mw))
+    if ftype == 'scrrs':
+        b = 3.0
+        a = 6.382
+        rl = 10**((logM0 - a) / b) / 1000.
+    
+    return rl # in km
+
+# for full rupture length   
+def len2mag_L14(rl, ftype): # in km
+    from numpy import log10
+    from mag_tools import m02mw
+    
+    rl *= 1000. # km2m
+    
+    if ftype == 'scrrs':
+        a = 6.382
+        b = 3.0
+    
+    logM0 = a + log10(rl) * b # in m0
+    
+    return m02mw(10**logM0)
+
+def lsr2mag_L14(lsr, ftype): # in km
     from numpy import log10
     from mag_tools import m02mw
     
