@@ -1013,4 +1013,97 @@ pop = array(pop).reshape((len(pop),1))
 
 darray = hstack((plo, pla, pop))
 savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
-"""                
+"""
+
+def annotate_cities(numCities, plt, m):
+    from numpy import argsort
+    import matplotlib.patheffects as PathEffects
+    path_effects=[PathEffects.withStroke(linewidth=3, foreground="w")]
+    
+    # set grid size (in degrees)
+    lonrng = m.urcrnrlon - m.llcrnrlon
+    if lonrng <= 3:
+        dd = 0.08
+        d2 = dd / 2.
+        d3 = d2 * 0.8
+        #latrng = arange(eqla-2*lonrng, eqla+2*lonrng, dd*0.8) # kluge to get approx square
+        pltbuffer = 0.1
+        txtoff = 0.025
+    elif lonrng > 3 and lonrng < 6:
+        dd = 0.15
+        d2 = dd / 2.
+        d3 = d2 * 0.85
+        #latrng = arange(eqla-2*degrng, eqla+2*degrng, dd*0.85) # kluge to get approx square
+        pltbuffer = 0.5
+        txtoff = 0.07
+    elif lonrng >= 6:
+        dd = 0.2
+        d2 = dd / 2.
+        #d3 = d2 * 0.85
+        #latrng = arange(eqla-2*degrng, eqla+2*degrng, dd*0.85) # kluge to get approx square
+        pltbuffer = 0.7
+        txtoff = 0.1
+
+    
+    # parse AU cities
+    cityFile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/REQIT/GA-shakemap/mapping/cities1000_au_ascii.txt'
+    
+    lines = open(cityFile).readlines()
+    
+    # label cities
+    clatList = []
+    clonList = []
+    
+    # for ordering in plot priority
+    pltlo = []
+    pltla = []
+    pltpop = []
+    pltloc = []
+    
+    for line in lines:
+        dat = line.strip().split('\t')
+        clat = float(dat[4])
+        clon = float(dat[5])
+        #loc = dat[1]
+        
+        if clat > m.llcrnrlat and clat < m.urcrnrlat-txtoff \
+           and clon > m.llcrnrlon and clon < m.urcrnrlon:
+            
+            # add city to list
+            pltlo.append(clon)
+            pltla.append(clat)
+            pltpop.append(float(dat[14]))
+            pltloc.append(dat[1])
+    
+    # order locs in trems of poplation
+    sortidx = argsort(pltpop)[::-1] # and reverse
+    
+    # now loop through ordered cities - use max 15
+    i = 0
+    for si in sortidx:
+        # plt max num locs
+        if i < numCities:
+            pltCity = True
+            print pltloc[si]
+            
+            for clol, clal in zip(clonList, clatList):
+                if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (2.5*pltbuffer):
+                    #print pltloc[si]
+                    pltCity = False
+                    
+            # build list of locs
+            clatList.append(pltla[si])
+            clonList.append(pltlo[si])
+            
+            if pltCity == True:
+                x, y = m(pltlo[si], pltla[si])
+                plt.plot(x, y, 'o', markerfacecolor='k', markeredgecolor='k', markeredgewidth=0.5, markersize=6, zorder=11000)
+        
+                x, y = m(pltlo[si]+txtoff, pltla[si]+txtoff)
+                plt.text(x, y, pltloc[si], size=14, ha='left', weight='normal', path_effects=path_effects)
+                
+                i += 1
+                
+    return clatList, clonList, 
+                                      
+                          

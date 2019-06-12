@@ -597,6 +597,5 @@ def parse_dyfi_geojson(jsonFilePath):
         # append to list
         dyfi_dict.append(tmp)
         
-    return dyfi_dict            
-                                      
-                          
+    return dyfi_dict
+
