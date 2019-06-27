@@ -1084,7 +1084,7 @@ def annotate_cities(numCities, plt, m):
         # plt max num locs
         if i < numCities:
             pltCity = True
-            print pltloc[si]
+            print(pltloc[si])
             
             for clol, clal in zip(clonList, clatList):
                 if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (2.5*pltbuffer):
