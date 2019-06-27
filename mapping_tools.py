@@ -1106,4 +1106,88 @@ def annotate_cities(numCities, plt, m):
                 
     return clatList, clonList, 
                                       
-                          
+# code based on: http://qingkaikong.blogspot.com/2016/06/nice-python-basemap-background.html
+def make_street_map(clat, clon, service='ESRI_StreetMap_World_2D', ll_buffer = 0.1, \
+             xpixels = 1500, plt_inset = True, inset_state = 'nsw', inset_loc = 3, \
+             plt_marker = True, marker='*', ms = 14, mew = 0.5, mfc = 'r', mec='k'):
+    
+    from mpl_toolkits.basemap import Basemap
+    import matplotlib.pyplot as plt
+    from numpy import array
+    
+    '''
+    Map Services:
+        ESRI_Imagery_World_2D
+        ESRI_StreetMap_World_2D
+        NatGeo_World_Map
+        NGS_Topo_US_2D
+        Ocean_Basemap
+        USA_Topo_Maps
+        World_Imagery
+        World_Physical_Map
+        World_Shaded_Relief
+        World_Street_Map
+        World_Terrain_Base
+        World_Topo_Map
+        
+    Example:
+        from mapping_tools import make_street_map
+        plt, m = make_street_map(-34.070702, 150.480499, service='NatGeo_World_Map', marker='t')
+    '''
+    # set map bounds
+    urcrnrlat = clat + ll_buffer
+    urcrnrlon = clon + ll_buffer
+    llcrnrlat = clat - ll_buffer
+    llcrnrlon = clon - ll_buffer
+
+    # EPSG Projection 3577 - GDA94 / Australian Albers
+    # EPSG Projection 3112 - GDA94 / Geoscience Australia Lambert
+    # EPSG:3308 - GDA94 / NSW Lambert 
+    epsg = 3308
+    
+    # note, you need change the epsg for different region, 
+    #US is 4269, and you can google the region you want
+    plt.figure(1, figsize = (10, 10))
+    ax = plt.subplot(111)
+    
+    m = Basemap(projection='mill',llcrnrlon=llcrnrlon ,llcrnrlat=llcrnrlat,
+        urcrnrlon=urcrnrlon ,urcrnrlat=urcrnrlat, resolution = 'h', epsg = epsg)
+    
+    # xpixels controls the pixels in x direction, and if you leave ypixels
+    # None, it will choose ypixels based on the aspect ratio
+    m.arcgisimage(service=service, xpixels = xpixels, verbose= True, dpi=600)
+    
+    # plot marker
+    if plt_marker == True:
+        x, y = m(clon, clat)
+        plt.plot(x, y, marker=marker, ms=ms, mfc=mfc, mew=mew, mec=mec)
+    
+    # make inset
+    if plt_inset == True:
+        if inset_state == 'nsw':
+            iurcrnrlat = -27.7
+            iurcrnrlon = 154.2
+            illcrnrlat = -38.
+            illcrnrlon = 140.4
+        
+        from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+        axins = zoomed_inset_axes(ax, ll_buffer*0.03, loc=inset_loc)
+        
+        m2 = Basemap(projection='merc',llcrnrlon=illcrnrlon ,llcrnrlat=illcrnrlat,
+                     urcrnrlon=iurcrnrlon ,urcrnrlat=iurcrnrlat, resolution = 'l')
+                    
+        m2.drawmapboundary(fill_color='0.8')
+        m2.fillcontinents(color='w', lake_color='0.8')
+        m2.drawcoastlines()
+        m2.drawcountries()
+        m2.drawstates()
+        
+        # fill main area
+        #xv = array([llcrnrlon, llcrnrlon, urcrnrlon, urcrnrlon, llcrnrlon])
+        #yv = array([llcrnrlat, urcrnrlat, urcrnrlat, llcrnrlat, llcrnrlat])
+        #x, y = m2(xv, yv)
+        #plt.fill(x, y, 'r-', lw=1.5)
+        x, y = m2(clon, clat)
+        plt.plot(x, y, 'rs')
+
+    return plt, m
