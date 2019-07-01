@@ -804,10 +804,16 @@ def remove_low_sample_data(st):
             rmlsr = True
             
         # remove junk stations
-        if tr.stats.channel.encode('ascii','ignore').startswith('L') \
-            or tr.stats.channel.encode('ascii','ignore').startswith('V') \
-            or tr.stats.channel.encode('ascii','ignore').startswith('U'):
-            st = st.remove(tr)
+        try:
+            if tr.stats.channel.encode('ascii','ignore').startswith('L') \
+                or tr.stats.channel.encode('ascii','ignore').startswith('V') \
+                or tr.stats.channel.encode('ascii','ignore').startswith('U'):
+                st = st.remove(tr)
+        except:
+            if tr.stats.channel.startswith('L') \
+                or tr.stats.channel.startswith('V') \
+                or tr.stats.channel.startswith('U'):
+                st = st.remove(tr)
                 
     # now strip low sample data from stream
     if rmlsr == True:
@@ -819,7 +825,10 @@ def remove_low_sample_data(st):
     channels = []
     sampling_rates = []
     for tr in st:
-        channels.append(tr.stats.channel.encode('ascii','ignore'))
+        try:
+            channels.append(tr.stats.channel.encode('ascii','ignore'))
+        except:
+            channels.append(tr.stats.channel)
         sampling_rates.append(tr.stats.sampling_rate)
     
     channels = array(channels)
