@@ -373,7 +373,43 @@ def merge_jump_seed(seedfolder, hhmm):
     # remove tmp files
     for tmpfile in mrgfiles:
         remove(tmpfile)
+
+# splits a mseed file with multiple stations to a single file per station
+# with multiple channels
+def split_mseed_stations(mseedfile, out_prefix):
+    from obspy import read, Stream
+    from numpy import array, unique
     
+    '''
+    mseedfile = path to mseed file, e.g. 'mseed_dump/2018-04-07 0547 58.ms'
+    out_prefix = prefix for output file name, e.g. '2018-04-07T05.48.AU'
+    '''
+    
+    # read streams
+    st = read(mseedfile)
+    
+    # get unique stations
+    stas = []
+    for tr in st:
+        stas.append(tr.stats.station)
+    ustas = unique(array(stas))
+    
+    # now loop through unique stations and dump data
+    for sta in ustas:
+        new_trs = []
+        for tr in st:
+            if tr.stats.station == sta:
+                new_trs.append(tr)
+        
+        # make new stream for one station
+        new_st = Stream(traces=new_trs)
+        
+        # set filename
+        newfile = '.'.join((out_prefix, sta, 'mseed'))
+        
+        # write mseed file
+        new_st.write(newfile, format="MSEED")
+        
 # trims segment from larger mseed file
 def trim_seed(eventDateTuple, mseedFile):
     from obspy import read, UTCDateTime
