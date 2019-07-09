@@ -13,7 +13,7 @@ def get_response_info(sta,recdate,chan):
     import datetime as dt
     from os import getcwd
     
-    #print sta,recdate,chan
+    #print(sta,recdate,chan
 
     nat_freq = -12345
     inst_ty = ''
@@ -45,7 +45,7 @@ def get_response_info(sta,recdate,chan):
         # skip first row
         if line[0:3] != 'STA' and line != '\n':
             tmp = line.split('\t')
-            #print tmp, tmp[2], tmp[3]
+            #print(tmp, tmp[2], tmp[3]
             mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
             maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
             if tmp[0] == sta and tmp[12].strip() == chan:
@@ -62,7 +62,7 @@ def get_response_info(sta,recdate,chan):
                     pazfile = tmp[13].strip()
                     
     if stlo == -12345:
-        print recdate,': Station', sta, chan, 'not found...'
+        print(recdate,': Station', sta, chan, 'not found...')
 
     return nat_freq, inst_ty, damping, sen, recsen, gain, pazfile, stlo, stla, netid
 
@@ -74,7 +74,7 @@ def get_paz_list():
     dirList=os.listdir('paz')
     i = 0
     for fname in dirList:
-        print str(i+1) + ')\t' + fname.strip('.paz')
+        print(str(i+1) + ')\t' + fname.strip('.paz'))
         i += 1
 
     var = raw_input('\nSelect PAZ file > ')
@@ -109,9 +109,9 @@ def read_pazfile(in_pazfile):
     nzeros = int(num[1])
     for i in range(1,nzeros+1):
         tmpz = paztxt[i].strip('\n').split('\t')
-#        print tmpz
+#        print(tmpz
         zeros.append(complex(float(tmpz[0]),float(tmpz[1]))*2*np.pi) # convert to angular frequency
-#    print zeros
+#    print(zeros
 
     # now get poles
     poles = []
@@ -119,9 +119,9 @@ def read_pazfile(in_pazfile):
     npoles = int(num[1])
     for i in range(nzeros+2,nzeros+npoles+2):
         tmpp = paztxt[i].strip('\n').split('\t')
-#        print tmpp
+#        print(tmpp
         poles.append(complex(float(tmpp[0]),float(tmpp[1]))*2*np.pi) # convert to angular frequency
-#    print poles
+#    print(poles
 
     # get constant
     constant = paztxt[nzeros+npoles+2].split('\t')
@@ -135,7 +135,7 @@ def read_pazfile(in_pazfile):
 
 # this function leads the user to input station information
 def enter_response_info(sta, chan, sps):
-    print '\nEnter site information for ' + sta + ' ' + chan
+    print('\nEnter site information for ' + sta + ' ' + chan)
     var = raw_input('\n'+'Velocity sensor or accelerometer ([v]/a)? > ')
     if var == '' or var == 'v':
         inst_ty = 'V'
@@ -160,7 +160,7 @@ def enter_response_info(sta, chan, sps):
     else:
         netid = var
 
-    print '\nLook-up station details here: http://www.isc.ac.uk/registries/listing/'
+    print('\nLook-up station details here: http://www.isc.ac.uk/registries/listing/')
 
     var = raw_input('\n'+sta+' station latitude (decimal degrees) > ')
     if var == '':
@@ -300,8 +300,8 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     
     dispResp = False
     
-    #print 'freq', np.shape(freq)
-    #print freq
+    #print('freq', np.shape(freq)
+    #print(freq
 
     # read PAZ file
     poles, zeros, constant, normf = read_pazfile(pazfile)
@@ -326,10 +326,10 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
 
     # use normalizing factor from file
     else:
-        print '\nUsing normalisation constant =', constant, '\n'
+        print('\nUsing normalisation constant =', constant, '\n')
         
         if normf == -99.: # displacement response
-            #print constant, sen
+            #print(constant, sen
             cal_freq = 1.0 # assumed
             #constant *= angc #* cal_freq # convert from disp to vel?
             dispResp = True
@@ -337,12 +337,12 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
         else:
             constant *= angc**(len(poles)-len(zeros))
         
-    #print constant, sen, dispResp
+    #print(constant, sen, dispResp
     if dispResp == True:
         sen /= angc
-    #print constant, sen
+    #print(constant, sen
     # combine amp factors
-    #print 'Norm Const:', constant
+    #print('Norm Const:', constant
     ampfact = sen * recsen * gain * constant
 
     # if accelerometer, convert units from counts/g to counts/m/s**2
@@ -355,9 +355,9 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     
     # check if disp response and convert to velocity
     '''
-    print 'disptrue', dispResp, normf
+    print('disptrue', dispResp, normf
     if dispResp == True:
-        print 'disptrue'
+        print('disptrue'
         resp.real *= angc*freq
         #resp.imag *= angc*freq
     '''

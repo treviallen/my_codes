@@ -17,7 +17,7 @@ def check_file_fmt(wavfile):
     # check to see if mseed first
     from obspy.core import read
 
-    print '\nObsPy Installed'
+    print('\nObsPy Installed')
 
     # try testing if SAC or miniSEED
     try:
@@ -27,7 +27,7 @@ def check_file_fmt(wavfile):
 
     except:
         sacseed = False
-        print wavfile
+        print(wavfile)
         f = open(wavfile, 'r')
         firstline = f.readline()
         if firstline.find('Nanometrics') == 0:
@@ -65,7 +65,7 @@ def return_data(wavfile):
     else:
         '\nFile format not recognised!'
         
-    #print 'return_data', alldata[:, 0]
+    #print('return_data', alldata[:, 0]
     return allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, fmt
 
 def readeqwave(wavfile):
@@ -74,7 +74,7 @@ def readeqwave(wavfile):
     sen = 'null'
     gain = 'null'
     
-    #print '\nReading header info...'
+    #print('\nReading header info...'
     header = open(wavfile).readlines()
 
     readdat = 0
@@ -126,7 +126,7 @@ def readeqwave(wavfile):
             sps = line.split('\t')
             sps = sps[0:-1]
             sps = [round(float(x)) for x in sps]
-            print sps
+            print(sps)
         
         ind = line.find('#Counts/Volt')
         if ind >= 0:
@@ -181,7 +181,7 @@ def readeqwave(wavfile):
         ind = line.find('--------')
         if ind >= 0:
             readdat = 1
-            #print 'Reading data...'
+            #print('Reading data...'
 
     # make date array
     alldatestr = []
@@ -194,7 +194,7 @@ def readeqwave(wavfile):
     i = 0
     for comp in comps:
         # not sure why this if statement is needed!
-        #print comp
+        #print(comp
         if comp.startswith('EH') or comp.startswith('v') or comp.startswith('EL') or comp.endswith(' t') \
            or comp.endswith(' T') or comp.endswith(' T 5') or comp.startswith('SP') \
            or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03') or comp.endswith('vel'):
@@ -240,7 +240,7 @@ def readeqwave(wavfile):
              o = 'U' # Unknown
 
         comps[i] = g + it + o
-        #print comps
+        #print(comps
 
         i += 1
     
@@ -249,7 +249,7 @@ def readeqwave(wavfile):
 # this function reads nmx ascii format
 def readnmx(wavfile):
     # READ HEADER INFO
-    print 'Reading header info...'
+    print('Reading header info...')
     header = open(wavfile).readlines()
 
     readdat = 0
@@ -308,7 +308,7 @@ def readnmx(wavfile):
         ind = line.find('Format Version: 5.0')
         if ind >= 0:
             readdat = 1
-            #print 'Reading data...'
+            #print('Reading data...'
 
     return sta, comps, datestr, sec, sps, data, nsamp
 
@@ -318,7 +318,7 @@ st.write("tspair.ascii", format="TSPAIR")
 http://docs.obspy.org/packages/autogen/obspy.core.ascii.writeTSPAIR.html"""
 def readtspair(wavfile):
     from datetime import datetime
-    print 'Reading header info...'
+    print('Reading header info...')
     header = open(wavfile).readlines()
 
     readdat = 0
@@ -371,7 +371,7 @@ def readseismac(wavfile):
     # READ HEADER INFO
     from datetime import datetime
 
-    #print '\nReading header info...'
+    #print('\nReading header info...'
     header = open(wavfile, 'rU')
 #    header = header[0]
 
@@ -380,7 +380,7 @@ def readseismac(wavfile):
     i = -1
     for line in header:
 #        line = line.rstrip(' \t\n\r')
-#        print line
+#        print(line
         # get station name
         ind = line.find('SiteName=')
         if ind >= 0:
@@ -398,7 +398,7 @@ def readseismac(wavfile):
         if ind >= 0:
             ymd = line.strip('\n').split('=')
             ymd = ymd[1]
-            print ymd
+            print(ymd)
 
         ind = line.find('sps')
         if ind >= 0:
@@ -427,7 +427,7 @@ def readseismac(wavfile):
             # make data array
             data = np.zeros((len(comps), nsamp))
 
-            #print 'Reading data...'
+            #print('Reading data...'
 
     # make date array
     allnsamp = []
@@ -483,7 +483,7 @@ def readseismac(wavfile):
              o = 'U' # Unknown
 
         comps[i] = g + it + o
-        #print comps
+        #print(comps
 
         i += 1
 
@@ -538,10 +538,10 @@ def readbkn(wavfile):
         if comp[0] == 'G' or sta == 'GOK' or sta == 'CMC' or sta == 'KOO1' \
            or sta == 'KOO2':
             comps[i] = 'HN' + comp[-1]
-            #print sta, 'Acc', comp, comps[i], wavfile
+            #print(sta, 'Acc', comp, comps[i], wavfile
         elif comp[0] == 'S' and sps > 80:
             comps[i] = 'EH' + comp[-1]
-            #print sta, 'Vel', comp, comps[i], wavfile
+            #print(sta, 'Vel', comp, comps[i], wavfile
             
     # get sensitivity
     gain = 1.0
@@ -580,7 +580,7 @@ def readbkn(wavfile):
 
             i += 1
         else:
-            #print line
+            #print(line
             if line.startswith('--------------'):
                 readdat = True
         
@@ -641,7 +641,7 @@ def readseed(st):
         #allnsamp.append(min_npts) # not sure why this line was added!
               
         # get channel 
-        #print tr
+        #print(tr
         if tr.stats['channel'] == 'HHE' or tr.stats['channel'] == 'HNE' or \
            tr.stats['channel'] == 'BHE' or tr.stats['channel'] == 'ENE' or \
            tr.stats['channel'] == 'EHE' or tr.stats['channel'] == 'SHE' or \
@@ -664,7 +664,7 @@ def readseed(st):
             comp = tr.stats['channel']
         else:
             numtrue = False
-            print tr.stats['channel']
+            print(tr.stats['channel'])
             if tr.stats['channel'] == '001' or tr.stats['channel'] == '004' or tr.stats['channel'] == 'HH1' or tr.stats['channel'] == 'BH1':
                 o = 'E'
                 it = 'H'
@@ -698,15 +698,15 @@ def readseed(st):
         comps.append(comp) 
         
         tmpdat = zeros_like(maxarray)
-        #print tr.stats['station'], len(maxarray), tr.stats['npts']
+        #print(tr.stats['station'], len(maxarray), tr.stats['npts']
         tmpdat[0:tr.stats['npts']] = tr.data
-        #print len(tmpdat)
+        #print(len(tmpdat)
         if i == 0:
             alldata = tmpdat.reshape(max_npts,1)
         else:
             alldata = hstack((alldata, tmpdat.reshape(max_npts,1)))
             
-    #print shape(alldata)
+    #print(shape(alldata)
     return allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp
 
 # make text to select channel
