@@ -59,7 +59,7 @@ def parse_dataxml(datxml):
                  'lat': float(child.attrib['lat']), 
                  'depth': float(child.attrib['depth']), 
                  'magnitude': float(child.attrib['magnitude'])}
-        
+    
     # get grid specs
     for child in root.iter('{http://earthquake.usgs.gov/eqcenter/shakemap}grid_specification'):
         gridspec = {'lon_min': float(child.attrib['lon_min']), 
@@ -163,6 +163,32 @@ def station_xml2csv(stationxml, stationcsv):
     from shakemap_tools import parse_dataxml
     
     stadict = parse_dataxml(stationxml)
+    
+    csvtxt = 'CODE,LON,LAT,MMI,SOURCE\n'
+    for sta in stadict:
+        csvtxt += ','.join((sta['code'], str('%0.4f' % float(sta['lon'])), str('%0.4f' % float(sta['lat'])), \
+                           sta['intensity'], sta['source'])) + '\n'
+    
+    f = open(stationcsv, 'wb')
+    f.write(csvtxt)
+    f.close()
+    
+def station_xml2csv_bruteforce(stationxml, stationcsv):
+    lines = open(stationxml).readlines()
+    
+    stadict = []
+    for line in lines:
+        if line.startswith('<station code'):
+            dat = line.split()
+            print line
+            code = dat[1].split('"')[1]
+            lon = dat[5].split('"')[1]
+            lat = dat[4].split('"')[1]
+            intensity = dat[-1].split('"')[1]
+            source = 'Geoscience Australia'
+            
+            tmp = {'code':code, 'lon':lon, 'lat':lat, 'intensity':intensity, 'source':source}
+            stadict.append(tmp)
     
     csvtxt = 'CODE,LON,LAT,MMI,SOURCE\n'
     for sta in stadict:
@@ -579,7 +605,7 @@ def csv2stationlist_xml(csvfile, eqla, eqlo, dep, mag, yyyymmddHHMMSS, locstring
     f.close()
 
 # script to parse and simplify dyfi data in dictonary format
-def parse_dyfi_geojson(jsonFilePath):  
+def parse_aggregated_dyfi_geojson(jsonFilePath):  
     import json
     from numpy import array
     

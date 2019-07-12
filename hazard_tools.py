@@ -285,18 +285,22 @@ def return_AS1170_4_shape(periods, siteclass):
            
 
 # function to get hazard curves for a list of cities
-def get_nsha18_city_curve(citylist, hazcurvefile):
+def get_nsha18_city_haz_curve(citylist, hazcurvefile):
     '''
     # make path to hazcurvefile
     #hazcurvefile = '/Users/tallen/Documents/Geoscience_Australia/NSHA2018/source_models/complete_model/final/results_fractiles/hazard_curve-mean-PGA_1.csv'
     '''
     from tools.oq_tools import return_annualised_haz_curves
     from numpy import around
+    from os import getcwd
     
     ##############################################################################
     # parse site file
     ###############################################################################
-    sitelistfile = '/Users/tallen/Documents/Geoscience_Australia/NSHA2018/shared/nsha_cities.csv'
+    if getcwd().startswith('/nas'):
+        sitelistfile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/sandpits/tallen/NSHA2018/shared/nsha_cities.csv'
+    else:
+        sitelistfile = '/Users/tallen/Documents/Geoscience_Australia/NSHA2018/shared/nsha_cities.csv'
     lines = open(sitelistfile).readlines()
     places = []
     place_lat = []
@@ -337,6 +341,96 @@ def get_nsha18_city_curve(citylist, hazcurvefile):
                         pltDict.append(sd)
     
     return pltDict
+
+# function to get hazard curves for a list of cities
+def get_nsha18_city_uhs(citylist, uhsfile):
+    '''
+    # make path to hazcurvefile
+    #hazcurvefile = '/Users/trev/Documents/Geoscience_Australia/NSHA2018/source_models/complete_model/final/results_fractiles/hazard_uhs-mean_1.csv'
+    '''
+    from tools.oq_tools import return_annualised_haz_curves
+    from numpy import around, array, unique
+    from os import getcwd
+    
+    ###############################################################################
+    # parse uhs file
+    ###############################################################################
+    
+    lines = open(uhsfile).readlines()
+    headers = [x for x in lines[1].strip().split(',')]
+    
+    # get keys from uhs file
+    keys = lines[1].strip().split(',')[2:]
+    
+    # get peridos in keys
+    periods = []
+    tmpProb = []
+    for key in keys:
+        tmpProb.append(key.split('~')[0])
+        
+        if key.startswith('0.1'):
+            if key.endswith('PGA'):
+                periods.append(0.0)
+            else:
+                periods.append(float(key.split('(')[-1][:-1]))
+    
+    # get unique probabilities
+    probabilities = unique(tmpProb)[::-1] # reorder
+    
+    
+    # site site data
+    uhsDict = []
+    for line in lines[2:]:
+        dat = [float(x) for x in line.strip().split(',')]
+        tmpdict = {'lon':float(dat[0]), 'lat':float(dat[1])}
+        
+        for i, prob in enumerate(probabilities):
+            startidx = i * len(periods) + 2
+            stopidx = startidx + len(periods)
+            siteUHS = [float(x) for x in dat[startidx:stopidx]]
+            
+            
+            tmpdict[prob] = array(siteUHS)
+    
+        uhsDict.append(tmpdict)
+        
+    ###################################################################################
+    # match city name to uhsDict
+    ###################################################################################
+    
+    # first parse city file
+    if getcwd().startswith('/nas'):
+        citycsv = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/sandpits/tallen/NSHA2018/shared/nsha_cities.csv'
+    else:
+        citycsv = '/Users/tallen/Documents/Geoscience_Australia/NSHA2018/shared/nsha_cities.csv'
+        
+    lines = open(citycsv).readlines()
+        
+    # make city dict
+    cityDict = []
+    for line in lines:
+        dat = line.strip().split(',')
+        tmpdict = {'city':dat[2], 'lon':float(dat[0]), 'lat':float(dat[1])} 
+        cityDict.append(tmpdict)
+    
+    # now match cities
+    for j in range(0, len(uhsDict)):
+        for city in cityDict:
+            if city['lon'] == uhsDict[j]['lon'] \
+               and city['lat'] == uhsDict[j]['lat']:
+               
+               # add place
+               uhsDict[j]['place'] = city['city']
+               
+    # now look for city in citylist
+    cityUHS = []
+    for city in citylist:
+        for uhs in uhsDict:
+            if city == uhs['place']:
+                print(city)
+                cityUHS.append(uhs)
+        
+    return periods, cityUHS
 
 # partial pythonisation of Nico's code
 # does not do iteration - just for plotting purposes

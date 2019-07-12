@@ -207,7 +207,7 @@ def interp_hazard_curves(investigation_time, interp_poe, poe_imls, outhazcurve):
 # returns annualised hazard curves for all spectral periods
 
 def get_nsha18_haz_curves(interp_lon, interp_lat, siteName):
-    from os import path
+    from os import path, getcwd
     from numpy import array, where, diff, hstack
     import warnings
     warnings.filterwarnings("ignore")
@@ -224,7 +224,8 @@ def get_nsha18_haz_curves(interp_lon, interp_lat, siteName):
     periods = ['PGA', 'SA(0.05)', 'SA(0.1)', 'SA(0.2)', 'SA(0.3)', 'SA(0.5)', 'SA(0.7)',  \
                'SA(1.0)', 'SA(1.5)', 'SA(2.0)', 'SA(4.0)']
     
-    gridFolder = path.join('..', '4.2_hazard_curve_grid_files')
+    if getcwd().startswith('/nas'):
+        gridFolder = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/NSHA_18/reporting/NSHA18-grids_and_maps/data_pkg/4_data_grids/4.2_hazard_curve_grid_files'
     
     interp_lon = array([interp_lon])
     interp_lat = array([interp_lat])
@@ -275,7 +276,7 @@ def get_nsha18_haz_curves(interp_lon, interp_lat, siteName):
 
 def get_nsha18_uhs(interp_lon, interp_lat, percent_chance, investigation_time, siteName):
 
-    from os import path, mkdir
+    from os import path, mkdir, getcwd
     from numpy import array, diff, exp, log, interp, where, hstack
     import warnings
     warnings.filterwarnings("ignore")
@@ -284,7 +285,8 @@ def get_nsha18_uhs(interp_lon, interp_lat, percent_chance, investigation_time, s
                'SA(1.0)', 'SA(1.5)', 'SA(2.0)', 'SA(4.0)']
     
     plt_periods = [0, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0, 4.0]
-    gridFolder = path.join('..', '4.2_hazard_curve_grid_files')
+    if getcwd().startswith('/nas'):
+        gridFolder = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/NSHA_18/reporting/NSHA18-grids_and_maps/data_pkg/4_data_grids/4.2_hazard_curve_grid_files'
     
     '''
     # test data

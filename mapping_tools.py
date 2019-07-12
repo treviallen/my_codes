@@ -1022,28 +1022,20 @@ def annotate_cities(numCities, plt, m):
     
     # set grid size (in degrees)
     lonrng = m.urcrnrlon - m.llcrnrlon
-    if lonrng <= 3:
-        dd = 0.08
-        d2 = dd / 2.
-        d3 = d2 * 0.8
-        #latrng = arange(eqla-2*lonrng, eqla+2*lonrng, dd*0.8) # kluge to get approx square
+    print('lonrng', lonrng)
+    if lonrng <= 1:
+        pltbuffer = 0.015
+        txtoff = 0.005    
+    elif lonrng <= 3:
         pltbuffer = 0.1
         txtoff = 0.025
     elif lonrng > 3 and lonrng < 6:
-        dd = 0.15
-        d2 = dd / 2.
-        d3 = d2 * 0.85
-        #latrng = arange(eqla-2*degrng, eqla+2*degrng, dd*0.85) # kluge to get approx square
         pltbuffer = 0.5
         txtoff = 0.07
     elif lonrng >= 6:
-        dd = 0.2
-        d2 = dd / 2.
-        #d3 = d2 * 0.85
-        #latrng = arange(eqla-2*degrng, eqla+2*degrng, dd*0.85) # kluge to get approx square
         pltbuffer = 0.7
         txtoff = 0.1
-
+    #print pltbuffer
     
     # parse AU cities
     cityFile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/REQIT/GA-shakemap/mapping/cities1000_au_ascii.txt'
@@ -1104,7 +1096,7 @@ def annotate_cities(numCities, plt, m):
                 
                 i += 1
                 
-    return clatList, clonList, 
+    return clatList, clonList
                                       
 # code based on: http://qingkaikong.blogspot.com/2016/06/nice-python-basemap-background.html
 def make_street_map(clat, clon, service='ESRI_StreetMap_World_2D', ll_buffer = 0.1, \
