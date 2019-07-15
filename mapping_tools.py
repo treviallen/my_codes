@@ -1092,7 +1092,7 @@ def annotate_cities(numCities, plt, m):
                 plt.plot(x, y, 'o', markerfacecolor='k', markeredgecolor='k', markeredgewidth=0.5, markersize=6, zorder=11000)
         
                 x, y = m(pltlo[si]+txtoff, pltla[si]+txtoff)
-                plt.text(x, y, pltloc[si], size=14, ha='left', weight='normal', path_effects=path_effects)
+                plt.text(x, y, pltloc[si], size=14, ha='left', weight='normal', path_effects=path_effects, zorder=11000)
                 
                 i += 1
                 
