@@ -109,7 +109,7 @@ def parse_sheef(sheeffile):
     sheef = []
     
     # now parse sheef
-    print 'Reading SHEEF...'
+    print('Reading SHEEF...')
     data = open(sheeffile).readlines()
 
     for line in data:
@@ -230,7 +230,7 @@ def sheef2hmtk_csv(sheeffile):
         oq_dat += line + '\n'
         
     #write to OQ out
-    print 'Writing HMTK csv...\n'
+    print('Writing HMTK csv...\n')
     hmtkfile = sheeffile.split('.')[0] + '_hmtk.csv'
     f = open(hmtkfile, 'wb')
     f.write(oq_dat)
@@ -242,7 +242,7 @@ def hmtk2sheef(hmtkcat, sheeffile):
     '''
     takes HMTK catalogue class and writes to SHEEF-formatted file
     '''
-    print 'Writing HMTK to SHEEF...'
+    print('Writing HMTK to SHEEF...')
     newsheef = ''
     cat = hmtkcat.data #just shorten variable name
     for i in range(0, hmtkcat.get_number_events()):
@@ -341,7 +341,7 @@ def write_sheef(sheefdict,outfile):
             prefmagtype = fix_string_len(rec['mwtype'], 3)
             
         '''
-        print ' ', rec['datestr'], '  ', prefmag, \
+        print(' ', rec['datestr'], '  ', prefmag, \
                        '  ', lon, '   ', lat, '   ', locsrc, ' ', dep, ' ', \
                        rec['depflag'], ' ', prefmagtype, ' ', \
                        ' ', omag, ' ', omagtype, '   ', str("%0.2f" % rec['mwconv'])
@@ -368,7 +368,7 @@ def sheef2shp(sheeffile, shpfile):
     from numpy import nan, isnan
     
     # now parse sheef
-    print 'Reading SHEEF...'
+    print('Reading SHEEF...')
     data = open(sheeffile).readlines()
     
     # set dictionary
@@ -436,7 +436,7 @@ def sheef2shp(sheeffile, shpfile):
     # now make point shapefile
     '''
     
-    print 'Making shapefile...'
+    print('Making shapefile...')
     w = shapefile.Writer(shapefile.POINT)
     w.field('LOC_SRC','C','100')
     w.field('YEAR','F', 9, 0)
@@ -470,7 +470,7 @@ def sheef2shp(sheeffile, shpfile):
                  sheef[i]['prefmag'],sheef[i]['prefmagtype'], \
                  sheef[i]['omag'],sheef[i]['omagtype'])
     
-    print 'Writing shapefile...'
+    print('Writing shapefile...')
     w.save(shpfile)    
 
 # code to parse CEEF and dump to pickle - don't think this works, but preserving just in case 2015-02-26
@@ -483,7 +483,7 @@ def parse_ceef(ceeffile, pklfile):
     from numpy import floor
     
     # now parse ceef
-    print 'Reading CEEF...'
+    print('Reading CEEF...')
     data = open(ceeffile).readlines()
     
     # set dictionary
@@ -526,7 +526,7 @@ def parse_ceef(ceeffile, pklfile):
             readevent = True
     
     # pickle ceef
-    #print ceefdat[-1]
+    #print(ceefdat[-1]
     output = open(pklfile, 'wb')
     dump(ceefdat,output)
     output.close()
@@ -542,7 +542,7 @@ def parse_ceef_out(ceeffile):
     from numpy import floor, isnan
     
     # now parse ceef
-    print 'Reading CEEF...'
+    print('Reading CEEF...')
     data = open(ceeffile).readlines()
     
     # set dictionary
@@ -634,7 +634,7 @@ def parse_ceef_out(ceeffile):
                 
                 tmpdict['datetime'] = datetime(tmpdict['year'], tmpmonth, tmpday, \
                                                tmphour, tmpmin, int(tmpsec), int(tmpmsec))
-                #print tmpdict
+                #print(tmpdict
                 ceefdat.append(tmpdict)
         
         # begin reading events    
@@ -695,7 +695,7 @@ def latest_events2shp(outshp):
             w.point(lon[i], lat[i])
             w.record(date[i], time[i], lat[i], lon[i], dep[i], mag[i], reg[i])
         
-        print 'Writing shapefile...'
+        print('Writing shapefile...')
         w.save(outshp)
         
         # write projection file
@@ -705,7 +705,7 @@ def latest_events2shp(outshp):
         f.close()
         
     except:
-        print '\nUsage: python latest_events2shp.py outshp\n'
+        print('\nUsage: python latest_events2shp.py outshp\n')
 
 # parses GGCat csvfile
 def parse_ggcat(ggcatcsv):
@@ -787,7 +787,7 @@ def parse_ga_event_query(gacsv):
     for line in lines:
         dat = line.strip().split(',')
         if len(dat) >= 27 and not line.startswith('"'):
-            #print 'origin', dat[20], dat
+            #print('origin', dat[20], dat
             try:
                 dateTime = dt.datetime.strptime(dat[24], '%Y-%m-%dT%H:%M:%S.%f')
             except:
@@ -798,7 +798,7 @@ def parse_ga_event_query(gacsv):
                      'day': dateTime.day, 'hour': dateTime.hour, \
                      'minute': dateTime.minute, 'second': dateTime.second, \
                      'lat': float(dat[13]), 'lon': float(dat[14]), \
-                     'dep': float(dat[4]), 'mag': float(dat[27]), 'magType': dat[28], \
+                     'dep': float(dat[4]), 'mag_ml': float(dat[17]), 'mag': float(dat[27]), 'magType': dat[28], \
                      'timestr': dat[10], 'description': dat[6]}
                      	
             evdict.append(tdict)

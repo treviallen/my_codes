@@ -793,8 +793,12 @@ def get_station_distance(st, dataless, eqlo, eqla):
     
 def return_all_au_station_data():
     from datetime import datetime
+    from os import getcwd
     
-    au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/sandpits/tallen/NSHA2018/catalogue/data/au_station_data.dat'
+    if getcwd().startswith('/nas'):
+        au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/sandpits/tallen/NSHA2018/catalogue/data/au_station_data.dat'
+    else:
+        au_station_file = '/Users/trev/Documents/Geoscience_Australia/NSHA2018/catalogue/data/au_station_data.dat'
     
     lines = open(au_station_file).readlines()
     
