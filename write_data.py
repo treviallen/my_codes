@@ -383,4 +383,4 @@ def export_SAC(filename, site, netid, sta, stla, stlo, eqla, eqlo, eqdep, \
 
     except:
         # print statement if cannot access obspy
-        print '\nCannot import Obspy modules!'
+        print('\nCannot import Obspy modules!')

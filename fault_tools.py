@@ -616,7 +616,6 @@ def mag2lsr_L14(mw, ftype): # in MW - not sure if correct
         b = 1.43
         a = 12.55
         lsr = 10**((logM0 - a) / b) / 1000.
-        print lsr
         
         idx = lsr > 15.
         b = 2.5
@@ -636,6 +635,11 @@ def mag2len_L14(mw, ftype): # in MW - not sure if correct
         b = 3.0
         a = 6.382
         rl = 10**((logM0 - a) / b) / 1000.
+        
+        idx = rl > 2.5
+        b = 2.5
+        a = 8.08
+        rl[idx] = 10**((logM0[idx] - a) / b) / 1000.
     
     return rl # in km
 
