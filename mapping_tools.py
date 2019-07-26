@@ -1015,7 +1015,8 @@ darray = hstack((plo, pla, pop))
 savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
 """
 
-def annotate_cities(numCities, plt, m):
+def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', \
+                    marker='o', markersize=6, markeredgewidth=0.5):
     from numpy import argsort
     import matplotlib.patheffects as PathEffects
     path_effects=[PathEffects.withStroke(linewidth=3, foreground="w")]
@@ -1089,7 +1090,9 @@ def annotate_cities(numCities, plt, m):
             
             if pltCity == True:
                 x, y = m(pltlo[si], pltla[si])
-                plt.plot(x, y, 'o', markerfacecolor='k', markeredgecolor='k', markeredgewidth=0.5, markersize=6, zorder=11000)
+                plt.plot(x, y, marker, markerfacecolor=markerfacecolor, \
+                         markeredgecolor=markeredgecolor, markeredgewidth=markeredgewidth, \
+                         markersize=markersize, zorder=11000)
         
                 x, y = m(pltlo[si]+txtoff, pltla[si]+txtoff)
                 plt.text(x, y, pltloc[si], size=14, ha='left', weight='normal', path_effects=path_effects, zorder=11000)

@@ -304,7 +304,9 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     #print(freq
 
     # read PAZ file
+    print pazfile
     poles, zeros, constant, normf = read_pazfile(pazfile)
+    print poles, zeros
     angc = 2.0 * np.pi
 
     # if constant unknown, get nearest freq to normalising frequency

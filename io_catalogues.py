@@ -798,7 +798,7 @@ def parse_ga_event_query(gacsv):
                      'day': dateTime.day, 'hour': dateTime.hour, \
                      'minute': dateTime.minute, 'second': dateTime.second, \
                      'lat': float(dat[13]), 'lon': float(dat[14]), \
-                     'dep': float(dat[4]), 'mag_ml': float(dat[17]), 'mag': float(dat[27]), 'magType': dat[28], \
+                     'dep': float(dat[4]), 'mag_ml': checkfloat(dat[17]), 'mag': checkfloat(dat[27]), 'magType': dat[28], \
                      'timestr': dat[10], 'description': dat[6]}
                      	
             evdict.append(tdict)
