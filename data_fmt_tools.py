@@ -832,6 +832,20 @@ def return_sta_data(sta):
             
     return sta_data
 
+# parses txt files downloaded from e.g.: http://ds.iris.edu/gmap/#network=AU&planet=earth
+def parse_iris_stationlist(stationlist):
+    lines = open(stationlist).readlines()[3:]
+    
+    staDict = []
+    
+    for line in lines:
+        dat = line.strip().split('|')
+        tmp = {'sta': dat[1], 'lat': float(dat[2]), 'lon': float(dat[3]), \
+               'elev': float(dat[4]), 'place': dat[5]}
+        staDict.append(tmp)
+        
+    return staDict
+
 def remove_low_sample_data(st):
     from numpy import array, unique, zeros_like, where
     
