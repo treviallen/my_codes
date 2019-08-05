@@ -41,7 +41,7 @@ def butter_filter_user(inst_ty, sps, freq, wavfft, seltask):
     import numpy as np
     
     filtfft = wavfft
-    #print np.shape(filtfft), 'filtfft'
+    #print(np.shape(filtfft), 'filtfft'
     
     # filter order
     ford = 4.0
@@ -71,8 +71,8 @@ def butter_filter_user(inst_ty, sps, freq, wavfft, seltask):
         hifreq = float(var)
 
     # do high pass filter
-    print freq, 'freq'
-    print np.shape(filtfft[1:]), 'filtfft[1:]'
+    #print(freq, 'freq'
+    #print(np.shape(filtfft[1:]), 'filtfft[1:]'
     #filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / lofreq)**(-2*ford))
     filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / lofreq)**(-2*ford))
     
@@ -264,7 +264,7 @@ def prep_psa_simple(corfftr, corffti, freq, inst_ty):
 def calc_response_spectra(iacc, sps, h, minT, maxT):
     import numpy as np
 
-    print '\nCalculating ' + str(h) + '% damped response spectrum. Please be patient.'
+    print('\nCalculating ' + str(h) + '% damped response spectrum. Please be patient.')
 
     damp = h * 0.01
     dt = 1. / sps

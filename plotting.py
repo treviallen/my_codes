@@ -108,7 +108,7 @@ def plot_dva(freq, sps, corfftr, corffti, header, inst_ty, chan_no):
     tvect = np.reshape(np.linspace(0,n/sps,num=n),(1,n))
     '''
     n = len(corfftr)
-    print n
+    #print(n
     tvect = np.linspace(0,n/sps,num=n)
 
     # if velocity seismometer
@@ -250,7 +250,7 @@ def plot_WoodAnderson(wadisp, sps, header, chan_no):
         x2 = n - 1
 
     # replot trimmed wave
-    print np.shape(wadisp)
+    #print(np.shape(wadisp))
     ax = figure.add_subplot(3,1,3)
     ax.plot(tvect[0,x1:x2],wadisp[x1:x2],'-', lw=0.5,color='green')
     plt.ylabel('WA Displacement (mm)')

@@ -103,9 +103,9 @@ def get_eq_distance(stlo, stla, evdate):
             if tmpdate >= mindate and tmpdate <= maxdate:
                 i += 1
                 if i == 1:
-                    print '\nSelect earthquake location from list...\n'
-                    print '   ' + events[0].strip('\n')
-                print str(i) + ') ' + line
+                    print('\nSelect earthquake location from list...\n')
+                    print('   ' + events[0].strip('\n'))
+                print(str(i) + ') ' + line)
                 # populate arrays
                 tlist.append(dt.datetime.strptime(eq[0], "%Y%m%d%H%M"))
                 mlist.append(float(eq[1]))
@@ -117,8 +117,8 @@ def get_eq_distance(stlo, stla, evdate):
     # note: if two earthquakes with similar origin, eventlist.dat will need
     # to modified manually
     if i == 1:
-        print '\nAutomatically associating earthquake parameters above...'
-        print "Modify 'eventlist.dat' manually if this is not what you want!"
+        print('\nAutomatically associating earthquake parameters above...')
+        print("Modify 'eventlist.dat' manually if this is not what you want!")
 
         evdate = tlist[0]
         eqmag = mlist[0]
@@ -129,7 +129,7 @@ def get_eq_distance(stlo, stla, evdate):
 
     # select from multiple events
     elif i > 0:
-        print str(i+1) + ') None'
+        print(str(i+1) + ') None')
         var = raw_input('\n'+'Enter selection > ')
         seleq = int(var)
 
@@ -155,6 +155,6 @@ def get_eq_distance(stlo, stla, evdate):
     rhyp = math.sqrt(repi**2 + eqdep**2)
 
 #    az = azimuth(eqloc, stnloc)
-#    print az
+#    print(az
 
     return rhyp, azim, eqla, eqlo, eqdep, eqmag, evdate

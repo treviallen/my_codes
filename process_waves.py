@@ -55,8 +55,11 @@ def task_options():
              + '7) Export to SAC format\n' \
              + '8) Plot instrument response\n\n' \
              + 'Task number [3] > '
-
-    return raw_input(tasks)
+    try:
+        selection = raw_input(tasks)
+    except:
+        selection = input(tasks)
+    return selection
 
 """****************************************************************************
 Common functions to read data file and get instrument parameters
@@ -64,7 +67,7 @@ Common functions to read data file and get instrument parameters
 
 def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed):
     
-    #print len(alldata[:,17])
+    #print(len(alldata[:,17])
     # select component
     chan, chan_no = readwaves.select_channel(allsta, comps)
 
@@ -121,7 +124,7 @@ Common FFT functions
 ****************************************************************************"""
 def common_fft(chan_dat, inst_ty, sps, seltask):
     # view wave and trim if necessary
-    print chan_dat
+    print(chan_dat)
     start_index, stop_index = plotting.trim_wave(chan_dat, sps, inst_ty, False)
     #taper_dat = chan_dat[0, start_index:stop_index]
     taper_dat = chan_dat[start_index:stop_index]
@@ -194,7 +197,7 @@ try:
     # try importing obspy modules
     from obspy.core import read
 
-    print '\nObsPy Installed'
+    print('\nObsPy Installed')
 
     # try testing if SAC or miniSEED
     try:
@@ -205,8 +208,8 @@ try:
         sacseed = False
 
 except:
-    # print statement if cannot access obspy
-    print '\nCannot import ObsPy modules!'
+    # print(statement if cannot access obspy
+    print('\nCannot import ObsPy modules!')
 
 # if SAC or SEED read waves
 if sacseed == True:
@@ -245,7 +248,7 @@ while continue_loop == True:
                 chan_no, chan_dat, stlo, stla, pazfile, alldata, netid = \
                 common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed)
 
-        print chan
+        print(chan)
         # do common fft functions
         chan_dat = chan_dat[0]
         freq, lofreq, hifreq, wavfft, dt = common_fft(chan_dat, inst_ty, sps, seltask)
@@ -314,7 +317,7 @@ while continue_loop == True:
         watrim = plotting.plot_WoodAnderson(wadisp, sps, filename, chan_no)
 
         # calculate magnitudes
-        print filename
+        print(filename)
         logA = np.log10(max(abs(watrim)))
         calculate_magnitudes.main(filename, logA, rhyp, eqdep)
 
@@ -323,7 +326,7 @@ while continue_loop == True:
                  filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq)
 
     elif seltask == '6': # export as miniSEED
-        print '\nModule not yet functional...'
+        print('\nModule not yet functional...')
 
     elif seltask == '7': # export as SAC
         # get velocity time history
@@ -359,7 +362,10 @@ while continue_loop == True:
 
 
     # ask user if users would like to perform another task using current wavfile
-    var = raw_input('\nPerform another task using wavefile: ' + wavfile + ' ([y]/n)? > ')
+    try:
+        var = raw_input('\nPerform another task using wavefile: ' + wavfile + ' ([y]/n)? > ')
+    except:
+        var = input('\nPerform another task using wavefile: ' + wavfile + ' ([y]/n)? > ')
     if var == 'n':
         continue_loop = False
     else:
