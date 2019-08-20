@@ -201,10 +201,11 @@ def drawshapepoly(m, plt, sf, **kwargs):
 
         p = 0
         parts = shape.parts
-        parts.append(len(shape.points)-1)
+        parts.append(len(shape.points))
         
-        for prt in range(0,len(parts)-1):
-            while p <= parts[prt+1]:
+        for prt in parts[1:]:
+            print 'part',prt
+            while p < prt:
                 x.append(shape.points[p][0])
                 y.append(shape.points[p][1])
                 p += 1
@@ -213,11 +214,15 @@ def drawshapepoly(m, plt, sf, **kwargs):
             if polyline == False:
                 if x[0] != x[-1] or y[0] != y[-1]:
                     x.append(x[0])
+                    y.append(y[0])
 
             try:
               # plot each polygon
+                
                 xx, yy = m(x,y)
+                
                 if fillshape == True and newfill == True:
+                    
                     plt.fill(xx,yy,color=fillcol)
                 m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
             except:
