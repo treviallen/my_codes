@@ -393,6 +393,22 @@ def remove_last_cmap_colour(cmap):
         
     return LinearSegmentedColormap.from_list('cmap2', cmap_list, N=cmap.N-1)
 
+def manual_colour_list(ncolours):
+    from numpy import array
+    colours =  array(['#a020f0', '#8a2be2', '#483d8b', '#000080', '#0000ff', '#4682b4', \
+                      '#00ced1', '#00ffff', '#66cdaa', '#2e8b57', '#006400', '#228b22', \
+                      '#7cfc00', '#ffff00', '#ffd700', '#ff8c00', '#ff4500', '#ff0000', \
+                      '#b22222', '#cd5c5c', '#ff69b4', '#ff1493', '#ffc0cb', '#bebebe', \
+                      '#708090', '#2f4f4f', '#000000', '#eedd82'])
+              
+    # get steps
+    step = int(round((len(colours)-1) / (ncolours-1)))
+    
+    # get indexes
+    idx = range(0, len(colours), step)
+    
+    return colours[idx]
+
 # from: http://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
