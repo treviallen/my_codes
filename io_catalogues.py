@@ -790,8 +790,14 @@ def parse_ga_event_query(gacsv):
             #print('origin', dat[20], dat
             try:
                 dateTime = dt.datetime.strptime(dat[27], '%Y-%m-%dT%H:%M:%S.%f')
+                oidx = 27
             except:
-                dateTime = dt.datetime.strptime(dat[27], '%Y-%m-%dT%H:%M:%S')
+                oidx = 24
+                
+            try:
+                dateTime = dt.datetime.strptime(dat[oidx], '%Y-%m-%dT%H:%M:%S.%f')
+            except:
+                dateTime = dt.datetime.strptime(dat[oidx], '%Y-%m-%dT%H:%M:%S')
                 
             tdict = {'datetime': dateTime, \
                      'year': dateTime.year, 'month': dateTime.month, \

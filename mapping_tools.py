@@ -169,7 +169,7 @@ def drawshapepoly(m, plt, sf, **kwargs):
                  
             if key == 'polyline':
                 polyline = kwargs[key]
-
+    
     shapes = sf.shapes()
 
     for i, shape in enumerate(shapes):
@@ -204,7 +204,7 @@ def drawshapepoly(m, plt, sf, **kwargs):
         parts.append(len(shape.points))
         
         for prt in parts[1:]:
-            print 'part',prt
+            #print 'part',prt
             while p < prt:
                 x.append(shape.points[p][0])
                 y.append(shape.points[p][1])
@@ -223,7 +223,7 @@ def drawshapepoly(m, plt, sf, **kwargs):
                 
                 if fillshape == True and newfill == True:
                     
-                    plt.fill(xx,yy,color=fillcol)
+                    plt.fill(xx,yy,color=fillcol, alpha=0.1)
                 m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
             except:
                 print('Skipping polygon...')
