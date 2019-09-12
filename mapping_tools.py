@@ -1023,6 +1023,7 @@ savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
 def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', \
                     marker='o', markersize=6, markeredgewidth=0.5):
     from numpy import argsort
+    from os import getcwd
     import matplotlib.patheffects as PathEffects
     path_effects=[PathEffects.withStroke(linewidth=3, foreground="w")]
     
@@ -1053,7 +1054,10 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
     #print pltbuffer
     
     # parse AU cities
-    cityFile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/REQIT/GA-shakemap/mapping/cities1000_au_ascii.txt'
+    if getcwd().startswith('/nas'):
+        cityFile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/REQIT/GA-shakemap/mapping/cities1000_au_ascii.txt'
+    else:
+        cityFile = '//Users//trev//Documents//DATA//Places//cities1000_au_ascii.txt'
     
     lines = open(cityFile).readlines()
     
@@ -1116,7 +1120,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
     return clatList, clonList
                                       
 # code based on: http://qingkaikong.blogspot.com/2016/06/nice-python-basemap-background.html
-def make_street_map(clat, clon, service='ESRI_StreetMap_World_2D', ll_buffer = 0.1, \
+def make_street_map(clat, clon, service='ESRI_Imagery_World_2D', ll_buffer = 0.1, \
              xpixels = 1500, plt_inset = True, inset_state = 'nsw', inset_loc = 3, \
              plt_marker = True, marker='*', ms = 14, mew = 0.5, mfc = 'r', mec='k'):
     
@@ -1199,4 +1203,4 @@ def make_street_map(clat, clon, service='ESRI_StreetMap_World_2D', ll_buffer = 0
         x, y = m2(clon, clat)
         plt.plot(x, y, 'rs')
 
-    return plt, m
+    return plt, m, ax
