@@ -29,7 +29,7 @@ def get_response_info(sta,recdate,chan):
     if cwd.startswith('/nas'):
         stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'        
     else:
-        stalist = '//Users//tallen//Documents//Code//my_codes//stationlist.dat'
+        stalist = '//Users//trev//Documents//Code//my_codes//stationlist.dat'
         
     stlo = -12345.0
     stla = -12345.0
@@ -77,7 +77,10 @@ def get_paz_list():
         print(str(i+1) + ')\t' + fname.strip('.paz'))
         i += 1
 
-    var = raw_input('\nSelect PAZ file > ')
+    try:
+        var = raw_input('\nSelect PAZ file > ')
+    except:
+        var = input('\nSelect PAZ file > ')
     pazfile = dirList[int(var)-1]
 
     return pazfile
@@ -93,7 +96,7 @@ def read_pazfile(in_pazfile):
     if cwd.startswith('/nas'):
         pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute        
     else:
-        pazpath = '//Users//tallen//Documents//Earthquake_Data//paz' # for bob
+        pazpath = '//Users//trev//Documents//Earthquake_Data//paz' # for bob
     
     try:
         pazfile = path.join(pazpath, in_pazfile)
@@ -136,7 +139,11 @@ def read_pazfile(in_pazfile):
 # this function leads the user to input station information
 def enter_response_info(sta, chan, sps):
     print('\nEnter site information for ' + sta + ' ' + chan)
-    var = raw_input('\n'+'Velocity sensor or accelerometer ([v]/a)? > ')
+    try:
+        var = raw_input('\n'+'Velocity sensor or accelerometer ([v]/a)? > ')
+    except:
+        var = input('\n'+'Velocity sensor or accelerometer ([v]/a)? > ')
+     
     if var == '' or var == 'v':
         inst_ty = 'V'
     elif var == 'a':

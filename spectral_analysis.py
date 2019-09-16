@@ -61,12 +61,20 @@ def butter_filter_user(inst_ty, sps, freq, wavfft, seltask):
 
     # ask for user input
     txt = '\n'+'High pass Butterworth corner ['+str(lofreq)+' Hz] > '
-    var = raw_input(txt)
+    
+    try:
+        var = raw_input(txt)
+    except:
+        var = input(txt)
+        
     if var != '':
         lofreq = float(var)
 
     txt = '\n'+'Low pass Butterworth corner ['+str(hifreq)+' Hz] > '
-    var = raw_input(txt)
+    try:
+        var = raw_input(txt)
+    except:
+        var = input(txt)
     if var != '':
         hifreq = float(var)
 
@@ -140,12 +148,18 @@ def acausal_butter_filter(inst_ty, sps, data, seltask):
 
     # ask for user input
     txt = '\n'+'High pass Butterworth corner ['+str(lofreq)+' Hz] > '
-    var = raw_input(txt)
+    try:
+        var = raw_input(txt)
+    except:
+        var = input(txt)
     if var != '':
         lofreq = float(var)
 
     txt = '\n'+'Low pass Butterworth corner ['+str(hifreq)+' Hz] > '
-    var = raw_input(txt)
+    try:
+        var = raw_input(txt)
+    except:
+        var = input(txt)
     if var != '':
         hifreq = float(var)
 

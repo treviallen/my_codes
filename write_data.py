@@ -212,7 +212,6 @@ def write_response_spectra(sta, evdate, sps, T, psa, pga, pgv, filename, stla, s
                              eqmag, rhyp, azim, pga, pgv, lofreq, hifreq, 'psa')
 
     # set data array
-    #psa =  psa[:,0]
     data = np.vstack((T, psa))
 
     # try saving to spc directory
@@ -227,7 +226,10 @@ def write_response_spectra(sta, evdate, sps, T, psa, pga, pgv, filename, stla, s
     f.close()
 
     # now append data
-    f = file(outfile, 'a')
+    try:
+        f = file(outfile, 'a')
+    except:
+        f = open(outfile, 'a')
     np.savetxt(f, data.T, delimiter='\t', fmt='%1.5e')
     f.close()
 

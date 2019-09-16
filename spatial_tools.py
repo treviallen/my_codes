@@ -43,8 +43,13 @@ def azimuth(eqloc, stnloc):
 
 # this function writes new earthquake parameters to "eventlist.dat"
 def write_evlist(evdate, eqla, eqlo, eqdep, eqmag):
+    from os import getcwd
     datestr = evdate.strftime("%Y%m%d%H%M")
-    eqlist = '//nas//users//u56903//unix//eventlist.dat'
+    if getcwd().startswith('/nas'):
+        eqlist = '//nas//users//u56903//unix//eventlist.dat'
+    else:
+        eqlist = '/Users/trev/Documents/Earthquake_Data/eventlist.dat'
+        
     newtxt = '\t'
     joinstr = (datestr, str(eqmag), str(eqlo), str(eqla), str(eqdep))
     newtxt = newtxt.join(joinstr)
@@ -79,10 +84,14 @@ def get_eq_params(evdate):
 # then calculate distance
 def get_eq_distance(stlo, stla, evdate):
     import datetime as dt
+    from os import getcwd
     from mapping_tools import distance
 
     # before asking for earthquake parameters, check event file
-    eqlist = '//nas//users//u56903//unix//eventlist.dat'
+    if getcwd().startswith('/nas'):
+        eqlist = '//nas//users//u56903//unix//eventlist.dat'
+    else:
+        eqlist = '/Users/trev/Documents/Earthquake_Data/eventlist.dat'
 
     # get max/min times to return (+/- 10 mins)
     mindate = evdate - dt.timedelta(minutes=60)

@@ -720,7 +720,10 @@ def select_channel(sta, comps):
         for i in range(0,len(comps)):
             chantxt = chantxt + str(i+1) + ') ' + sta[i] + ' ' + comps[i] + '\n'
         chantxt = chantxt + '\n' + 'Channel number > '
-        selchan = int(raw_input(chantxt)) - 1
+        try:
+            selchan = int(raw_input(chantxt)) - 1
+        except:
+            selchan = int(input(chantxt)) - 1
     return comps[selchan], selchan
 
 # REMOVE DC OFFSET
