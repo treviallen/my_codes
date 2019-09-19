@@ -145,9 +145,10 @@ def write_waves(sta, evdate, sps, idisp, ivel, iacc, filename, stla, stlo, \
 
 # this function writes out the FFT data
 def write_fft(sta, evdate, sps, freq, corfftr, corffti, filename, stla, stlo, \
-              eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq, inst_ty):
+              eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq, inst_ty):
 
-    n = len(freq[0]) / 2
+    #n = len(freq[0]) / 2
+    n = len(freq) / 2
 
     # set file and path names
     filename = filename + '.fds'
@@ -156,8 +157,12 @@ def write_fft(sta, evdate, sps, freq, corfftr, corffti, filename, stla, stlo, \
 
     # set header info
     header = get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
-                             eqmag, rhyp, -12345, -12345, lofreq, hifreq, 'fds')
-
+                             eqmag, rhyp, azim, -12345, -12345, lofreq, hifreq, 'fds')
+    
+    '''
+    (filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
+                    eqmag, rhyp, azim, pga, pgv, lofreq, hifreq, filetype)
+    '''
     # calculate displacement spectra
     dispamp = np.zeros(np.shape(freq))
     dispfftr = np.zeros(np.shape(freq))
@@ -168,12 +173,18 @@ def write_fft(sta, evdate, sps, freq, corfftr, corffti, filename, stla, stlo, \
         dispffti[0,1:] = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])**2
         dispamp[0,1:] = np.sqrt((1./sps)**2 * (dispfftr[0,1:]**2 + dispffti[0,1:]**2))
     else: # assume seismometer
+        '''
         dispfftr[0,1:] = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])
         dispffti[0,1:] = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])
         dispamp[0,1:] = np.sqrt((1./sps)**2 * (dispfftr[0,1:]**2 + dispffti[0,1:]**2))
+        '''
+        dispfftr[1:] = corfftr[1:]/(2.*(np.pi)*freq[1:])
+        dispffti[1:] = corffti[1:]/(2.*(np.pi)*freq[1:])
+        dispamp[1:] = np.sqrt((1./sps)**2 * (dispfftr[1:]**2 + dispffti[1:]**2))
 
     # set data array
-    data = np.vstack((freq[0,1:n],dispamp[0,1:n]))
+    #data = np.vstack((freq[0,1:n],dispamp[0,1:n]))
+    data = np.vstack((freq[1:n],dispamp[1:n]))
 
     # try saving to fft directory
     try:

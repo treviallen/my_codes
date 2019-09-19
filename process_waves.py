@@ -283,12 +283,13 @@ while continue_loop == True:
     elif seltask == '2': # calculate FFT
 
         # plot Fourier displacement spectra
+        print corfftr # bug here!
         plotting.plot_fft(sps, freq, corfftr, corffti, filename, inst_ty)
 
         # write time histories to file
         write_data.write_fft(sta, evdate, sps, freq, corfftr, corffti, \
                                filename, stla, stlo, eqla, eqlo, eqdep, eqmag, \
-                               rhyp, lofreq, hifreq, inst_ty)
+                               rhyp, azim, lofreq, hifreq, inst_ty)
 
     elif seltask == '3': # calculate response spectrum
 

@@ -285,25 +285,28 @@ def plot_response_spectra(T, psa, pga, header, chan_no):
 def plot_fft(sps, freq, corfftr, corffti, header, inst_ty):
     import numpy as np
     import matplotlib.pyplot as plt
-
+    
     if inst_ty == 'N': # for accelerometer
         corfftr = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])**2
         corffti = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])**2
     else: # or seismometer
-        corfftr = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])
-        corffti = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])
+        #corfftr = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])
+        #corffti = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])
+        corfftr = corfftr[1:]/(2.*(np.pi)*freq[1:])
+        corffti = corffti[1:]/(2.*(np.pi)*freq[1:])
     dispamp = np.sqrt((1./sps)**2 * (corfftr**2 + corffti**2))
 
     # get plotting length
     pl = int(round(len(dispamp) * 0.45))
-    pltfreq = freq[0,2:]
+    #pltfreq = freq[0,2:]
+    pltfreq = freq[2:]
     pltdisp = dispamp[1:]
-
+    
     plt.figure(2,figsize=(9,9))
     plt.loglog(pltfreq[0:pl], pltdisp[0:pl],'b')
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Displacement Fourier Spectrum (m-s)')
-#    plt.savefig('fft_example.png', format='png')
+    plt.savefig('fft_example.png', format='png')
     plt.show()
 
 # this function plots the instrument response
