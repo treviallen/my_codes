@@ -13,8 +13,6 @@ def get_response_info(sta,recdate,chan):
     import datetime as dt
     from os import getcwd
     
-    #print(sta,recdate,chan
-
     nat_freq = -12345
     inst_ty = ''
     damping = 0.707
@@ -41,25 +39,25 @@ def get_response_info(sta,recdate,chan):
         stalist = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/stationlist.dat'   
         stadat = open(stalist).readlines()
         
-    for line in stadat:
+    for line in stadat[1:]:
         # skip first row
-        if line[0:3] != 'STA' and line != '\n':
-            tmp = line.split('\t')
-            #print(tmp, tmp[2], tmp[3]
-            mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
-            maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
-            if tmp[0] == sta and tmp[12].strip() == chan:
-                if recdate >= mindate and recdate <= maxdate:
-                    inst_ty = tmp[1]
-                    stlo = float(tmp[4])
-                    stla = float(tmp[5])
-                    netid = tmp[6]
-                    nat_freq = float(tmp[7])
-                    damping = float(tmp[8])
-                    sen = float(tmp[9])
-                    recsen = float(tmp[10])
-                    gain = float(tmp[11])
-                    pazfile = tmp[13].strip()
+        tmp = line.rstrip().split('\t')
+        
+        mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
+        maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
+        if tmp[0] == sta and tmp[12].strip() == chan:
+            
+            if recdate >= mindate and recdate <= maxdate:
+                inst_ty = tmp[1]
+                stlo = float(tmp[4])
+                stla = float(tmp[5])
+                netid = tmp[6]
+                nat_freq = float(tmp[7])
+                damping = float(tmp[8])
+                sen = float(tmp[9])
+                recsen = float(tmp[10])
+                gain = float(tmp[11])
+                pazfile = tmp[13].rstrip()
                     
     if stlo == -12345:
         print(recdate,': Station', sta, chan, 'not found...')
