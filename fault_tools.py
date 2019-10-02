@@ -607,10 +607,12 @@ def len2wid_L10(flen, ftype): # in MW
 '''do Leonard 2014 - SCR'''
 def mag2lsr_L14(mw, ftype): # in MW - not sure if correct
     from mag_tools import mw2m0
-    from numpy import log10
+    from numpy import log10, array
     
     logM0 = log10(mw2m0(mw))
     print logM0
+    logM0 = array([logM0])
+    
     # assume mw is a list
     if ftype == 'scrrs':
         b = 1.43
@@ -628,9 +630,10 @@ def mag2lsr_L14(mw, ftype): # in MW - not sure if correct
 def mag2len_L14(mw, ftype): # in MW - not sure if correct
     # assume mw is a list
     from mag_tools import mw2m0
-    from numpy import log10
+    from numpy import log10, array
     
     logM0 = log10(mw2m0(mw))
+    logM0 = array([logM0])
     if ftype == 'scrrs':
         b = 3.0
         a = 6.382
