@@ -407,6 +407,20 @@ def labelpolygon(m, plt, sf, field, **kwargs):
             tx, ty = m(mean(centroidx),mean(centroidy))
         '''
 
+def return_map_shape_points(m, shpfile):
+    import shapefile
+    sf = shapefile.Reader(shpfile)
+    shapes = sf.shapes()
+    shplon = []
+    shplat = []
+    for shape in shapes:
+        shplon.append(shape.points[0][0])
+        shplat.append(shape.points[0][1])
+    
+    x, y = m(shplon, shplat)
+    
+    return x, y
+
 # Add background to text to highlight
 def addTextOutline(textHandle, lineWidth, backColour):
     '''
