@@ -610,7 +610,7 @@ def mag2lsr_L14(mw, ftype): # in MW - not sure if correct
     from numpy import log10, array
     
     logM0 = log10(mw2m0(mw))
-    print logM0
+    #print logM0
     logM0 = array([logM0])
     
     # assume mw is a list

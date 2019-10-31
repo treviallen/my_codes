@@ -732,6 +732,8 @@ def get_station_vs30(sta):
     cwd = getcwd()
     if cwd.startswith('/nas'):
         vs30file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Site_Class_Model/au_station_vs30.csv'
+    else:
+        vs30file = '/Users/trev/Documents/Earthquake_Data/Site_Class/au_station_vs30_edit.csv'
     
     # assume that vs30 is based on proxy estimates
     isproxy = True
