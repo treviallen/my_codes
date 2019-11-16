@@ -120,7 +120,7 @@ def calc_R35(comp, logA, repi):
     magstr = 'R35:\t' + str("%0.2f" % R35)
     if comp == 0: # if vertical
         magstr = magstr + '*'
-    #print magstr
+    #print(magstr)
 
     return R35
 
@@ -131,7 +131,7 @@ def calc_GS86(comp, logA, repi):
     magstr = 'GS86:\t' + str("%0.2f" % GS86)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print magstr
+    print(magstr)
 
     return GS86
 
@@ -143,7 +143,7 @@ def calc_HB87(comp, logA, rhyp):
     magstr = 'HB87:\t' + str("%0.2f" % HB87)
     if comp == 0: # if vertical
         magstr = magstr + '*'
-    print magstr
+    print(magstr)
 
     return HB87
 
@@ -155,7 +155,7 @@ def calc_BJ84(comp, logA, rhyp):
     magstr = 'HB87:\t' + str("%0.2f" % BJ84)
     if comp == 0: # if vertical
         magstr = magstr + '*'
-    print magstr
+    print(magstr)
 
     return BJ84
 
@@ -181,7 +181,7 @@ def calc_SED84(comp, logA, rhyp):
         SED84 = logA2800 + Cd + Ce
             
     magstr = 'SED84:\t' + str("%0.2f" % SED84)
-    print magstr
+    print(magstr)
 
     return SED84
 
@@ -192,7 +192,7 @@ def calc_GG91(comp, logA, rhyp):
     magstr = 'GG91:\t' + str("%0.2f" % GG91)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print magstr
+    print(magstr)
 
     return GG91
 
@@ -205,7 +205,7 @@ def calc_MLM92(comp, logA, rhyp):
         MLM92 = logA + 1.34 * np.log10(rhyp / 100.) + 0.00055 * (rhyp - 100) + 3.0
 
     magstr = 'MLM92:\t' + str("%0.2f" % MLM92)
-    print magstr
+    print(magstr)
 
     return MLM92
 
@@ -216,7 +216,7 @@ def calc_WGW96(comp, logA, rhyp):
     magstr = 'WGW96:\t' + str("%0.2f" % WGW96)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print magstr
+    print(magstr)
 
     return WGW96
     
@@ -239,7 +239,7 @@ def calc_A10(comp, logA, rhyp):
     magstr = 'A10:\t' + str("%0.2f" % A10)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print magstr
+    print(magstr)
 
     return A10
     
@@ -250,7 +250,7 @@ def calc_A16(logA, rhyp, comp):
     if cwd.startswith('/nas'):
         coeffile = '/nas/gemd/ehp/georisk_earthquake/hazard/Magnitudes/2017_SEA_ML_working//A16_coeffs.txt'
     else:
-        coeffile = '//Users//tallen//Dropbox//Magnitudes//2016_working//A16_coeffs.txt'
+        coeffile = '//Users//trev//Dropbox//Magnitudes//2016_working//A16_coeffs.txt'
         
     dat = loadtxt(coeffile)
     b1 = dat[0]
@@ -276,7 +276,7 @@ def calc_A16(logA, rhyp, comp):
     magstr = 'A16:\t' + str("%0.2f" % A16)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print magstr
+    print(magstr)
     
     return A16
 
@@ -306,7 +306,7 @@ def calc_Y17(logA, rhyp, comp):
     magstr = 'A17:\t' + str("%0.1f" % A16)
     if comp == 0: # if vertical
         magstr = magstr + '*'
-    print magstr
+    print(magstr
     
     return Y17
 '''    
@@ -321,8 +321,8 @@ def main(filename, logA, rhyp, eqdep):
     repi = np.sqrt(rhyp**2 - eqdep**2)
 
     # header text
-    print '\nML calculated from record: ' + filename \
-        + ' at Rhyp = ' + str("%0.2f" % rhyp) + ' km'
+    print('\nML calculated from record: ' + filename \
+        + ' at Rhyp = ' + str("%0.2f" % rhyp) + ' km')
 
     # get Richer (1935; 1958), extended by Eiby & Muir (1968)
     R35 = calc_R35(comp, logA, repi)
@@ -349,7 +349,7 @@ def main(filename, logA, rhyp, eqdep):
     A10 = calc_A10(comp, logA, rhyp)
 
     # add disclaimer
-    print '\n* Does not use correct component'
+    print('\n* Does not use correct component')
 
     # now write ML data to file
     import write_data

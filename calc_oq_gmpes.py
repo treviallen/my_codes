@@ -394,14 +394,13 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
-    '''
     try:
         from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
         from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
     except:
         from openquake_local.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
         from openquake_local.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
-    '''
+
     #from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -414,7 +413,6 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
     
-
     rup = RuptureContext()
     rup.mag = mag
     rup.hypo_depth = dep
@@ -456,19 +454,19 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     
     gmpe = BooreEtAl2014()
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
-    '''
+    
     gmpe = YenierAtkinson2015CEUS()
     YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     gmpe = ShahjoueiPezeshk2016()
     SP16imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
-    '''
+    
     crust_ty = 'ena'
     
     #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
     #AA13imt = []
 
-    return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt #, YA15imt, SP16imt # AA13imt, CY08imt, 
+    return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
@@ -492,8 +490,8 @@ def allen2012_gsim(mag, dep, rrup):
     return A12imt
     
 def gaull1990_gsim(mag, dep, rhypo):
-    '''
-    from openquake_local.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
+    
+    from openquake.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
                                                     GaullEtAL1990SoutheasternAustralia, \
                                                     GaullEtAL1990PGAfromPGVWesternAustralia, \
                                                     GaullEtAL1990PGAfromPGVSoutheasternAustralia, \
@@ -501,14 +499,14 @@ def gaull1990_gsim(mag, dep, rhypo):
                                                     GaullEtAL1990PGAfromPGVIndonesia
     '''
     from gaull_1990 import GaullEtAL1990WesternAustralia, \
-                                                    GaullEtAL1990SoutheasternAustralia, \
-                                                    GaullEtAL1990NortheasternAustralia, \
-                                                    GaullEtAL1990PGAfromPGVWesternAustralia, \
-                                                    GaullEtAL1990PGAfromPGVSoutheasternAustralia, \
-                                                    GaullEtAL1990PGAfromPGVNortheasternAustralia, \
-                                                    GaullEtAL1990Indonesia, \
-                                                    GaullEtAL1990PGAfromPGVIndonesia
-                                                   
+                           GaullEtAL1990SoutheasternAustralia, \
+                           GaullEtAL1990NortheasternAustralia, \
+                           GaullEtAL1990PGAfromPGVWesternAustralia, \
+                           GaullEtAL1990PGAfromPGVSoutheasternAustralia, \
+                           GaullEtAL1990PGAfromPGVNortheasternAustralia, \
+                           GaullEtAL1990Indonesia, \
+                           GaullEtAL1990PGAfromPGVIndonesia
+    '''                                               
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from openquake.hazardlib.imt import PGA
     from openquake.hazardlib.const import StdDev
