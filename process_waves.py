@@ -324,7 +324,7 @@ while continue_loop == True:
 
         # write output to file
         write_data.write_WA_disp(sta, evdate, sps, wadisp, \
-                 filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq)
+                 filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq)
 
     elif seltask == '6': # export as miniSEED
         print('\nModule not yet functional...')

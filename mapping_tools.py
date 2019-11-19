@@ -133,12 +133,11 @@ def getshapecolour(sf, field, colmap, ncolours, **kwargs):
         
     return cs, ci, cmap, zmin, zmax
     
-def drawshapepoly(m, plt, sf, **kwargs):
+def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, **kwargs):
     from numpy import arange, isnan, nan
     
     # get kwargs
     ncolours = 256
-    col = 'k'
     lw = 1.0
     ls = '-'
     fillshape = False
@@ -189,12 +188,13 @@ def drawshapepoly(m, plt, sf, **kwargs):
             except:
                 col = 'w'
                 
+        '''
         if fillshape == True:
             fillcol = col
             linecol = 'k'
         else:
             linecol = col
-
+        '''
         # get xy coords
         x = []
         y = []
@@ -220,11 +220,21 @@ def drawshapepoly(m, plt, sf, **kwargs):
               # plot each polygon
                 
                 xx, yy = m(x,y)
-                
+                print edgecolor
                 if fillshape == True and newfill == True:
-                    
-                    plt.fill(xx,yy,color=fillcol, alpha=0.1)
-                m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
+                    print fillcolor
+                    if label == 'null':
+                        plt.fill(xx,yy, facecolor=fillcolor, edgecolor=edgecolor, linewidth=lw, alpha=alpha)
+                        m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
+                    else:
+                        plt.fill(xx,yy, facecolor=fillcolor, edgecolor=edgecolor, linewidth=lw, label=label, alpha=alpha)  
+                        m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
+                        label = 'null' # set to null after first plot
+                elif label == 'null':
+                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, zorder=1)
+                else:
+                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, label=label, zorder=1)
+                    label = 'null' # set to null after first plot
             except:
                 print('Skipping polygon...')
 
@@ -1035,7 +1045,7 @@ savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
 """
 
 def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', \
-                    marker='o', markersize=6, markeredgewidth=0.5):
+                    marker='o', markersize=6, markeredgewidth=0.5, fs=14):
     from numpy import argsort
     from os import getcwd
     import matplotlib.patheffects as PathEffects
@@ -1127,7 +1137,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
                          markersize=markersize, zorder=11000)
         
                 x, y = m(pltlo[si]+txtoff, pltla[si]+txtoff)
-                plt.text(x, y, pltloc[si], size=14, ha='left', weight='normal', path_effects=path_effects, zorder=11000)
+                plt.text(x, y, pltloc[si], size=fs, ha='left', weight='normal', path_effects=path_effects, zorder=11000)
                 
                 i += 1
                 

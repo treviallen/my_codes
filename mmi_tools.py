@@ -75,7 +75,7 @@ def mmi2pgm_wald99(mmi, pgm):
         
 # do Worden et al 2012 IGMICE
 def mmi2pgm_worden12(mmi, pgm, mag, rrup):
-    from numpy import array, where
+    from numpy import array, where, isnan, log10
     
     # first check if is list
     if isinstance(mmi, list):
@@ -87,6 +87,9 @@ def mmi2pgm_worden12(mmi, pgm, mag, rrup):
         c2 = 1.47
         c3 = 2.89
         c4 = 3.16
+        c5 = 0.90
+        c6 = 0.00
+        c7 = -0.18
         logpgmsig = 0.40
         
     if pgm == 'pga': # in cm/s**2
@@ -95,6 +98,9 @@ def mmi2pgm_worden12(mmi, pgm, mag, rrup):
         c2 = 1.55
         c3 = -1.60
         c4 = 3.70
+        c5 = -0.91
+        c6 = 1.02
+        c7 = -0.17
         logpgmsig = 0.39
         
     if pgm == 'sa03': # in cm/s**2
@@ -103,6 +109,9 @@ def mmi2pgm_worden12(mmi, pgm, mag, rrup):
         c2 = 1.69
         c3 = -4.15
         c4 = 4.14
+        c5 = -1.05
+        c6 = 0.60
+        c7 = 0.00
         logpgmsig = 0.46
         
     if pgm == 'sa10': # in cm/s**2
@@ -111,6 +120,9 @@ def mmi2pgm_worden12(mmi, pgm, mag, rrup):
         c2 = 1.51
         c3 = 0.20
         c4 = 2.90
+        c5 = 2.27
+        c6 = -0.49
+        c7 = -0.29
         logpgmsig = 0.51
         
     if pgm == 'sa30': # in cm/s**2
@@ -119,14 +131,26 @@ def mmi2pgm_worden12(mmi, pgm, mag, rrup):
         c2 = 1.17
         c3 = 1.99
         c4 = 3.01
+        c5 = 1.91
+        c6 = -0.57
+        c7 = -0.21
         logpgmsig = 0.69
     
     # do calc - first calc all
     value = 10**((mmi - c1) / c2)
     # now check if mmi > t2
     idx = where(mmi > t2)[0]
-    #print(idx, value, mmi)
     value[idx] = 10**((mmi[idx] - c3) / c4)
+    
+    # do mag & dist corrections
+    if not isnan(mag):
+        value += c5 + c6 * log10(rrup) + c7 * mag
+        
+        value = 10**((mmi - c1 - c5 - c6*log10(rrup) - c7*mag) / c2)
+        # now check if mmi > t2
+        idx = where(mmi > t2)[0]
+        value[idx] = 10**((mmi[idx] - c3 - c5 - c6*log10(rrup) - c7*mag) / c4)
+        
     return value, logpgmsig
 
 # do Worden et al 2012 GMICE

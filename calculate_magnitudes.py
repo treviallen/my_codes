@@ -166,7 +166,7 @@ def calc_SED84(comp, logA, rhyp):
     '''    
     from numpy import nan, log10
     
-    # convert logA assuming W-A a,plification of 2800
+    # convert logA assuming W-A amplification of 2800
     logA2800 = log10(2800. * (10**logA) / 2080.)
     
     # pre-allocate value
@@ -347,6 +347,15 @@ def main(filename, logA, rhyp, eqdep):
     
     # calculate A10
     A10 = calc_A10(comp, logA, rhyp)
+    
+    mlDict = {'R35':R35,
+              'GS86':GS86,
+              'HB87':HB87,
+              'BJ84':BJ84,
+              'GG91':GG91,
+              'MLM92':MLM92,
+              'WGW96':WGW96,
+              'A10':A10}
 
     # add disclaimer
     print('\n* Does not use correct component')
@@ -376,6 +385,8 @@ def main(filename, logA, rhyp, eqdep):
     f = open(logAfile, 'wb')
     f.write(lines + '\n' + newline)
     f.close()
+    
+    return mlDict
 
 # get wood-anderson amplitudes from period and amplitude data
 def get_WA_amps(dism_nm, domfreq):

@@ -402,13 +402,13 @@ def common_resp(freq, nat_freq, damping, sen, recsen, gain, wavfft, inst_ty, paz
 
 
 # get Wood-Andersion instrument response and convolve with input seismogram
-def convolve_WoodAnderson(freq, corfftr, corffti, inst_ty):
+def convolve_WoodAnderson(freq, corfftr, corffti, inst_ty, ampfact=2080, damping=0.8):
     import numpy as np
     import scipy.signal as signal
 
     # get Wood-Anderson response
     nat_freq = 1.25
-    damping = 0.8
+    #damping = 0.8
     ampfact = 2080
     angc = 2.0 * np.pi
 

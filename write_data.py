@@ -246,7 +246,7 @@ def write_response_spectra(sta, evdate, sps, T, psa, pga, pgv, filename, stla, s
 
 # this function writes Wood-Anderson displacement (in mm) to file
 def write_WA_disp(sta, evdate, sps, wadisp, filename, stla, stlo, \
-                  eqla, eqlo, eqdep, eqmag, rhyp, lofreq, hifreq):
+                  eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq):
 
     # set file and path names
     filename = filename + '.wa'
@@ -259,7 +259,7 @@ def write_WA_disp(sta, evdate, sps, wadisp, filename, stla, stlo, \
                              eqmag, rhyp, azim, pga, pgv, lofreq, hifreq,
     '''                             
     header = get_header_text(filename, sta, evdate, sps, stla, stlo, eqla, eqlo, eqdep, \
-                             eqmag, rhyp, 0, 0, lofreq, hifreq, 'wa')
+                             eqmag, rhyp, azim, 0, 0, lofreq, hifreq, 'wa')
 
     # try saving to wa directory
     try:
@@ -315,8 +315,8 @@ def write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, MLM92, A10):
         if tmp[0] == sta and tmp[1] == comp:
             replacesta = '\t'
             joinstr = (sta, comp,str("%0.1f" % rhyp), str("%0.1f" % repi), str("%0.3f" % logA), \
-                       str("%0.1f" % R35), str("%0.1f" % BJ84), str("%0.1f" % HB87), \
-                       str("%0.1f" % MLM92), str("%0.1f" % A10))
+                       str("%0.2f" % R35), str("%0.2f" % BJ84), str("%0.2f" % HB87), \
+                       str("%0.2f" % MLM92), str("%0.2f" % A10))
             replacesta = replacesta.join(joinstr) + '\n'
             newtxt = newtxt + replacesta
             newsta = False
@@ -328,8 +328,8 @@ def write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, MLM92, A10):
     if newsta == True:
         newstastr = '\t'
         joinstr = (sta, comp,str("%0.1f" % rhyp), str("%0.1f" % repi), str("%0.3f" % logA), \
-                       str("%0.1f" % R35), str("%0.1f" % BJ84), str("%0.1f" % HB87), \
-                       str("%0.1f" % MLM92), str("%0.1f" % A10))
+                   str("%0.2f" % R35), str("%0.2f" % BJ84), str("%0.2f" % HB87), \
+                   str("%0.2f" % MLM92), str("%0.2f" % A10))
         newstastr = newstastr.join(joinstr) + '\n'
         newtxt = newtxt + newstastr
 
