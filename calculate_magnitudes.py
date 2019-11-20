@@ -348,7 +348,10 @@ def main(filename, logA, rhyp, eqdep):
     # calculate A10
     A10 = calc_A10(comp, logA, rhyp)
     
-    mlDict = {'R35':R35,
+    mlDict = {'logA':logA,
+              'repi':repi,
+              'rhyp':rhyp,
+              'R35':R35,
               'GS86':GS86,
               'HB87':HB87,
               'BJ84':BJ84,
