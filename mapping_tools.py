@@ -204,7 +204,7 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
         parts.append(len(shape.points))
         
         for prt in parts[1:]:
-            #print 'part',prt
+            #print('part',prt
             while p < prt:
                 x.append(shape.points[p][0])
                 y.append(shape.points[p][1])
@@ -220,9 +220,9 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
               # plot each polygon
                 
                 xx, yy = m(x,y)
-                print edgecolor
+                #print(edgecolor)
                 if fillshape == True and newfill == True:
-                    print fillcolor
+                    #print(fillcolor)
                     if label == 'null':
                         plt.fill(xx,yy, facecolor=fillcolor, edgecolor=edgecolor, linewidth=lw, alpha=alpha)
                         m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
@@ -1075,7 +1075,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
     elif lonrng >= 6:
         pltbuffer = 0.7
         txtoff = 0.1
-    #print pltbuffer
+    #print(pltbuffer
     
     # parse AU cities
     if getcwd().startswith('/nas'):
@@ -1123,7 +1123,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
             
             for clol, clal in zip(clonList, clatList):
                 if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (3.*pltbuffer):
-                    #print pltloc[si]
+                    #print(pltloc[si]
                     pltCity = False
                     
             # build list of locs
