@@ -34,7 +34,7 @@ def aki_maximum_likelihood(mrng, number_obs, mc):
     neq = sum(number_obs)
     if neq <= 1:
         # Cannot determine b-value (too few event) return NaNs
-        print 'Too few events (<= 1) to calculate b-value'
+        print('Too few events (<= 1) to calculate b-value')
         return nan, nan
     
     else:
@@ -146,7 +146,7 @@ def weichert_algorithm(tper, fmag, nobs, mrate=0.0, bval=1.0,
                 return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
     return bval, sigb, a_m, siga_m, fn0, stdfn0
 
-
+"""
 # function to get earthquakes withing a given radius for a given lat/lon from NSHA-Cat
 # def get_events_in_circle(clon, clat, max_dist, min_mag):
 max_dist = 100.
@@ -205,7 +205,7 @@ for record, shape, point in zip(records, shapes, points):
     
     
     if dist[0] <= max_dist and float(record[-2]) >= min_mag:
-        print float(record[-2]), dist[0], dist[0] <= max_dist and float(record[-2]) >= min_mag
+        print(float(record[-2]), dist[0], dist[0] <= max_dist and float(record[-2]) >= min_mag)
         w.point(shape.points[0][0], shape.points[0][1])
         
         # make new record
@@ -228,7 +228,7 @@ prjfile = outfile.split('.shp')[0]+'.prj'
 f = open(prjfile, 'wb')
 f.write('GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]')
 f.close()
-
+"""
 
 
 
