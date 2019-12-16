@@ -1070,8 +1070,8 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         pltbuffer = 0.1
         txtoff = 0.017
     elif lonrng > 3 and lonrng < 6:
-        pltbuffer = 0.3
-        txtoff = 0.04
+        pltbuffer = 0.175
+        txtoff = 0.03
     elif lonrng >= 6:
         pltbuffer = 0.7
         txtoff = 0.1
