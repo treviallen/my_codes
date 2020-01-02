@@ -138,7 +138,7 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
     
     # get kwargs
     ncolours = 256
-    lw = 1.0
+    lw = 0.5
     ls = '-'
     fillshape = False
     polyline = False # do not close polygon
@@ -176,12 +176,11 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
         # get colour
         try:
             cs = (cmap(arange(ncolours)))
-            if isnan(cindex[i]) == False or cindex[i] == -1: 
+            if isnan(cindex[i]) == False and cindex[i] != -1: 
                 col = [cs[int(cindex[i])][0],cs[int(cindex[i])][1],cs[int(cindex[i])][2]]
-                print('cindex'+str(cindex[i]))
             else:
                 newfill = False
-                col = 'w'
+                col = '0.9'
             
         except:
             try:
@@ -224,7 +223,7 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
                 #print(edgecolor)
                 if fillshape == True and cmap != -99:
                     plt.fill(xx,yy, facecolor=col, edgecolor=edgecolor, linewidth=lw, label=label, alpha=alpha)  
-                    m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
+                    #m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
                 elif fillshape == True and newfill == True:
                     #print(fillcolor)
                     if label == 'null':
