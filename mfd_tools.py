@@ -396,9 +396,9 @@ def get_mfds(mvect, mxvect, tvect, dec_tvect, ev_dict, mcomps, ycomps, ymax, mrn
         
         # scale for N0
         fn0 = 10**(log10(bc_lo100[0]) + beta2bval(beta)*bc_mrng[0])
-
-    # do Aki ML first if N events less than 80
-    elif len(mvect) >= 30 and len(mvect) < 50:
+        """
+        # do Aki ML first if N events less than 80
+        elif len(mvect) >= 30 and len(mvect) < 50:
             
         # do Aki max likelihood
         bval, sigb = aki_maximum_likelihood(mrng[midx]+bin_width/2, n_obs[midx], 0.) # assume completeness taken care of
@@ -420,9 +420,9 @@ def get_mfds(mvect, mxvect, tvect, dec_tvect, ev_dict, mcomps, ycomps, ymax, mrn
         fn0 = 10**(log10(Nminmag[0]) + bval*bc_mrng[fidx])
         
         print('    Aki ML b-value =', bval, sigb)
-                        
+        """                    
     # do Weichert for zones with more events
-    elif len(mvect) >= 50:
+    elif len(mvect) >= 20:
                   
         # calculate weichert
         bval, sigb, a_m, siga_m, fn0, stdfn0 = weichert_algorithm(array(n_yrs[midx]), \
@@ -444,7 +444,7 @@ def get_mfds(mvect, mxvect, tvect, dec_tvect, ev_dict, mcomps, ycomps, ymax, mrn
         bval = 1.0            
         
         beta = bval2beta(bval)
-        sigb = 0.1
+        sigb = 1.0
         sigbeta = bval2beta(sigb)
         
         # solve for N0
@@ -458,7 +458,7 @@ def get_mfds(mvect, mxvect, tvect, dec_tvect, ev_dict, mcomps, ycomps, ymax, mrn
     
     err_up, err_lo = get_confidence_intervals(n_obs, cum_rates)
         
-    return bval, beta, sigb, sigbeta, fn0, cum_rates, ev_out, err_up, err_lo
+    return bval, beta, sigb, sigbeta, fn0, cum_rates, ev_out, out_idx, err_up, err_lo
 
 ###############################################################################
 # just fit a-value

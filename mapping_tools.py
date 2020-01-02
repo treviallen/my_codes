@@ -133,7 +133,7 @@ def getshapecolour(sf, field, colmap, ncolours, **kwargs):
         
     return cs, ci, cmap, zmin, zmax
     
-def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, **kwargs):
+def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, **kwargs):
     from numpy import arange, isnan, nan
     
     # get kwargs
@@ -176,8 +176,9 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
         # get colour
         try:
             cs = (cmap(arange(ncolours)))
-            if isnan(cindex[i]) == False: 
+            if isnan(cindex[i]) == False or cindex[i] == -1: 
                 col = [cs[int(cindex[i])][0],cs[int(cindex[i])][1],cs[int(cindex[i])][2]]
+                print('cindex'+str(cindex[i]))
             else:
                 newfill = False
                 col = 'w'
@@ -221,7 +222,10 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
                 
                 xx, yy = m(x,y)
                 #print(edgecolor)
-                if fillshape == True and newfill == True:
+                if fillshape == True and cmap != -99:
+                    plt.fill(xx,yy, facecolor=col, edgecolor=edgecolor, linewidth=lw, label=label, alpha=alpha)  
+                    m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
+                elif fillshape == True and newfill == True:
                     #print(fillcolor)
                     if label == 'null':
                         plt.fill(xx,yy, facecolor=fillcolor, edgecolor=edgecolor, linewidth=lw, alpha=alpha)
