@@ -364,15 +364,15 @@ def get_mfds(mvect, mxvect, tvect, dec_tvect, ev_dict, mcomps, ycomps, ymax, mrn
     if len(midx) == 0:
         midx = [where(isfinite(diff_cum))[0][-1]]
     
-    # make sure there is at least 4 observations for b-value calculations
-    if len(midx) < 5:
+    # make sure there is at least 4 regression points for b-value calculations
+    if len(midx) < 4:
         idxstart = midx[0] - 1
         
-        while idxstart >= 0 and len(midx) < 5:
+        while idxstart >= 0 and len(midx) < 4:
             # if num observations greater than zero, add to midx
             if n_obs[idxstart] > 0:
                 midx = hstack((idxstart, midx))
-                print('    get lower mag T', midx)
+                print('    get lower mag ', midx)
                 
             idxstart -= 1
         
@@ -422,9 +422,15 @@ def get_mfds(mvect, mxvect, tvect, dec_tvect, ev_dict, mcomps, ycomps, ymax, mrn
         print('    Aki ML b-value =', bval, sigb)
         """                    
     # do Weichert for zones with more events
-    elif len(mvect) >= 20:
+    elif len(mvect) >= 50:
                   
         # calculate weichert
+        '''
+        print(mvect)
+        print(midx)
+        print(mrng)
+        print(diff_cum)
+        '''
         bval, sigb, a_m, siga_m, fn0, stdfn0 = weichert_algorithm(array(n_yrs[midx]), \
                                                mrng[midx]+bin_width/2, n_obs[midx], mrate=0.0, \
                                                bval=1.1, itstab=1E-4, maxiter=1000)
@@ -444,7 +450,7 @@ def get_mfds(mvect, mxvect, tvect, dec_tvect, ev_dict, mcomps, ycomps, ymax, mrn
         bval = 1.0            
         
         beta = bval2beta(bval)
-        sigb = 1.0
+        sigb = 1.0 # temp fix for smoothing
         sigbeta = bval2beta(sigb)
         
         # solve for N0

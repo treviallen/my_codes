@@ -14,6 +14,18 @@ def print_functions():
 def load_shape(shpfile):
     import shapefile
     return shapefile.Reader(shpfile)
+    
+def get_shp_polygons(shpfile):
+    import shapefile
+    from shapely.geometry import Polygon
+    
+    sf = shapefile.Reader(shpfile)
+    shapes = sf.shapes()
+    polygons = []
+    for poly in shapes:
+        polygons.append(Polygon(poly.points))
+
+    return sf, polygons
 
 def get_field_index(sf, field):
     fields = sf.fields[1:]
@@ -133,7 +145,7 @@ def getshapecolour(sf, field, colmap, ncolours, **kwargs):
         
     return cs, ci, cmap, zmin, zmax
     
-def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, **kwargs):
+def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, zorder=20000, **kwargs):
     from numpy import arange, isnan, nan
     
     # get kwargs
@@ -181,6 +193,7 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
             else:
                 newfill = False
                 col = '0.9'
+                #col = 'none'
             
         except:
             try:
@@ -234,9 +247,9 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
                         m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
                         label = 'null' # set to null after first plot
                 elif label == 'null':
-                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, zorder=1)
+                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, zorder=20000)
                 else:
-                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, label=label, zorder=1)
+                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, label=label, zorder=20000)
                     label = 'null' # set to null after first plot
             except:
                 print('Skipping polygon...')
@@ -885,16 +898,28 @@ def get_WGS84_area(geom):
     import shapely.ops as ops
     #from shapely.geometry.polygon import Polygon
     from functools import partial
-        
-    geom_area = ops.transform(
-        partial(
-            pyproj.transform,
-            pyproj.Proj(init='EPSG:4326'),
-            pyproj.Proj(
-                proj='aea',
-                lat1=geom.bounds[1],
-                lat2=geom.bounds[3])),
-        geom)
+    
+    try:
+        geom_area = ops.transform(
+            partial(
+                pyproj.transform,
+                pyproj.Proj(init='EPSG:4326'),
+                pyproj.Proj(
+                    proj='aea',
+                    lat_1=geom.bounds[1],
+                    lat_2=geom.bounds[3])),
+            geom)
+    # different keys for old lat/lon
+    except:
+        geom_area = ops.transform(
+            partial(
+                pyproj.transform,
+                pyproj.Proj(init='EPSG:4326'),
+                pyproj.Proj(
+                    proj='aea',
+                    lat1=geom.bounds[1],
+                    lat2=geom.bounds[3])),
+            geom)
     
     # print(the area in km^2)
     #print(geom_area.area / 1000000.
