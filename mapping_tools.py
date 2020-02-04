@@ -344,6 +344,7 @@ def drawoneshapepoly(m, plt, sf, field, value, **kwargs):
                 if polyline == False:
                     if x[0] != x[-1] or y[0] != y[-1]:
                         x.append(x[0])
+                        y.append(y[0])
     
                 # plot each polygon
                 xx, yy = m(x,y)
