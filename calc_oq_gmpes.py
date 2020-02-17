@@ -395,7 +395,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
     try:
-        from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
+        #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
         from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
     except:
         from openquake_local.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
@@ -455,8 +455,8 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = BooreEtAl2014()
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
-    gmpe = YenierAtkinson2015CEUS()
-    YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    #gmpe = YenierAtkinson2015CEUS()
+    #YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     gmpe = ShahjoueiPezeshk2016()
     SP16imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
@@ -466,7 +466,8 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
     #AA13imt = []
 
-    return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
+    #return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
+    return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
@@ -725,13 +726,14 @@ def get_station_vs30(sta):
     sta = station code
     '''
     from os import getcwd
-    from numpy import isnan, mean, nan
+    from numpy import isnan, nanmean, nan
     
     cwd = getcwd()
     if cwd.startswith('/nas'):
         vs30file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Site_Class_Model/au_station_vs30.csv'
     else:
-        vs30file = '/Users/trev/Documents/Earthquake_Data/Site_Class/au_station_vs30_edit.csv'
+        #vs30file = '/Users/trev/Documents/Earthquake_Data/Site_Class/au_station_vs30_edit.csv'
+        vs30file = '/Users/trev/Documents/Earthquake_Data/Site_Class/au_station_vs30.csv'
     
     # assume that vs30 is based on proxy estimates
     isproxy = True
@@ -746,16 +748,19 @@ def get_station_vs30(sta):
         if dat[0] == sta:
             
             # check Kayen Vs30
-            kvs = float(dat[6])            
+            kvs = float(dat[6])
+            usgsvs = float(dat[7])
+            asscmvs = float(dat[5])           
             if not isnan(kvs):
                 vs30 = kvs
                 isproxy = False
             
             # if nan, take mean of ASSCM and USGS
             else:
-                vs30 = mean([float(dat[5]), float(dat[7])])
+                vs30 = nanmean([float(dat[5]), float(dat[7])])
+                vs30 = float(dat[-1]) # overwriting with usgs
       
-    return vs30, isproxy      
+    return vs30, isproxy, usgsvs, asscmvs, kvs
     
 # returns preferred site vs30
 def return_site_vs30_info(sta):
