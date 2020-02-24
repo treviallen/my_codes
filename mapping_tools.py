@@ -1083,12 +1083,15 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
     # set grid size (in degrees)
     lonrng = m.urcrnrlon - m.llcrnrlon
     print('lonrng', lonrng)
-    if lonrng <= 0.61:
+    if lonrng <= 0.4:
         pltbuffer = 0.04
         txtoff = 0.0035 
+    elif lonrng <= 0.61:
+        pltbuffer = 0.04
+        txtoff = 0.005 
     elif lonrng <= 1:
         pltbuffer = 0.04
-        txtoff = 0.005
+        txtoff = 0.006
     elif lonrng <= 2:
         pltbuffer = 0.06
         txtoff = 0.012 
