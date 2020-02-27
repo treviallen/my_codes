@@ -25,7 +25,7 @@ def get_response_info(sta,recdate,chan):
     # check if sitename in file
     cwd = getcwd()
     if cwd.startswith('/nas'):
-        stalist = '//nas//users//u56903//unix//Code//my_codes//stationlist.dat'        
+        stalist = '/nas/users/u56903/unix/Code/my_codes/stationlist.dat'        
     else:
         stalist = '//Users//trev//Documents//Code//my_codes//stationlist.dat'
         
@@ -33,10 +33,10 @@ def get_response_info(sta,recdate,chan):
     stla = -12345.0
     try:
         stadat = open(stalist).readlines()
-    
+        
     # reset stalist to local drives on rhe-compute
     except:
-        stalist = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/stationlist.dat'   
+        #stalist = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/stationlist.dat'   
         stadat = open(stalist).readlines()
         
     for line in stadat[1:]:
@@ -46,7 +46,6 @@ def get_response_info(sta,recdate,chan):
         mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
         maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
         if tmp[0] == sta and tmp[12].strip() == chan:
-            
             if recdate >= mindate and recdate <= maxdate:
                 inst_ty = tmp[1]
                 stlo = float(tmp[4])
@@ -309,7 +308,7 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     #print(freq
 
     # read PAZ file
-    #print(pazfile)
+    print(pazfile)
     poles, zeros, constant, normf = read_pazfile(pazfile)
     #print(poles, zeros)
     angc = 2.0 * np.pi

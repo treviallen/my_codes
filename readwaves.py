@@ -667,15 +667,15 @@ def readseed(st):
         else:
             numtrue = False
             print(tr.stats['channel'])
-            if tr.stats['channel'] == '001' or tr.stats['channel'] == '004' or tr.stats['channel'] == 'HH1' or tr.stats['channel'] == 'BH1':
+            if tr.stats['channel'] == '001' or tr.stats['channel'] == '004' or tr.stats['channel'] == 'HH1' or tr.stats['channel'] == 'BH1' or tr.stats['channel'] == 'HLE':
                 o = 'E'
                 it = 'H'
                 numtrue = True
-            elif tr.stats['channel'] == '002' or tr.stats['channel'] == '005' or tr.stats['channel'] == 'HH2'or tr.stats['channel'] == 'BH2':
+            elif tr.stats['channel'] == '002' or tr.stats['channel'] == '005' or tr.stats['channel'] == 'HH2'or tr.stats['channel'] == 'BH2' or tr.stats['channel'] == 'HLN':
                 o = 'N'
                 it = 'H'
                 numtrue = True
-            elif tr.stats['channel'] == '003' or tr.stats['channel'] == '006':
+            elif tr.stats['channel'] == '003' or tr.stats['channel'] == '006' or tr.stats['channel'] == 'HLZ':
                 o = 'Z'
                 numtrue = True
                 
