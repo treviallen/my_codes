@@ -553,7 +553,7 @@ def get_iris_data(dateTuple, sta, net):
     
     client = Client("IRIS")
     t1 = UTCDateTime(utcdt) - 120
-    t2 = t1 + 1800
+    t2 = t1 + 3000
     t3 = t1 + 3
     
     bulk = [(net.upper(), sta.upper(), "*", "*", t1, t2),
@@ -796,7 +796,7 @@ def return_all_au_station_data():
     from os import getcwd
     
     if getcwd().startswith('/nas'):
-        au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/modelling/sandpits/tallen/NSHA2018/catalogue/data/au_station_data.dat'
+        au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks/AU/au_station_data.dat'
     else:
         au_station_file = '/Users/trev/Documents/Geoscience_Australia/NSHA2018/catalogue/data/au_station_data.dat'
     
