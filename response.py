@@ -45,6 +45,7 @@ def get_response_info(sta,recdate,chan):
         
         mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
         maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
+        #print(mindate, maxdate, recdate)
         if tmp[0] == sta and tmp[12].strip() == chan:
             if recdate >= mindate and recdate <= maxdate:
                 inst_ty = tmp[1]
