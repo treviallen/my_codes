@@ -806,7 +806,7 @@ def get_station_vs30(sta):
             # if nan, take mean of ASSCM and USGS
             else:
                 vs30 = nanmean([float(dat[5]), float(dat[7])])
-                vs30 = float(dat[-1]) # overwriting with usgs
+                #vs30 = float(dat[-1]) # overwriting with usgs
       
     return vs30, isproxy, usgsvs, asscmvs, kvs
         
