@@ -1178,7 +1178,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
 # code based on: http://qingkaikong.blogspot.com/2016/06/nice-python-basemap-background.html
 def make_street_map(clat, clon, service='ESRI_Imagery_World_2D', ll_buffer = 0.1, \
              xpixels = 1500, plt_inset = True, inset_state = 'nsw', inset_loc = 3, \
-             plt_marker = True, marker='*', ms = 14, mew = 0.5, mfc = 'r', mec='k'):
+             inset_multiplier=0.03, plt_marker = True, marker='*', ms = 14, mew = 0.5, mfc = 'r', mec='k'):
     
     from mpl_toolkits.basemap import Basemap
     import matplotlib.pyplot as plt
@@ -1240,7 +1240,8 @@ def make_street_map(clat, clon, service='ESRI_Imagery_World_2D', ll_buffer = 0.1
             illcrnrlon = 140.4
         
         from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-        axins = zoomed_inset_axes(ax, ll_buffer*0.03, loc=inset_loc)
+        print(inset_loc)
+        axins = zoomed_inset_axes(ax, ll_buffer*inset_multiplier, loc=inset_loc)
         
         m2 = Basemap(projection='merc',llcrnrlon=illcrnrlon ,llcrnrlat=illcrnrlat,
                      urcrnrlon=iurcrnrlon ,urcrnrlat=iurcrnrlat, resolution = 'l')

@@ -394,13 +394,16 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
+    #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015BSSA
+    from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
+    '''
     try:
         #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
         from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
     except:
-        from openquake_local.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
+        from openquake_.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015BSSA
         from openquake_local.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
-
+    '''
     #from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -455,7 +458,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = BooreEtAl2014()
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
-    #gmpe = YenierAtkinson2015CEUS()
+    #gmpe = YenierAtkinson2015BSSA()
     #YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     gmpe = ShahjoueiPezeshk2016()
@@ -542,7 +545,7 @@ def gaull1990_gsim(mag, dep, rhypo):
     
     return G90WAimt, G90SEAimt, G90INDimt, G90WA_PGVimt, G90SEA_PGVimt, G90IND_PGVimt
     
-def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
+def hdf5_gsim(mag, dep, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     #from openquake.hazardlib.gsim.gmpe_table import GMPETable
     from gsim_table import GMPETable
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
@@ -577,6 +580,44 @@ def hdf5_gsim(mag, dep, ztor, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     
     return hdf5imt
     #return imt
+
+def tang2019_cam_gsim(mag, dep, rrup, vs30):
+    from openquake.hazardlib.gsim.tang_2019 import TangEtAl2019
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array
+    
+    crust_ty = 'intraplate'
+    
+    sites = SitesContext()
+    sites.vs30 = array([float(vs30)])
+    sites.vs30measured = 0
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+
+    dists = DistancesContext()
+    dists.rrup = array([rrup])
+    
+    gmpe = TangEtAl2019()
+    Tea19imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    return Tea19imt
+
+# USGS 2018 mean NGA-East from PEER Report 2018/XX
+def nga_east_mean(mag, dep, dip, rake, rrup, vs30):
+    from numpy import sqrt
+    
+    hdf5file = '/Users/trev/Documents/Code/my_codes/hdf5/NGA-East_Backbone_Model.geometric.hdf5'
+    
+    if dep > rrup:
+        rjb = rrup
+    else:
+        rjb = sqrt(rrup**2 - dep**2)
+    rhypo = rrup
+    ztor = dep - 2 # random guess
+                    
+    return hdf5_gsim(mag, dep, dip, rake, rrup, rjb, rhypo, vs30, hdf5file)
 
 def aa13_gsims(mag, dep, rrup, rjb, rhypo, vs30):
     from openquake.hazardlib.gsim.gsim_table import GMPETable
@@ -741,9 +782,16 @@ def get_station_vs30(sta):
     # parse vs30 file
     lines = open(vs30file).readlines()[1:]
     
+    # set values to nan
     vs30 = nan
+    usgsvs = nan
+    asscmvs = nan
+    kvs = nan
+    
+    # loop through station lines
     for line in lines:
         dat = line.strip().split(',')
+        
         
         if dat[0] == sta:
             
@@ -758,26 +806,10 @@ def get_station_vs30(sta):
             # if nan, take mean of ASSCM and USGS
             else:
                 vs30 = nanmean([float(dat[5]), float(dat[7])])
-                vs30 = float(dat[-1]) # overwriting with usgs
+                #vs30 = float(dat[-1]) # overwriting with usgs
       
     return vs30, isproxy, usgsvs, asscmvs, kvs
-    
-# returns preferred site vs30
-def return_site_vs30_info(sta):
-    '''
-    ufile = 'au_station_data_usgs_vs30.gmt'
-
-    lines = open(ufile).readlines()
-    
-    usta = []
-    uvs30 = []
-    
-    for line in lines:
-        raw = line.strip().split('\t')
-        usta.append(raw[2])
-        uvs30.append(float(raw[3]))
-    '''
-    
+        
 
 # script to find extrapolation ratio based on input gmm
 def get_extrap_ratio(extrapDat, targetDat, boundPer, extrapPer):
