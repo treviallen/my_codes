@@ -787,6 +787,8 @@ def get_station_vs30(sta):
     usgsvs = nan
     asscmvs = nan
     kvs = nan
+    stla = nan
+    stlo = nan
     
     # loop through station lines
     for line in lines:
@@ -794,7 +796,8 @@ def get_station_vs30(sta):
         
         
         if dat[0] == sta:
-            
+            stla = float(dat[2])
+            stlo = float(dat[1])
             # check Kayen Vs30
             kvs = float(dat[6])
             usgsvs = float(dat[7])
@@ -808,7 +811,7 @@ def get_station_vs30(sta):
                 vs30 = nanmean([float(dat[5]), float(dat[7])])
                 #vs30 = float(dat[-1]) # overwriting with usgs
       
-    return vs30, isproxy, usgsvs, asscmvs, kvs
+    return vs30, isproxy, usgsvs, asscmvs, kvs, stla, stlo
         
 
 # script to find extrapolation ratio based on input gmm
