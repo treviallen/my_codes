@@ -178,7 +178,7 @@ def get_binned_stats(bins, xdat, yres):
 
 def get_binned_stats_mean(bins, xdat, yres):
     #from numpy import array, diff, nanstd, where, isfinite, nanmean, isnan
-    from numpy import array, diff, std, where, isfinite, mean, isnan, delete
+    from numpy import array, diff, std, where, isfinite, mean, median, isnan, delete
     
     yres = array(yres)
     xdat = array(xdat)
@@ -189,7 +189,7 @@ def get_binned_stats_mean(bins, xdat, yres):
     xdat = delete(xdat, idx)   
     binsize = diff(bins)[0]
 
-    medres = []
+    meanres = []
     stdres = []
     medx = []
     nperbin = []
@@ -201,13 +201,13 @@ def get_binned_stats_mean(bins, xdat, yres):
         #medres.append(nanmean(yres[index]))
         #stdres.append(nanstd(yres[index]))
         #medx.append(nanmean(xdat[index]))
-        medres.append(mean(yres[index]))
+        meanres.append(mean(yres[index]))
         stdres.append(std(yres[index]))
-        medx.append(mean(xdat[index]))
+        medx.append(median(xdat[index]))
         nperbin.append(len(index))
         
-    idx = where(isfinite(medres))[0]
-    return array(medres)[idx], array(stdres)[idx], array(medx)[idx], bins[idx], array(nperbin)[idx]
+    idx = where(isfinite(meanres))[0]
+    return array(meanres)[idx], array(stdres)[idx], array(medx)[idx], bins[idx], array(nperbin)[idx]
 
 # get weighted std, from http://stackoverflow.com/questions/2413522/weighted-standard-deviation-in-numpy
 def weighted_avg_and_std(values, weights):

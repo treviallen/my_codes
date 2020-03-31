@@ -786,6 +786,7 @@ def parse_ga_event_query(gacsv):
     
     for line in lines:
         dat = line.strip().split(',')
+        
         if len(dat) >= 27 and not line.startswith('"'):
             try:
                 try:
@@ -804,7 +805,7 @@ def parse_ga_event_query(gacsv):
                 dateTime = dt.datetime.strptime(dat[oidx], '%Y-%m-%dT%H:%M:%S.%f')
             except:
                 dateTime = dt.datetime.strptime(dat[oidx], '%Y-%m-%dT%H:%M:%S')
-                
+            
             tdict = {'datetime': dateTime, \
                      'year': dateTime.year, 'month': dateTime.month, \
                      'day': dateTime.day, 'hour': dateTime.hour, \
@@ -815,6 +816,6 @@ def parse_ga_event_query(gacsv):
                      'timestr': dat[10], 'description': dat[6], 'event_id':dat[11]}
                      	
             evdict.append(tdict)
-        
+            
     return evdict
 
