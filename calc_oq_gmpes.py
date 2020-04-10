@@ -761,6 +761,34 @@ def adjust_gmm_with_SS14(inIMT, hostVS, targetVS):
         
     # make new data struct
     return {'per':inIMT['per'], 'pga':pga_target, 'sa': array(sa_target)}
+    	
+def adjust_gmm_with_nga_east(inIMT, targetVS):
+    from nga_east_amplification_2020 import nga_east_siteamp
+    from numpy import array, exp, log
+    
+    '''
+    inIMT    = imt as calculated via OpenQuake
+    targetVS = Target vs30 of site
+    
+    NGA-East model reference vs30 = 3000
+    '''
+    # first correct to reference vs30
+    refT = 0.0 # i.e. PGA
+    
+    # get reference PGA on 3000 m/s
+    ln_pga_ref3k = inIMT['pga'][0]
+    
+    # first correct PGA to target site class - ignore impeedance term for AU sites
+    pga_target = log(ln_pga_ref3k * nga_east_siteamp(targetVS, refT, ln_pga_ref3k, impedance=False)[0])
+    
+    # correct spectra to target site class
+    sa_target = []
+    for t, sa in zip(inIMT['per'], inIMT['sa']):
+        sa_target.append(log(exp(sa) * nga_east_siteamp(targetVS, t, ln_pga_ref3k, impedance=False)[0]))
+        
+    # make new data struct
+    return {'per':inIMT['per'], 'pga':pga_target, 'sa': array(sa_target)}
+
 
 def get_station_vs30(sta):
     '''

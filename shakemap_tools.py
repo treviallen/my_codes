@@ -180,7 +180,7 @@ def station_xml2csv_bruteforce(stationxml, stationcsv):
     for line in lines:
         if line.startswith('<station code'):
             dat = line.split()
-            print line
+            print(line)
             code = dat[1].split('"')[1]
             lon = dat[5].split('"')[1]
             lat = dat[4].split('"')[1]
@@ -397,7 +397,7 @@ def write_mmi_obs_raw(source_str, mmidict):
             	                                                                            
     # write SM raw            
     outfile = 'mmi_obs.dat'
-    f = open(outfile, 'wb')   
+    f = open(outfile, 'w')   
     f.write(obstxt)           
     f.close()     
 
