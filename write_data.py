@@ -148,7 +148,7 @@ def write_fft(sta, evdate, sps, freq, corfftr, corffti, filename, stla, stlo, \
               eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq, inst_ty):
 
     #n = len(freq[0]) / 2
-    n = len(freq) / 2
+    n = int(np.floor(len(freq) / 2))
 
     # set file and path names
     filename = filename + '.fds'
@@ -169,9 +169,9 @@ def write_fft(sta, evdate, sps, freq, corfftr, corffti, filename, stla, stlo, \
     dispffti = np.zeros(np.shape(freq))
 
     if inst_ty == 'N': # Assume accelerometer
-        dispfftr[0,1:] = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])**2
-        dispffti[0,1:] = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])**2
-        dispamp[0,1:] = np.sqrt((1./sps)**2 * (dispfftr[0,1:]**2 + dispffti[0,1:]**2))
+        dispfftr[1:] = corfftr[1:]/(2.*(np.pi)*freq[1:])**2
+        dispffti[1:] = corffti[1:]/(2.*(np.pi)*freq[1:])**2
+        dispamp[1:] = np.sqrt((1./sps)**2 * (dispfftr[1:]**2 + dispffti[1:]**2))
     else: # assume seismometer
         '''
         dispfftr[0,1:] = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])
@@ -198,7 +198,7 @@ def write_fft(sta, evdate, sps, freq, corfftr, corffti, filename, stla, stlo, \
     f.close()
 
     # now append data
-    f = file(outfile, 'a')
+    f = open(outfile, 'a')
     np.savetxt(f, data.T, delimiter='\t', fmt='%1.6e')
     f.close()
 

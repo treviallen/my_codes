@@ -376,7 +376,7 @@ def main(filename, logA, rhyp, eqdep):
     if cwd.startswith('/nas'):
         logAfile = '//nas//users//u56903//unix//Code//my_codes//log_A_values.csv'
     else:
-        logAfile = '//Users//tallen//Documents//Code//my_codes//log_A_values.csv'
+        logAfile = '//Users//trev//Documents//Code//my_codes//log_A_values.csv'
     lines = open(logAfile).read()
 
     # append new line                      
@@ -385,7 +385,7 @@ def main(filename, logA, rhyp, eqdep):
     newline = ','.join((dt.strftime('%Y-%m-%d %H:%M:%S'), filename.split('.')[1], filename.split('.')[2], \
                         str('%0.1f' % rhyp), str('%0.1f' % repi), str('%0.4f' % logA)))
     
-    f = open(logAfile, 'wb')
+    f = open(logAfile, 'w')
     f.write(lines + '\n' + newline)
     f.close()
     

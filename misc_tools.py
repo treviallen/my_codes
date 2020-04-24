@@ -407,7 +407,7 @@ def manual_colour_list(ncolours):
     # get indexes
     idx = range(0, len(colours), step)
     
-    return colours[idx]
+    return colours[::-1]
 
 # from: http://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):

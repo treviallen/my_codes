@@ -283,7 +283,7 @@ while continue_loop == True:
     elif seltask == '2': # calculate FFT
 
         # plot Fourier displacement spectra
-        print corfftr # bug here!
+        #print(corfftr) # bug here!
         plotting.plot_fft(sps, freq, corfftr, corffti, filename, inst_ty)
 
         # write time histories to file
@@ -323,8 +323,8 @@ while continue_loop == True:
         calculate_magnitudes.main(filename, logA, rhyp, eqdep)
 
         # write output to file
-        write_data.write_WA_disp(sta, evdate, sps, wadisp, \
-                 filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq)
+        #write_data.write_WA_disp(sta, evdate, sps, wadisp, \
+        #         filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq)
 
     elif seltask == '6': # export as miniSEED
         print('\nModule not yet functional...')

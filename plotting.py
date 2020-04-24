@@ -287,8 +287,8 @@ def plot_fft(sps, freq, corfftr, corffti, header, inst_ty):
     import matplotlib.pyplot as plt
     
     if inst_ty == 'N': # for accelerometer
-        corfftr = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])**2
-        corffti = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])**2
+        corfftr = corfftr[1:]/(2.*(np.pi)*freq[1:])**2
+        corffti = corffti[1:]/(2.*(np.pi)*freq[1:])**2
     else: # or seismometer
         #corfftr = corfftr[0,1:]/(2.*(np.pi)*freq[0,1:])
         #corffti = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])

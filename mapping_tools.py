@@ -358,6 +358,118 @@ def drawoneshapepoly(m, plt, sf, field, value, **kwargs):
     '''
     end of drawshapepoly
     '''
+    
+def drawmanualshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, zorder=20000, **kwargs):
+    from numpy import arange, isnan, nan
+    
+    # get kwargs
+    ncolours = 256
+    lw = 0.5
+    ls = '-'
+    fillshape = False
+    polyline = False # do not close polygon
+
+    for key in ('col', 'cindex', 'cmap', 'ncolours', 'lw', 'ls', 'fillshape', 'polyline'):
+        if key in kwargs:
+            if key == 'col':
+                col = kwargs[key]
+                
+            if key == 'cindex':
+                cindex = kwargs[key]
+
+            if key == 'cmap':
+                cmap = kwargs[key]
+
+            if key == 'ncolours':
+                ncolours = kwargs[key]
+
+            if key == 'ls':
+                ls = kwargs[key]
+
+            if key == 'lw':
+                lw = kwargs[key]
+
+            if key == 'fillshape':
+                fillshape = kwargs[key]
+                 
+            if key == 'polyline':
+                polyline = kwargs[key]
+    
+    shapes = sf.shapes()
+
+    for i, shape in enumerate(shapes):
+        newfill = True
+        # get colour
+        try:
+            cs = (cmap(arange(ncolours)))
+            if isnan(cindex[i]) == False and cindex[i] != -1: 
+                col = [cs[int(cindex[i])][0],cs[int(cindex[i])][1],cs[int(cindex[i])][2]]
+            else:
+                newfill = False
+                col = '0.9'
+                #col = 'none'
+            
+        except:
+            try:
+                col = col
+            except:
+                col = 'w'
+                
+        '''
+        if fillshape == True:
+            fillcol = col
+            linecol = 'k'
+        else:
+            linecol = col
+        '''
+        # get xy coords
+        x = []
+        y = []
+
+        p = 0
+        parts = shape.parts
+        parts.append(len(shape.points))
+        
+        for prt in parts[1:]:
+            #print('part',prt
+            while p < prt:
+                x.append(shape.points[p][0])
+                y.append(shape.points[p][1])
+                p += 1
+            
+            # close polygon if not polyline
+            if polyline == False:
+                if x[0] != x[-1] or y[0] != y[-1]:
+                    x.append(x[0])
+                    y.append(y[0])
+
+            try:
+              # plot each polygon
+                
+                xx, yy = m(x,y)
+                #print(edgecolor)
+                if fillshape == True :
+                    plt.fill(xx,yy, facecolor=col, edgecolor=edgecolor, linewidth=lw, label=label, alpha=alpha)  
+                    #m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
+                elif fillshape == True and newfill == True:
+                    #print(fillcolor)
+                    if label == 'null':
+                        plt.fill(xx,yy, facecolor=fillcolor, edgecolor=edgecolor, linewidth=lw, alpha=alpha)
+                        m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
+                    else:
+                        plt.fill(xx,yy, facecolor=fillcolor, edgecolor=edgecolor, linewidth=lw, label=label, alpha=alpha)  
+                        m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
+                        label = 'null' # set to null after first plot
+                
+            except:
+                print('Skipping polygon...')
+
+            x = []
+            y = []
+            
+    '''
+    end of drawshapepoly
+    '''
         
 # label polygon with a field in shapefile
 def labelpolygon(m, plt, sf, field, **kwargs):
