@@ -588,6 +588,43 @@ def get_iris_data(dateTuple, sta, net):
     '''
     
     return st, trname
+    
+def get_arclink_data(datetupple, sta, net)
+    from obspy import UTCDateTime
+    from obspy.clients.arclink.client import Client
+    client = Client(user='test@obspy.org')
+    
+    # format UTC datetime
+    dtsplit = [str(x) for x in dateTuple] # convert dt to string  
+    #print( dtsplit
+    utcdt = '-'.join((dtsplit[0], dtsplit[1].zfill(2), dtsplit[2].zfill(2))) \
+            + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))
+    
+    t1 = UTCDateTime(utcdt) - 120
+    t2 = t1 + 1500
+    
+    # save out to file
+    try:
+        st = client.get_waveforms(net, sta, "", "BH*", t1, t2)
+        tr = st[0]
+        
+        trname = path.join('iris_dump', \
+                           '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                           tr.stats['network'], tr.stats['station'], 'mseed')))
+        
+        # check if waves folder exists
+        if not path.isdir('iris_dump'):
+            makedirs('iris_dump')
+            
+        print('Writing file:', trname)
+        st.write(trname, format="MSEED")
+    except:
+        print('Data not available:', sta.upper())
+        # dummy data returned
+        st = 0
+        trname='null'
+    
+    return st, trname
 
 def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
     '''

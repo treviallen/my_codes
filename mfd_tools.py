@@ -7,7 +7,7 @@ Created on Tue Apr 18 12:10:31 2017
 from numpy import array, sqrt, where, nan, isnan, delete, hstack, diff, log10, isfinite
 from tools.nsha_tools import toYearFraction, get_shapely_centroid
 from shapely.geometry import Point, Polygon
-from hmtk.parsers.catalogue.csv_catalogue_parser import CsvCatalogueParser
+#from hmtk.parsers.catalogue.csv_catalogue_parser import CsvCatalogueParser
 from datetime import datetime
 from catalogue_tools import weichert_algorithm, aki_maximum_likelihood, bval2beta
 from oq_tools import get_oq_incrementalMFD, beta2bval
