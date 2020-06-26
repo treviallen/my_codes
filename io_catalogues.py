@@ -806,14 +806,15 @@ def parse_ga_event_query(gacsv):
             except:
                 dateTime = dt.datetime.strptime(dat[oidx], '%Y-%m-%dT%H:%M:%S')
             
+            # note - changed pref mag idx from 27 to 30
             tdict = {'datetime': dateTime, \
                      'year': dateTime.year, 'month': dateTime.month, \
                      'day': dateTime.day, 'hour': dateTime.hour, \
                      'minute': dateTime.minute, 'second': dateTime.second, \
                      'lat': float(dat[13]), 'lon': float(dat[14]), \
                      'dep': float(dat[4]), 'mag_ml': checkfloat(dat[17]), \
-                     'mag': checkfloat(dat[27]), 'magType': dat[28], \
-                     'timestr': dat[10], 'description': dat[6], 'event_id':dat[11]}
+                     'mag': checkfloat(dat[30]), 'magType': dat[28], \
+                     'timestr': dat[10], 'description': dat[6], 'event_id':dat[11]} 
                      	
             evdict.append(tdict)
             

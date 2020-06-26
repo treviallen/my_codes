@@ -192,7 +192,7 @@ def calc_GG91(comp, logA, rhyp):
     magstr = 'GG91:\t' + str("%0.2f" % GG91)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return GG91
 
@@ -205,7 +205,7 @@ def calc_MLM92(comp, logA, rhyp):
         MLM92 = logA + 1.34 * np.log10(rhyp / 100.) + 0.00055 * (rhyp - 100) + 3.0
 
     magstr = 'MLM92:\t' + str("%0.2f" % MLM92)
-    print(magstr)
+    #print(magstr)
 
     return MLM92
 

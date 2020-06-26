@@ -472,7 +472,7 @@ def drawmanualshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k
     '''
         
 # label polygon with a field in shapefile
-def labelpolygon(m, plt, sf, field, **kwargs):
+def labelpolygon(m, plt, sf, field, addOutline=False, **kwargs):
     '''
     fstyle  = ['normal', 'italic', 'oblique']
     fweight = ['light', 'normal', 'medium', 'semibold', 'bold', 'heavy', 'black']
@@ -492,8 +492,8 @@ def labelpolygon(m, plt, sf, field, **kwargs):
     fstyle = 'normal'
     fweight = 'normal'
     value = None
-    addOutline = False
-    for key in ('xoff', 'yoff', 'fsize', 'fweight', 'col', 'fstyle', 'value', 'addOutline'):
+    
+    for key in ('xoff', 'yoff', 'fsize', 'fweight', 'col', 'fstyle', 'value'):
         if key in kwargs:
             if key == 'xoff':
                 xoff = kwargs[key]
@@ -509,8 +509,7 @@ def labelpolygon(m, plt, sf, field, **kwargs):
                 col = kwargs[key]
             if key == 'value':
                 value = kwargs[key]
-            if key == 'addOutline':
-                addOutline = kwargs[key]
+            
     
     shapes = sf.shapes()
     recs = sf.records()

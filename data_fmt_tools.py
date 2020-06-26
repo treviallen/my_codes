@@ -221,7 +221,38 @@ def append_seed(mseedfiles, outfile):
     
     # now write to file
     st.write(outfile, format='MSEED')
+
+# function to merge data files from the ausarray deployment
+def merge_ausarray_data(folder):       
+    from obspy import read
+    from misc_tools import listdir_extension
+    from sys import argv
+    from os import path
     
+    files = listdir_extension(folder, 'HHE')
+    
+    for f in files:
+        print(f)
+        try:
+            st = read(path.join(folder, f))
+            
+            stn = read(path.join(folder, f.replace('HHE','HHN')))
+            st += stn
+            
+            stz = read(path.join(folder, f.replace('HHE','HHZ')))
+            st += stz
+            
+            # write to file
+            tr = st[0]
+            mseed = path.join('mseed', \
+                               '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                               tr.stats['network'], tr.stats['station'], 'mseed')))
+            #mseed = path.join('mseed', f.replace('HHE','mseed'))
+            st.write(mseed, format="MSEED")
+            
+        except:
+            print('  Cannot read file')
+        
 # merge mseed files
 # mseedfiles = tuple of files
 def merge_seed(mseedfiles):
@@ -514,7 +545,7 @@ def eqwave2mseed(eqwfile):
         ymd = allrecdate[i][0:8]
         hhmm = allrecdate[i][8:]
         stats['starttime'] = UTCDateTime(int(allrecdate[i][0:4]), int(allrecdate[i][4:6]), int(allrecdate[i][6:8]), \
-        	                               int(allrecdate[i][8:10]), int(allrecdate[i][10:12]), float(allsec[i]))
+                                           int(allrecdate[i][8:10]), int(allrecdate[i][10:12]), float(allsec[i]))
         print(stats['starttime'])
         tr = Trace(data=data, header=stats)
             
@@ -589,13 +620,15 @@ def get_iris_data(dateTuple, sta, net):
     
     return st, trname
     
-def get_arclink_data(datetupple, sta, net)
+def get_arclink_data(datetupple, sta, net):
     from obspy import UTCDateTime
     from obspy.clients.arclink.client import Client
+    from os import path
+    
     client = Client(user='test@obspy.org')
     
     # format UTC datetime
-    dtsplit = [str(x) for x in dateTuple] # convert dt to string  
+    dtsplit = [str(x) for x in datetupple] # convert dt to string  
     #print( dtsplit
     utcdt = '-'.join((dtsplit[0], dtsplit[1].zfill(2), dtsplit[2].zfill(2))) \
             + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))
@@ -604,26 +637,27 @@ def get_arclink_data(datetupple, sta, net)
     t2 = t1 + 1500
     
     # save out to file
-    try:
-        st = client.get_waveforms(net, sta, "", "BH*", t1, t2)
-        tr = st[0]
+    #try:
+    st = client.get_waveforms(net, sta, "", "*", t1, t2)
+    tr = st[0]
+    
+    trname = path.join('iris_dump', \
+                       '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                       tr.stats['network'], tr.stats['station'], 'mseed')))
+    
+    # check if waves folder exists
+    if not path.isdir('iris_dump'):
+        makedirs('iris_dump')
         
-        trname = path.join('iris_dump', \
-                           '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
-                           tr.stats['network'], tr.stats['station'], 'mseed')))
-        
-        # check if waves folder exists
-        if not path.isdir('iris_dump'):
-            makedirs('iris_dump')
-            
-        print('Writing file:', trname)
-        st.write(trname, format="MSEED")
+    print('Writing file:', trname)
+    st.write(trname, format="MSEED")
+    '''
     except:
         print('Data not available:', sta.upper())
         # dummy data returned
         st = 0
         trname='null'
-    
+    '''
     return st, trname
 
 def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
@@ -835,7 +869,7 @@ def return_all_au_station_data():
     if getcwd().startswith('/nas'):
         au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks/AU/au_station_data.dat'
     else:
-        au_station_file = '/Users/trev/Documents/Geoscience_Australia/NSHA2018/catalogue/data/au_station_data.dat'
+        au_station_file = '/Users/trev/Documents/Networks/AU/au_station_data.dat'
     
     lines = open(au_station_file).readlines()
     
@@ -958,7 +992,7 @@ def return_trace_datetime_array(tr):
     
     dt_times = []
     for time in times:
-    	dt_times.append(tr.stats.starttime.datetime + timedelta(seconds=time))
+        dt_times.append(tr.stats.starttime.datetime + timedelta(seconds=time))
         
     return dt_times
 

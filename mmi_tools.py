@@ -580,6 +580,29 @@ def atkinson_worden_wald14_ceus_ipe(mag, rhyp, repi):
     
     return mmi_e, sig
 
+def atkinson_worden_wald14_ceus_oq(mag, rhypo, dep):
+    from openquake.hazardlib.gsim.atkinson_2014_ipe import AtkinsonEtAl2014CEUS
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from openquake.hazardlib.imt import MMI
+    from openquake.hazardlib.const import StdDev
+    
+    from numpy import array, log10, logspace, sqrt
+    
+    ipe = AtkinsonEtAl2014CEUS()
+    
+    sites = SitesContext()
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+    
+    dists = DistancesContext()
+    dists.rhypo = array(rhypo)
+    
+    mmi, sig = ipe.get_mean_and_stddevs(sites, rup, dists, MMI(), [StdDev.TOTAL])
+    
+    return mmi, sig[0]
+ 
 
 ##########################################################################################
 # DYFI
