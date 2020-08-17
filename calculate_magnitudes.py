@@ -192,7 +192,7 @@ def calc_GG91(comp, logA, rhyp):
     magstr = 'GG91:\t' + str("%0.2f" % GG91)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    #print(magstr)
+    print(magstr)
 
     return GG91
 
@@ -205,7 +205,7 @@ def calc_MLM92(comp, logA, rhyp):
         MLM92 = logA + 1.34 * np.log10(rhyp / 100.) + 0.00055 * (rhyp - 100) + 3.0
 
     magstr = 'MLM92:\t' + str("%0.2f" % MLM92)
-    #print(magstr)
+    print(magstr)
 
     return MLM92
 
@@ -365,7 +365,7 @@ def main(filename, logA, rhyp, eqdep):
 
     # now write ML data to file
     import write_data
-    write_data.write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, MLM92, A10)  
+    write_data.write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, GG91, MLM92, A10)  
     
     # export logA values for further analysis
     

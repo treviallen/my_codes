@@ -584,7 +584,7 @@ def get_iris_data(dateTuple, sta, net):
     
     client = Client("IRIS")
     t1 = UTCDateTime(utcdt) - 120
-    t2 = t1 + 3000
+    t2 = t1 + 600 #3000
     t3 = t1 + 3
     
     bulk = [(net.upper(), sta.upper(), "*", "*", t1, t2),

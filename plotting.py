@@ -257,7 +257,7 @@ def plot_WoodAnderson(wadisp, sps, header, chan_no):
     plt.xlabel('Time (s)')
     plt.title(header)
     annotate_maxmin(plt, ax ,wadisp)
-#    figure.savefig('wa_example.png', format='png')
+    #plt.savefig('wa_example.png', format='png', bbox_inches='tight')
 
     plt.close(figure)
     #plt.show()

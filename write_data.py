@@ -278,7 +278,7 @@ def write_WA_disp(sta, evdate, sps, wadisp, filename, stla, stlo, \
     f.close()
 
 # this function writes ML estimates to file
-def write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, MLM92, A10):
+def write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, GG91, MLM92, A10):
     evstacomp = filename.split('.')
     event = evstacomp[0]
     sta = evstacomp[1]
@@ -289,7 +289,7 @@ def write_ML_dat(filename, rhyp, repi, logA, R35, BJ84, HB87, MLM92, A10):
     outdir = 'ml'
     outfile = os.path.join(outdir,filename)
 
-    header = 'SITE\tCOMP\tRHYP\tREPI\tLOGA\tR35\tBJ84\tHB87\tMLM92\tA10\n'
+    header = 'SITE\tCOMP\tRHYP\tREPI\tLOGA\tR35\tBJ84\tHB87\tGG91\tMLM92\tA10\n'
     newtxt = ''
 
     # try saving to ml directory
