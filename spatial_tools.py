@@ -59,21 +59,40 @@ def write_evlist(evdate, eqla, eqlo, eqdep, eqmag):
 
 # this function asks user for earthquake parameters
 def get_eq_params(evdate):
+    
+    try:
         # get earthquake latitude
-    var = raw_input('\n'+'Enter earthquake latitude (decimal degrees) > ')
-    eqla = float(var)
-
-    # get earthquake latitude
-    var = raw_input('\n'+'Enter earthquake longitude (decimal degrees) > ')
-    eqlo = float(var)
-
-    # get earthquake latitude
-    var = raw_input('\n'+'Enter earthquake depth (km) > ')
-    eqdep = float(var)
-
-    # get earthquake latitude
-    var = raw_input('\n'+'Enter earthquake magnitude (MW) > ')
-    eqmag = float(var)
+        var = raw_input('\n'+'Enter earthquake latitude (decimal degrees) > ')
+        eqla = float(var)
+        
+        # get earthquake latitude
+        var = raw_input('\n'+'Enter earthquake longitude (decimal degrees) > ')
+        eqlo = float(var)
+        
+        # get earthquake latitude
+        var = raw_input('\n'+'Enter earthquake depth (km) > ')
+        eqdep = float(var)
+        
+        # get earthquake latitude
+        var = raw_input('\n'+'Enter earthquake magnitude (MW) > ')
+        eqmag = float(var)
+    
+    except:
+        # get earthquake latitude
+        var = input('\n'+'Enter earthquake latitude (decimal degrees) > ')
+        eqla = float(var)
+        
+        # get earthquake latitude
+        var = input('\n'+'Enter earthquake longitude (decimal degrees) > ')
+        eqlo = float(var)
+        
+        # get earthquake latitude
+        var = input('\n'+'Enter earthquake depth (km) > ')
+        eqdep = float(var)
+        
+        # get earthquake latitude
+        var = input('\n'+'Enter earthquake magnitude (MW) > ')
+        eqmag = float(var)
 
     # now, write new event info to event file
     write_evlist(evdate, eqla, eqlo, eqdep, eqmag)

@@ -139,7 +139,7 @@ def write_waves(sta, evdate, sps, idisp, ivel, iacc, filename, stla, stlo, \
     f.close()
 
     # now append data
-    f = file(outfile, 'a')
+    f = open(outfile, 'a')
     np.savetxt(f, data.T, delimiter='\t', fmt='%1.6e')
     f.close()
 
