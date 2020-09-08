@@ -395,7 +395,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
     #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015BSSA
-    from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
+    #from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
     '''
     try:
         #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015CEUS
@@ -461,16 +461,17 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #gmpe = YenierAtkinson2015BSSA()
     #YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    '''
     gmpe = ShahjoueiPezeshk2016()
     SP16imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
-    
+    '''
     crust_ty = 'ena'
     
     #AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty)
     #AA13imt = []
 
     #return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
-    return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , SP16imt # AA13imt, CY08imt, 
+    return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt #, SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
