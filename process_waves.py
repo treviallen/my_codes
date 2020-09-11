@@ -124,7 +124,6 @@ Common FFT functions
 ****************************************************************************"""
 def common_fft(chan_dat, inst_ty, sps, seltask):
     # view wave and trim if necessary
-    print(chan_dat)
     start_index, stop_index = plotting.trim_wave(chan_dat, sps, inst_ty, False)
     #taper_dat = chan_dat[0, start_index:stop_index]
     taper_dat = chan_dat[start_index:stop_index]
@@ -314,7 +313,7 @@ while continue_loop == True:
         wadisp = response.convolve_WoodAnderson(freq, corfftr, corffti, inst_ty)
 
 #        if plot_outputs == True:
-        # plot W-A displacement time history and get windo for ML
+        # plot W-A displacement time history and get window for ML
         watrim = plotting.plot_WoodAnderson(wadisp, sps, filename, chan_no)
 
         # calculate magnitudes

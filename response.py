@@ -408,8 +408,6 @@ def convolve_WoodAnderson(freq, corfftr, corffti, inst_ty, ampfact=2080, damping
 
     # get Wood-Anderson response
     nat_freq = 1.25
-    #damping = 0.8
-    #ampfact = 2080
     angc = 2.0 * np.pi
 
     poles = [-(damping + np.sqrt(1 - damping ** 2) * 1j) * angc * nat_freq]

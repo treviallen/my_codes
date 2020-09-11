@@ -25,31 +25,27 @@ def trim_wave(data, sps, inst_ty, fftanal):
     import matplotlib.pyplot as plt
     plt.ion()
 
-    # clear & initialize figure
-    #figure = plt.figure(6,figsize=(16,9))
-    #plt.close(figure)
     figure = plt.figure(6,figsize=(16,9))
-     
     # do smart way
-    try:
-        nsamp = len(data)
-        
-        # set time array
-        tvect = np.linspace(0, nsamp/sps, num=nsamp)
-        
-        ax = figure.add_subplot(3,1,1)
-        ax.plot(tvect, data,'-', lw=0.5,color='orange')
+    #try:
+    nsamp = len(data)
     
+    # set time array
+    tvect = np.linspace(0, nsamp/sps, num=nsamp)
+    
+    ax = figure.add_subplot(3,1,1)
+    ax.plot(tvect, data,'-', lw=0.5,color='orange')
+    '''
     # do stupid way!
     except:
-        nsamp = len(data[0])
+        nsamp = len(data)
     
         # set time array
         tvect = np.reshape(np.linspace(0,nsamp/sps,num=nsamp),(1,nsamp))
     
         ax = figure.add_subplot(3,1,1)
         ax.plot(tvect[0],data[0],'-', lw=0.5, color='orange')
-    
+    '''
     if fftanal == False:
         plt.title('Select by clicking twice about time window of interest' + '\n' \
                    + '(hint: set t2 < t1 to return whole wave)')
@@ -262,7 +258,7 @@ def plot_WoodAnderson(wadisp, sps, header, chan_no):
     plt.close(figure)
     #plt.show()
 
-    return wadisp[x1:x2]
+    return wadisp[x1:x2], x1, x2
 
 # this function plots the 5% damped response spectra
 def plot_response_spectra(T, psa, pga, header, chan_no):

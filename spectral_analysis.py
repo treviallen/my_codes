@@ -95,17 +95,18 @@ def butter_filter_user(inst_ty, sps, freq, wavfft, seltask):
 
 # this function automatically applies a 4th order bandpass Butterworth filter
 # using predefined filter corners
-def butter_filter_auto(inst_ty, sps, freq, wavfft):
+def butter_filter_auto(inst_ty, sps, freq, wavfft, lofreq=0.01):
     import numpy as np
     filtfft = wavfft
     # filter order
     ford = 4.0
 
     # set initial hi & lo pass frequencies
-    if inst_ty == 'B' or inst_ty == 'N' or inst_ty == 'H':
-        lofreq = 0.02
-    else:
-        lofreq = 0.2
+    if lofreq == 0.01:
+        if inst_ty == 'B' or inst_ty == 'N' or inst_ty == 'H':
+            lofreq = 0.02
+        else:
+            lofreq = 0.2
 
 #    # override if plotting FFT
 #    if seltask == '2':
@@ -115,10 +116,10 @@ def butter_filter_auto(inst_ty, sps, freq, wavfft):
     hifreq = sps / 2.0
 
     # do high pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / lofreq)**(-2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / lofreq)**(-2*ford))
 
     # do low pass filter
-    filtfft[1:] /= np.sqrt(1 + (abs(freq[0,1:]) / hifreq)**(2*ford))
+    filtfft[1:] /= np.sqrt(1 + (abs(freq[1:]) / hifreq)**(2*ford))
 
     # remover zero freq
     filtfft[0] *= 0.0
