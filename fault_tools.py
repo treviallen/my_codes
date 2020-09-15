@@ -718,7 +718,7 @@ def len2mag_J94_SCR_quad(flen):
     return 5.22 + 0.38 * log10(flen) + 0.37 * log10(flen)**2
     
 
-''' do Allen & Hayes 2017 intraslab '''
+''' do Allen & Hayes 2017'''
 
 # get mag 2 len in km**2
 def mag2len_AH17(mw, rtype):
@@ -768,6 +768,18 @@ def mag2area_AH17_other(mw, rtype):
     elif rtype == 'ss':
         a = -4.04
         sig = 0.20
+        
+    return 10**(a + b * mw), sig
+    
+# get mag 2 area in km**2
+def mag2area_AH17_inter(mw):
+    if mw < 8.63:
+        a = -5.62
+        b = 1.22
+    else:
+        a = 2.23
+        b = 0.31
+    sig = 0.256 
         
     return 10**(a + b * mw), sig
 
