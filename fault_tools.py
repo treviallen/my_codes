@@ -753,11 +753,15 @@ def mag2wid_AH17(mw, rtype):
     elif rtype == 'ss':
         a = -1.39
         sig = 0.17
+    
+    wid = 10**(a + b * mw)
+    if wid > 200.:
+        wid = 200.
         
-    return 10**(a + b * mw), sig
+    return wid, sig
 
 # get mag 2 area in km**2
-def mag2area_AH17_other(mw, rtype):
+def mag2area_AH17_linear(mw, rtype):
     b = 0.96
     if rtype == 'intra':
         a = -3.89
@@ -768,10 +772,13 @@ def mag2area_AH17_other(mw, rtype):
     elif rtype == 'ss':
         a = -4.04
         sig = 0.20
+    elif rtype == 'inter':
+        a = -3.63
+        sig = 0.255
         
     return 10**(a + b * mw), sig
     
-# get mag 2 area in km**2
+# calculate mag 2 area in km**2
 def mag2area_AH17_inter(mw):
     if mw < 8.63:
         a = -5.62
@@ -782,6 +789,20 @@ def mag2area_AH17_inter(mw):
     sig = 0.256 
         
     return 10**(a + b * mw), sig
+    
+# calculate area (in km**2) 2 mag 
+def area2mag_AH17_inter(area):
+    from numpy import log10
+    
+    if area < 74000:
+        a = -5.62
+        b = 1.22
+    else:
+        a = 2.23
+        b = 0.31
+    sig = 0.256 
+    
+    return ((log10(area) - a) / b), sig
 
 # get mag 2 len in km**2
 def len2wid_AH17(length, rtype):
