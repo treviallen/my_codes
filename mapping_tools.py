@@ -672,17 +672,17 @@ def get_line_parallels(pts, rngkm):
     for j, pt in enumerate(pts):
         # if 1st point
         if j == 0:
-            rngm, az, baz = gps2DistAzimuth(pts[j][1], pts[j][0], \
+            rngm, az, baz = gps2dist_azimuth(pts[j][1], pts[j][0], \
                                             pts[j+1][1], pts[j+1][0])
             
         # if last point
         elif j == len(pts)-1:
-            rngm, az, baz = gps2DistAzimuth(pts[j-1][1], pts[j-1][0], \
+            rngm, az, baz = gps2dist_azimuth(pts[j-1][1], pts[j-1][0], \
                                             pts[j][1], pts[j][0])
                                            
         # use points either side (assumes evenly spaced)
         else:
-            rngm, az, baz = gps2DistAzimuth(pts[j-1][1], pts[j-1][0], \
+            rngm, az, baz = gps2dist_azimuth(pts[j-1][1], pts[j-1][0], \
                                             pts[j+1][1], pts[j+1][0])
            
         # get azimuth for new points
