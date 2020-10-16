@@ -658,7 +658,7 @@ def checkPointInPoly(shpfile, lon, lat):
     return value
     
 def get_line_parallels(pts, rngkm):
-    from obspy.core.util.geodetics import gps2DistAzimuth
+    from obspy.geodetics.base import gps2dist_azimuth
     from mapping_tools import reckon
     '''
     pts are an N x [lon, lat] matrix, i.e.:
