@@ -813,6 +813,8 @@ def parse_ga_event_query(gacsv):
                      'minute': dateTime.minute, 'second': dateTime.second, \
                      'lat': float(dat[13]), 'lon': float(dat[14]), \
                      'dep': float(dat[4]), 'mag_ml': checkfloat(dat[17]), \
+                     'mag_mb': checkfloat(dat[15]), 'mag_ms': checkfloat(dat[18]),
+                     'mag_mw': checkfloat(dat[19]), 'mag_mwp': checkfloat(dat[21]),
                      'mag': checkfloat(dat[30]), 'magType': dat[28], \
                      'timestr': dat[10], 'description': dat[6], 'event_id':dat[11]} 
                      	
