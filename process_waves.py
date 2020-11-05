@@ -318,7 +318,7 @@ while continue_loop == True:
 
         # calculate magnitudes
         print(filename)
-        logA = np.log10(max(abs(watrim)))
+        logA = np.log10(max(abs(watrim[0])))
         calculate_magnitudes.main(filename, logA, rhyp, eqdep)
 
         # write output to file
