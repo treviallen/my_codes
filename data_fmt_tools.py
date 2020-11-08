@@ -870,9 +870,9 @@ def return_all_au_station_data():
     if getcwd().startswith('/nas'):
         au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks/AU/au_station_data.dat'
     else:
-        au_station_file = '/Users/trev/Documents/Networks/AU/au_station_data.dat'
+        au_station_file = '/Users/trev/Documents/Code/my_codes/au_station_data.dat'
     
-    lines = open(au_station_file).readlines()
+    lines = open(au_station_file).readlines()[1:]
     
     sta_dict = []
     
