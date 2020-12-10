@@ -933,12 +933,14 @@ def remove_low_sample_data(st):
         try:
             if tr.stats.channel.encode('ascii','ignore').startswith('L') \
                 or tr.stats.channel.encode('ascii','ignore').startswith('V') \
-                or tr.stats.channel.encode('ascii','ignore').startswith('U'):
+                or tr.stats.channel.encode('ascii','ignore').startswith('U') \
+                or tr.stats.channel.encode('ascii','ignore').startswith('C'):
                 st = st.remove(tr)
         except:
             if tr.stats.channel.startswith('L') \
                 or tr.stats.channel.startswith('V') \
-                or tr.stats.channel.startswith('U'):
+                or tr.stats.channel.startswith('U') \
+                or tr.stats.channel.startswith('C'):
                 st = st.remove(tr)
                 
     # now strip low sample data from stream
