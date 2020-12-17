@@ -62,19 +62,19 @@ def get_eq_params(evdate):
     
     try:
         # get earthquake latitude
-        var = raw_input('\n'+'Enter earthquake latitude (decimal degrees) > ')
+        var = input('\n'+'Enter earthquake latitude (decimal degrees) > ')
         eqla = float(var)
         
         # get earthquake latitude
-        var = raw_input('\n'+'Enter earthquake longitude (decimal degrees) > ')
+        var = input('\n'+'Enter earthquake longitude (decimal degrees) > ')
         eqlo = float(var)
         
         # get earthquake latitude
-        var = raw_input('\n'+'Enter earthquake depth (km) > ')
+        var = input('\n'+'Enter earthquake depth (km) > ')
         eqdep = float(var)
         
         # get earthquake latitude
-        var = raw_input('\n'+'Enter earthquake magnitude (MW) > ')
+        var = input('\n'+'Enter earthquake magnitude (MW) > ')
         eqmag = float(var)
     
     except:
@@ -158,7 +158,7 @@ def get_eq_distance(stlo, stla, evdate):
     # select from multiple events
     elif i > 0:
         print(str(i+1) + ') None')
-        var = raw_input('\n'+'Enter selection > ')
+        var = input('\n'+'Enter selection > ')
         seleq = int(var)
 
         # ask for user input
