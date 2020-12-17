@@ -868,7 +868,7 @@ def return_all_au_station_data():
     from os import getcwd
     
     if getcwd().startswith('/nas'):
-        au_station_file = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks/AU/au_station_data.dat'
+        au_station_file = '/nas/users/u56903/unix/Code/my_codes/au_station_data.dat'
     else:
         au_station_file = '/Users/trev/Documents/Code/my_codes/au_station_data.dat'
     
@@ -933,12 +933,14 @@ def remove_low_sample_data(st):
         try:
             if tr.stats.channel.encode('ascii','ignore').startswith('L') \
                 or tr.stats.channel.encode('ascii','ignore').startswith('V') \
-                or tr.stats.channel.encode('ascii','ignore').startswith('U'):
+                or tr.stats.channel.encode('ascii','ignore').startswith('U') \
+                or tr.stats.channel.encode('ascii','ignore').startswith('C'):
                 st = st.remove(tr)
         except:
             if tr.stats.channel.startswith('L') \
                 or tr.stats.channel.startswith('V') \
-                or tr.stats.channel.startswith('U'):
+                or tr.stats.channel.startswith('U') \
+                or tr.stats.channel.startswith('C'):
                 st = st.remove(tr)
                 
     # now strip low sample data from stream
