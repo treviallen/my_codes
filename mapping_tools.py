@@ -247,9 +247,9 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
                         m.plot(xx, yy, linewidth=lw, color=edgecolor, ls=ls, zorder=1)
                         label = 'null' # set to null after first plot
                 elif label == 'null':
-                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, zorder=20000)
+                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, zorder=zorder)
                 else:
-                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, label=label, zorder=20000)
+                    m.plot(xx, yy, linewidth=lw, color=edgecolor, linestyle=ls, label=label, zorder=zorder)
                     label = 'null' # set to null after first plot
             except:
                 print('Skipping polygon...')

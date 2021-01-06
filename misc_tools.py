@@ -332,6 +332,12 @@ def doy2ymd(yyyy, doy):
     
     return dt.strftime('%Y%m%d')
     
+def datetime2epochtime(Y,m,d,H,M,S):
+    from datetime import datetime
+    
+    print datetime(Y,m,d,H,M,S).strftime('%s')
+
+
 # time delta to days, hours, mins
 def timedelta2days_hours_minutes(td):
     return td.days, td.seconds//3600, (td.seconds//60)%60
@@ -616,3 +622,9 @@ def get_mpl2_colourlist():
     return ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
             '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
             '#bcbd22', '#17becf']
+            
+def get_ga_master_colours():
+    return ['#006983', '#a33f1f', '#72c7e7', '#5e6a71']
+    
+def get_ga_secondary_colours():
+    return ['#6e7645', '#ca7700', '#988642', '#a5d867', '#003145']
