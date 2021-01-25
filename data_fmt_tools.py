@@ -815,7 +815,10 @@ def get_stn_dataless_seed(network):
         
     # set dataless path
     if getcwd().startswith('/nas'):
-        dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.dataless'))
+        try:
+            dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.dataless'))
+        except:
+            dataless = Parser('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks/AU/AU_dataless.286690.dataless')
         
     return dataless
 
