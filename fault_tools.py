@@ -679,6 +679,18 @@ def lsr2mag_L14(lsr, ftype): # in km
     
     return m02mw(10**logM0)
 
+# for full rupture length   
+def mag2wid_L14(mw, ftype): # in MW - not sure if correct
+    # from Table 4
+    from numpy import log10, array
+    
+    if ftype == 'scrrs':
+        b = 2.5
+        a = 4.14
+        wid = 10**((mw - a) / b)
+    
+    return wid # in km
+
 '''do Clark et al (2014) - non-extended crust'''
 def srl2mag_Cea14(srl, reg):
     from numpy import log10

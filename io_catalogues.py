@@ -800,11 +800,12 @@ def parse_ga_event_query(gacsv):
                 
             except:
                 oidx = 24
-            
+            #print oidx
             try:
                 dateTime = dt.datetime.strptime(dat[oidx], '%Y-%m-%dT%H:%M:%S.%f')
             except:
                 dateTime = dt.datetime.strptime(dat[oidx], '%Y-%m-%dT%H:%M:%S')
+            #print(dateTime)
             
             # note - changed pref mag idx from 27 to 30
             tdict = {'datetime': dateTime, \

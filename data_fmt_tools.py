@@ -741,7 +741,7 @@ def get_nat_cwb_data(Y,m,d,H,M,td_start, td_end):
     st.write(msfile, format="MSEED") 
     print(st)
     
-def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
+def get_sta_cwb_data(Y,m,d,H,M, td_start, td_end, sta):
     '''
     origintime = tuple fmt (Y,m,d,H,M)
     td_start, td_end: time deltas in seconds
@@ -764,8 +764,6 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
     ##########################################################################
     dt = datetime.datetime(Y,m,d,H,M)
     
-    print(dt)
-    
     # convert datetime object to UTCdatetime
     dt = utcdatetime.UTCDateTime(dt)
     
@@ -784,11 +782,15 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
      #       st.merge(-1) #-1 method only merges overlapping or adjacent traces with same i            
     # Now sort the streams by station and channel
     st.sort()
+    
     # Cleanup duplicate traces returned by server
     for tr in st:
         if tr.stats['sampling_rate'] < 20:
             st.remove(tr)
         
+    # remove low-sample recs
+    st = remove_low_sample_data(st)
+    
     st.merge(0, fill_value='interpolate') #1 method only merges overlapping or adjacent traces with same id
     
     # Now sort the streams by station and channel
@@ -799,7 +801,7 @@ def get_sta_cwb_data(Y,m,d,H,M,td_start, td_end, sta):
         makedirs('cwb_dump')
         
     # set mseed filename
-    msfile = path.join('cwb_dump', dt.strftime('%Y-%m-%dT%H.%M')+ '.AU.' + sta + '.mseed')
+    msfile = path.join('cwb_dump', start_time.strftime('%Y-%m-%dT%H.%M')+ '.AU.' + sta + '.mseed')
     
     # now write streams for each event to mseed
     if len(st) > 0:
@@ -909,14 +911,18 @@ def return_sta_data(sta):
 
 # parses txt files downloaded from e.g.: http://ds.iris.edu/gmap/#network=AU&planet=earth
 def parse_iris_stationlist(stationlist):
+    from obspy import UTCDateTime
     lines = open(stationlist).readlines()[3:]
     
     staDict = []
     
     for line in lines:
         dat = line.strip().split('|')
+        start = UTCDateTime(dat[6]).datetime
+        stop  = UTCDateTime(dat[7]).datetime
         tmp = {'sta': dat[1], 'lat': float(dat[2]), 'lon': float(dat[3]), \
-               'elev': float(dat[4]), 'place': dat[5]}
+               'elev': float(dat[4]), 'place': dat[5], \
+               'starttime':start, 'stoptime':stop}
         staDict.append(tmp)
         
     return staDict
