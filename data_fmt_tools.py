@@ -901,6 +901,7 @@ def return_all_au_station_data():
 # get single station data
 def return_sta_data(sta):
     
+    sta = sta.encode('ascii', 'ignore')
     sta_dict = return_all_au_station_data()
     
     for sd in sta_dict:
