@@ -335,7 +335,7 @@ def doy2ymd(yyyy, doy):
 def datetime2epochtime(Y,m,d,H,M,S):
     from datetime import datetime
     
-    print datetime(Y,m,d,H,M,S).strftime('%s')
+    print(datetime(Y,m,d,H,M,S).strftime('%s'))
 
 
 # time delta to days, hours, mins

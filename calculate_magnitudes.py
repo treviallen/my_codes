@@ -146,6 +146,17 @@ def calc_HB87(comp, logA, rhyp):
     print(magstr)
 
     return HB87
+    
+def calc_HB87_IASPEI(comp, logA, rhyp):
+    logA0 = 1.11 * np.log10(rhyp) + 0.00189 * rhyp - 2.09
+    HB87_IASPEI = logA + logA0
+
+    magstr = 'HB87 IASPEI:\t' + str("%0.2f" % HB87_IASPEI)
+    if comp == 0: # if vertical
+        magstr = magstr + '*'
+    print(magstr)
+
+    return HB87_IASPEI
 
 # Bakun & Joyner (1984) - SoCal
 def calc_BJ84(comp, logA, rhyp):
