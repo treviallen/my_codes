@@ -641,7 +641,7 @@ def mag2len_L14(mw, ftype): # in MW - not sure if correct
         
         idx = rl > 2.5
         b = 2.5
-        a = 8.08
+        a = 8.077
         rl[idx] = 10**((logM0[idx] - a) / b) / 1000.
     
     return rl # in km
@@ -654,8 +654,12 @@ def len2mag_L14(rl, ftype): # in km
     rl *= 1000. # km2m
     
     if ftype == 'scrrs':
-        a = 6.382
-        b = 3.0
+        if rl <= 2500:
+            a = 6.382
+            b = 3.0
+        else: 
+            a = 8.077
+            b = 2.5
     
     logM0 = a + log10(rl) * b # in m0
     
@@ -679,6 +683,7 @@ def lsr2mag_L14(lsr, ftype): # in km
     
     return m02mw(10**logM0)
 
+'''
 # for full rupture length   
 def mag2wid_L14(mw, ftype): # in MW - not sure if correct
     # from Table 4
@@ -690,6 +695,20 @@ def mag2wid_L14(mw, ftype): # in MW - not sure if correct
         wid = 10**((mw - a) / b)
     
     return wid # in km
+'''
+def mag2wid_L14(mw, ftype): # in MW
+    # assume mw is a list
+    from mag_tools import mw2m0
+    from numpy import log10, array
+    
+    logM0 = log10(mw2m0(mw))
+    logM0 = array([logM0])
+    if ftype == 'scrrs':
+        b = 3.75
+        a = 3.84
+        rw = 10**((logM0 - a) / b) / 1000.
+            
+    return rw # in km
 
 '''do Clark et al (2014) - non-extended crust'''
 def srl2mag_Cea14(srl, reg):
