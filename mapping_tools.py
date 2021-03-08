@@ -301,12 +301,12 @@ def drawoneshapepoly(m, plt, sf, field, value, **kwargs):
 
     shapes = sf.shapes()
     recs = sf.records()
-    
-    
+
     # get field index
     findex = get_field_index(sf, field)
     #print('findex', findex)
-
+    
+    return_polys = []
     for i, shape in enumerate(shapes):
         #print('i', i)
         if recs[i][findex] == value:
@@ -351,10 +351,13 @@ def drawoneshapepoly(m, plt, sf, field, value, **kwargs):
                 if fillshape == True:
                     plt.fill(xx,yy,color=fillcol)
                 m.plot(xx, yy, linewidth=lw, color=linecol, linestyle=ls, zorder=1)
-    
+                
+                return_polys.append([x,y])
+                
                 x = []
                 y = []
-            
+    
+    return return_polys
     '''
     end of drawshapepoly
     '''
@@ -736,7 +739,7 @@ def km2deg(rngkm):
     return kilometer2degrees(rngkm, radius=6371.)
 
 # function to get linear profile of lat/lons    
-def get_distance_locs(lat1, lon1, lat2, lon2, npts):
+def get_profile_locs(lat1, lon1, lat2, lon2, npts):
     from mapping_tools import reckon, distance
     from numpy import array
     
@@ -772,6 +775,34 @@ def get_distance_locs(lat1, lon1, lat2, lon2, npts):
     
     return array(plons), array(plats)
 
+# function to evenly discretise random xy points
+def discretize_xy_profile(lons, lats, disckm, remainder=disckm):
+    '''
+    remainder is offset in km if first point is not equal to input points
+    '''
+    
+    discLon = []
+    discLat = []
+    #remainder = discLen
+    for poly in flolas:
+        for i in range(1, len(poly[0])):
+            # get dist from point 1 to point 2
+            rng, az, baz = distance(lats[i-1], lons[i-1], lats[i], lons[i])
+            
+            lens = arange(disckm-remainder, rng, disckm)
+            
+            # get xy locs for lens
+            if len(lens) > 0:
+                for l in lens:
+                    discPos = reckon(lats[i-1], lons[i-1], l, az)
+                    discLon.append(discPos[0])
+                    discLat.append(discPos[1])
+                    
+                remainder = rng - lens[-1]
+            else:
+                remainder += rng
+                
+    return discLon, discLat
 
 # generates a vector of distance, azimuth & back azimuth using "distance"
 # returns rngkm (km), az, baz (degrees)
