@@ -783,6 +783,7 @@ def discretize_xy_profile(lons, lats, disckm, remainder=disckm):
     
     discLon = []
     discLat = []
+    discAzm = []
     #remainder = discLen
     for poly in flolas:
         for i in range(1, len(poly[0])):
@@ -797,12 +798,46 @@ def discretize_xy_profile(lons, lats, disckm, remainder=disckm):
                     discPos = reckon(lats[i-1], lons[i-1], l, az)
                     discLon.append(discPos[0])
                     discLat.append(discPos[1])
+                    discAzm.append(az)
                     
                 remainder = rng - lens[-1]
             else:
                 remainder += rng
                 
-    return discLon, discLat
+    return discLon, discLat, discAzm
+
+# add dip direction along faults with non-uniform xy coords
+def map_fault_dip_dirn(m, plt, lons, lats, disckm, trikm, triScale=1.0, remainder=disckm, fc='k', ec='none', lw=0.5):
+    '''
+    trikm = length of equilateral triangle
+    triScale = vertical scaling for triangle
+    disckm = separation of points along line
+    remainder = offset in km if first point is not equal to first input points
+    '''
+    from mapping_tools import distance, reckon, discretize_xy_profile
+    from numpy import sqrt
+    
+    halfTrikm = trikm / 2.
+    
+    discLon, discLat, discAzm = discretize_xy_profile(lons, lats, disckm, remainder=disckm)
+    
+    # now, at each point, make dip triangle
+    for dlo, dla, daz in zip(discLon, discLat, discAzm):
+        # pt1
+        triLons = [reckon(dla, dlo, halfTrikm, daz)[0]]
+        triLats = [reckon(dla, dlo, halfTrikm, daz)[1]]
+        
+        # pt2
+        triLons.append(reckon(dla, dlo, halfTrikm, daz+180)[0])
+        triLats.append(reckon(dla, dlo, halfTrikm, daz+180)[1])
+        
+        # pt3 - assum equilateral triange
+        triHeight = triScale * sqrt(trikm**2 - halfTrikm**2)
+        triLons.append(reckon(dla, dlo, triHeight, daz-90)[0])
+        triLats.append(reckon(dla, dlo, triHeight, daz-90)[1])
+    
+        xx, yy = m(triLons, triLats)
+        plt.fill(xx,yy, facecolor=fc, edgecolor=ec, linewidth=lw, alpha=1)
 
 # generates a vector of distance, azimuth & back azimuth using "distance"
 # returns rngkm (km), az, baz (degrees)
