@@ -182,7 +182,8 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
                 polyline = kwargs[key]
     
     shapes = sf.shapes()
-
+    
+    return_polys = []
     for i, shape in enumerate(shapes):
         newfill = True
         # get colour
@@ -254,9 +255,13 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
             except:
                 print('Skipping polygon...')
 
+            return_polys.append([x,y])
+                
             x = []
             y = []
             
+    return return_polys
+    
     '''
     end of drawshapepoly
     '''
@@ -776,38 +781,44 @@ def get_profile_locs(lat1, lon1, lat2, lon2, npts):
     return array(plons), array(plats)
 
 # function to evenly discretise random xy points
-def discretize_xy_profile(lons, lats, disckm, remainder=disckm):
+def discretize_xy_profile(lons, lats, disckm, remainder=0.0):
     '''
     remainder is offset in km if first point is not equal to input points
     '''
+    from numpy import arange
     
+    # set remainder to disckm
+    if remainder == 0.0:
+        remainder = disckm
+        
     discLon = []
     discLat = []
     discAzm = []
+    
     #remainder = discLen
-    for poly in flolas:
-        for i in range(1, len(poly[0])):
-            # get dist from point 1 to point 2
-            rng, az, baz = distance(lats[i-1], lons[i-1], lats[i], lons[i])
-            
-            lens = arange(disckm-remainder, rng, disckm)
-            
-            # get xy locs for lens
-            if len(lens) > 0:
-                for l in lens:
-                    discPos = reckon(lats[i-1], lons[i-1], l, az)
-                    discLon.append(discPos[0])
-                    discLat.append(discPos[1])
-                    discAzm.append(az)
-                    
-                remainder = rng - lens[-1]
-            else:
-                remainder += rng
+    for i in range(1, len(lons)):
+        # get dist from point 1 to point 2
+        rng, az, baz = distance(lats[i-1], lons[i-1], lats[i], lons[i])
+        
+        lens = arange(disckm-remainder, rng, disckm)
+        
+        # get xy locs for lens
+        if len(lens) > 0:
+            for l in lens:
+                discPos = reckon(lats[i-1], lons[i-1], l, az)
+                discLon.append(discPos[0])
+                discLat.append(discPos[1])
+                discAzm.append(az)
                 
+            remainder = rng - lens[-1]
+        else:
+            remainder += rng
+            
     return discLon, discLat, discAzm
 
 # add dip direction along faults with non-uniform xy coords
-def map_fault_dip_dirn(m, plt, lons, lats, disckm, trikm, triScale=1.0, remainder=disckm, fc='k', ec='none', lw=0.5):
+def map_fault_dip_dirn(m, plt, lons, lats, disckm, trikm, triScale=1.0, remainder=0.0, \
+                       fc='k', ec='none', lw=0.5, invArrow=False):
     '''
     trikm = length of equilateral triangle
     triScale = vertical scaling for triangle
@@ -819,7 +830,14 @@ def map_fault_dip_dirn(m, plt, lons, lats, disckm, trikm, triScale=1.0, remainde
     
     halfTrikm = trikm / 2.
     
-    discLon, discLat, discAzm = discretize_xy_profile(lons, lats, disckm, remainder=disckm)
+    # set orientation
+    print('invArrow', invArrow)
+    if invArrow == False:
+        arrowDirn = 90.
+    else:
+        arrowDirn = -90.
+        
+    discLon, discLat, discAzm = discretize_xy_profile(lons, lats, disckm, remainder=remainder)
     
     # now, at each point, make dip triangle
     for dlo, dla, daz in zip(discLon, discLat, discAzm):
@@ -833,8 +851,8 @@ def map_fault_dip_dirn(m, plt, lons, lats, disckm, trikm, triScale=1.0, remainde
         
         # pt3 - assum equilateral triange
         triHeight = triScale * sqrt(trikm**2 - halfTrikm**2)
-        triLons.append(reckon(dla, dlo, triHeight, daz-90)[0])
-        triLats.append(reckon(dla, dlo, triHeight, daz-90)[1])
+        triLons.append(reckon(dla, dlo, triHeight, daz-arrowDirn)[0])
+        triLats.append(reckon(dla, dlo, triHeight, daz-arrowDirn)[1])
     
         xx, yy = m(triLons, triLats)
         plt.fill(xx,yy, facecolor=fc, edgecolor=ec, linewidth=lw, alpha=1)
