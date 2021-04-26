@@ -9,9 +9,9 @@ def quadratic_vertex(x, y, vertex):
 
     def fit_quadratic_vertex(c, x):
     
-        xx = x - vertex
+        ans = -1*abs(c[0]) * (x-vertex)**2 + c[1]
         
-        return c[0] * xx**2 + c[1]
+        return ans
     
     c0*(x-vertex)**2 + c1
     

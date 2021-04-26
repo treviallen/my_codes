@@ -1190,7 +1190,8 @@ def get_cummulative_stats(A0, bval, mc, curvetype, mrange, n_char_mag, name, **k
         cumrate.append(sum(mrate[k:]))
         if  mw >= mmin and mw <= mx:
             if model == 'WC94':
-                slip_per_mag.append(mag2disp_WC94(mw, 'ss') * 1000 * mrate[k])
+                #print(mw)
+                slip_per_mag.append(mag2disp_WC94(mw, 'ss')[0] * 1000 * mrate[k])
             elif model == 'L10':
                 slip_per_mag.append(mag2disp_L10(mw, 'ss') * 1000 * mrate[k])
         k += 1
