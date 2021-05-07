@@ -104,9 +104,10 @@ def parse_oq_xml_poes(xmlfile):
     
     return calcDetails, calcDat
 
-def get_nsha12_hazard_curve(lon, lat, spectral_period):
+def get_nsha12_hazard_curve(lon, lat, spectral_period, prefix):
     '''
     spectral_periods: list of strings, i.e. '0.0', '0.2'
+    prefix: for filename
     
     '''
     from os import path, system
@@ -160,6 +161,13 @@ def get_nsha12_hazard_curve(lon, lat, spectral_period):
         except:
             print('File not found:', grdpath)
             
+    if len(return_period_nums) > 0:
+        txt = 'RETURN_PERIOD,PCT_50YRS,HAZARD(G)\n'
+        for haz, ex, rp in zip(hazArray, exceedances, return_period_nums):
+            txt += ','.join((str('%0.0f' % rp), str('%0.2f' % ex), str('%0.5f' % haz)))+'\n'
+        f = open('_'.join(('NSHM12', spectral_period, prefix+'.csv')), 'wb')
+        f.write(txt)
+        f.close()
         
     return array(hazArray), array(return_period_nums), array(exceedances)
 
