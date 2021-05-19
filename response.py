@@ -134,6 +134,18 @@ def read_pazfile(in_pazfile):
 
     return poles, zeros, constant, normf
 
+# returns normalisation factor from lists of poles & zeros
+def normfact_from_paz(p, z):
+    '''
+    p = list of poles in rad-sec in real+imagj fmt, eg: [-0.01234+0.01234j, -0.01234-0.01234j, -39.1800+49.1200j, -39.1800-49.1200j]
+    z = list of zeros in rad-sec, eg: [0.,0.,0.]
+    '''
+    
+    import scipy.signal as signal
+    
+    print(signal.ltisys.zpk2tf(z, p, 1.))
+    return signal.ltisys.zpk2tf(z, p, 1.)[1][2]
+
 # this function leads the user to input station information
 def enter_response_info(sta, chan, sps):
     print('\nEnter site information for ' + sta + ' ' + chan)
