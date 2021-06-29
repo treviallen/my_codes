@@ -233,6 +233,7 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
     from openquake.hazardlib.gsim.megawati_pan_2010 import MegawatiPan2010
     from openquake.hazardlib.gsim.zhao_2016 import ZhaoEtAl2016SSlab #, ZhaoEtAl2006SSlabCascadia 
+    from openquake.hazardlib.gsim.kuehn_2020 import KuehnEtAl2020SSlab
     from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, sqrt, log, exp
@@ -292,6 +293,9 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = ZhaoEtAl2016SSlab()
     Zea16imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    gmpe = KuehnEtAl2020SSlab()
+    Kea20imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
 
     # prepare Atkinson & Adams 2013
     #repi = sqrt(rrup**2 - dep**2)
@@ -299,7 +303,7 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
     #return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06CISimt, MP10imt, Aea15imt #, Zea16imt #, AA13imt #, Aea15imt, Zea06CISimt, 
     print('Zea06CIS not working')
-    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06imt, MP10imt, Aea15imt, Zea16imt
+    return Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06imt, MP10imt, Aea15imt, Zea16imt, Kea20imt
     #Yea97imt, AB03imt, AB03CISimt, Gea05imt, Zea06imt, Zea06imt, MP10imt, Aea15imt
 
 # calls and calculates candidate interface GMPEs - values returned in ln(g)
@@ -388,6 +392,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.toro_2002 import ToroEtAl2002
     from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
     from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
+    from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006Modified2011
     from openquake.hazardlib.gsim.chiou_youngs_2008 import ChiouYoungs2008
     from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009NonCratonic
     from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009YilgarnCraton
@@ -440,6 +445,9 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = AtkinsonBoore2006()
     AB06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    gmpe = AtkinsonBoore2006Modified2011()
+    AB11imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
     #gmpe = ChiouYoungs2008()
     #CY08imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
@@ -471,7 +479,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #AA13imt = []
 
     #return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
-    return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt #, SP16imt # AA13imt, CY08imt, 
+    return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt #, SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
@@ -690,6 +698,9 @@ def bssa_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
         
     return Bea14imt
+
+#def return_weighted_gmm_distance(gmm_imt_list, gmm_weight_list):
+
 
 # reads sa data files and returns period (T) and acceleration (SA) vectors
 def read_sa(safile):

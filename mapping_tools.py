@@ -566,7 +566,41 @@ def return_map_shape_points(m, shpfile):
     x, y = m(shplon, shplat)
     
     return x, y
-
+    
+def xy2shp(xycsv, headerlines=1, lola=True):
+   '''
+   lola = order of coords - True if lon/lat
+   '''
+   import shapefile
+   from numpy import array, hstack
+   
+   lines = open(xycsv).readlines()
+   
+   # get WA polygons
+   lons = []
+   lats = []
+   for line in lines[headerlines:]:
+       if lola==True:
+           lons.append(float(line.split(',')[0]))
+           lats.append(float(line.split(',')[1]))
+       else:
+           lons.append(float(line.split(',')[1]))
+           lats.append(float(line.split(',')[0]))
+   
+   lats = array(lats).reshape(len(lons),1) 
+   lons = array(lons).reshape(len(lons),1) 
+   
+   # write shapefile
+   w = shapefile.Writer(xycsv.split('.')[0]+'.shp', shapeType=5)
+   
+   #w.field(xycsv.split('.')[0],'C','5')
+   
+   xy = [hstack((lons, lats)).tolist()]
+   w.poly(xy)
+   #w.record('1')
+   
+   w.close()
+   
 # Add background to text to highlight
 def addTextOutline(textHandle, lineWidth, backColour):
     '''
