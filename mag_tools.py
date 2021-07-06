@@ -157,4 +157,40 @@ def ghasemi_bl_ms2mw(ms):
     
     return c1 * mb + c2
 
+def get_au_ml_zone(eqlos, eqlas):
+    '''
+    eqlos & eqlas are a list of lats/lons
     
+    returns list of regions
+    '''
+    
+    import shapefile
+    from shapely.geometry import Point, Polygon
+    from mapping_tools import get_field_data
+    from os import getcwd
+    from numpy import array
+    
+    if getcwd().startswith('/nas'):
+        shpfile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Magnitudes/NEAC/australia_ml_regions.shp'
+    
+    sf = shapefile.Reader(shpfile)
+    shapes = sf.shapes()
+    polygons = []
+    for poly in shapes:
+        polygons.append(Polygon(poly.points))
+        
+    ml_reg = get_field_data(sf, 'ML_REGION', 'str')
+    
+    # loop thru events and polygons
+    eq_region = []
+    for lo, la in zip(eqlos, eqlas):
+        zone = ''
+            
+        for poly, reg in zip(polygons, ml_reg):
+            pt = Point(lo, la)
+            if pt.within(poly):
+                zone = reg
+                
+        eq_region.append(zone)
+            
+    return array(eq_region)
