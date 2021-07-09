@@ -867,7 +867,18 @@ def get_station_distance(st, dataless, eqlo, eqla):
         azim.append(distance(eqla, eqlo, staloc['latitude'], staloc['longitude'])[1])
                
     return stalocs, array(stations), array(channel), array(repi), array(azim)
+
+def get_station_distance_stadat(sta, eqlo, eqla): 
+    from data_fmt_tools import return_sta_data
+    from mapping_tools import distance
     
+    sta_data = return_sta_data(sta)
+    
+    distkm = distance(eqla, eqlo, sta_data['stla'], sta_data['stlo'])[0]
+    azim = distance(eqla, eqlo, sta_data['stla'], sta_data['stlo'])[1]
+    
+    return distkm, azim
+   
 def return_all_au_station_data():
     from datetime import datetime
     from os import getcwd
