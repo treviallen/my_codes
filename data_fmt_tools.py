@@ -1,3 +1,31 @@
+def fix_stream_network(mseedfile, new_network):
+    from obspy import read
+    
+    st = read(mseedfile)
+    
+    # loop thru traces
+    for tr in st:
+        tr.stats['network'] = new_network
+    
+    # overwrite mseed
+    st.write(mseedfile, format="MSEED")
+
+def fix_stream_channels(mseedfile):
+    from obspy import read
+    
+    st = read(mseedfile)
+    
+    # loop thru traces
+    for tr in st:
+        if tr.stats['channel'].startswith('EL'):
+            tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
+        
+        elif tr.stats['channel'].startswith('EN'):
+            tr.stats['channel'] = 'HN' + tr.stats['channel'][-1]
+    
+    # overwrite mseed
+    st.write(mseedfile, format="MSEED")
+
 # converts css to mseed
 def css2mseed(cssfile, mseedpath):
     '''
