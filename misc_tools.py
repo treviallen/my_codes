@@ -20,6 +20,12 @@ def dictlist2array(dictList, key):
         
     return array(flatList)
 
+# check if key exists in dict
+def check_key_exists(dict, key):
+    if key in dict.keys():
+        return True
+    else:
+        return False
 
 # returns unknown int value from a string
 def getintval(line,start,stop):
