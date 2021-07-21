@@ -808,6 +808,7 @@ def parse_ga_event_query(gacsv):
             #print(dateTime)
             
             # note - changed pref mag idx from 27 to 30; - changing magtyp idx from 28-31
+            # auth added for edited file as last col, so shouldn't throw error
             tdict = {'datetime': dateTime, \
                      'year': dateTime.year, 'month': dateTime.month, \
                      'day': dateTime.day, 'hour': dateTime.hour, \
@@ -816,7 +817,7 @@ def parse_ga_event_query(gacsv):
                      'dep': float(dat[4]), 'mag_ml': checkfloat(dat[17]), \
                      'mag_mb': checkfloat(dat[15]), 'mag_ms': checkfloat(dat[18]),
                      'mag_mw': checkfloat(dat[19]), 'mag_mwp': checkfloat(dat[21]),
-                     'mag': checkfloat(dat[30]), 'magType': dat[31], \
+                     'mag': checkfloat(dat[30]), 'magType': dat[31], 'auth':dat[-1],
                      'timestr': dat[10], 'description': dat[6], 'event_id':dat[11]} 
                      	
             evdict.append(tdict)
