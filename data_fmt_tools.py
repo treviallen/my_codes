@@ -1,15 +1,3 @@
-def fix_stream_network(mseedfile, new_network):
-    from obspy import read
-    
-    st = read(mseedfile)
-    
-    # loop thru traces
-    for tr in st:
-        tr.stats['network'] = new_network
-    
-    # overwrite mseed
-    st.write(mseedfile, format="MSEED")
-
 def fix_stream_channels(mseedfile):
     from obspy import read
     
@@ -17,7 +5,7 @@ def fix_stream_channels(mseedfile):
     
     # loop thru traces
     for tr in st:
-        if tr.stats['channel'].startswith('EL'):
+        if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY'):
             tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
         
         elif tr.stats['channel'].startswith('EN'):
@@ -26,6 +14,20 @@ def fix_stream_channels(mseedfile):
     # overwrite mseed
     st.write(mseedfile, format="MSEED")
 
+def fix_stream_network(mseedfile, newnet):
+    '''
+    newnet = new two letter code, e.g. 'AU'
+    '''
+    from obspy import read
+    
+    st = read(mseedfile)
+    
+    # loop thru traces
+    for tr in st:
+        tr.stats['network'] = newnet
+    
+    # overwrite mseed
+    st.write(mseedfile, format="MSEED")
 # converts css to mseed
 def css2mseed(cssfile, mseedpath):
     '''
@@ -251,7 +253,7 @@ def append_seed(mseedfiles, outfile):
     st.write(outfile, format='MSEED')
 
 # function to merge data files from the ausarray deployment
-def merge_ausarray_data(folder):       
+def merge_ausarray_channels(folder):       
     from obspy import read
     from misc_tools import listdir_extension
     from sys import argv
@@ -272,10 +274,12 @@ def merge_ausarray_data(folder):
             
             # write to file
             tr = st[0]
+            
             mseed = path.join('mseed', \
                                '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
                                tr.stats['network'], tr.stats['station'], 'mseed')))
             #mseed = path.join('mseed', f.replace('HHE','mseed'))
+            print('Writing: '+mseed)
             st.write(mseed, format="MSEED")
             
         except:

@@ -709,6 +709,14 @@ def mag2wid_L14(mw, ftype): # in MW
         rw = 10**((logM0 - a) / b) / 1000.
             
     return rw # in km
+	
+def mag2area_L14(mw, ftype): # in MW
+    if ftype == 'scrrs':
+        # coeffs from Table 4
+        b = 1.0
+        a = 4.19
+            
+    return 10**((mw - a) / b) # in km**2
 
 '''do Clark et al (2014) - non-extended crust'''
 def srl2mag_Cea14(srl, reg):
