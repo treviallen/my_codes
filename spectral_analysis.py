@@ -229,6 +229,7 @@ def get_cor_velocity(corfftr, corffti, freq, inst_ty):
     pgv = max(abs(ivel.real))
     
     return pgv, ivel
+   
 
 
 # this function prepares data for the response spectral calculation
