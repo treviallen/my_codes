@@ -73,7 +73,9 @@ def nsha18_fixed_bilin_mw2ml(mw):
         ml_bl = hx_bl + (mw - hy_bl) / c_bl
         
     return ml_bl, sig
-
+    
+def nsha18_mb2mw(mb):
+    return 1.20 * mb - 1.176
 
 # from Mueller (pers comm) - from Sipkin SRL 2003
 def sipkin_mb2mw(mb):
