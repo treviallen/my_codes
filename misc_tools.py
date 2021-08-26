@@ -254,6 +254,37 @@ def get_binned_stats_meanx(bins, xdat, yres):
 
     return array(medres)[idx], array(stdres)[idx], array(meanx)[idx], bins[idx], array(nperbin)[idx]
 
+def trimmed_lin_reg(x, y, nstd = 2):
+    from scipy.stats import linregress
+    from numpy import nanstd, nan, isnan, where
+    
+    nidx = where(isnan(y) == False)[0]
+    init_fit = linregress(x[nidx], y[nidx])
+    init_slope = init_fit[0]
+    init_inter = init_fit[1]
+    
+    # do trimmed lin reg
+    mod_pred = init_inter + init_slope * x
+    mod_res = y - mod_pred
+    mod_std = nanstd(mod_res)
+    
+    # remove vals outside nstd
+    idx = where(abs(mod_res) <= nstd * mod_std)[0]
+    
+    # re-regress
+    if len(idx) > 0:
+       lts_fit = linregress(x[idx], y[idx])
+       lts_slope = lts_fit[0]
+       lts_inter = lts_fit[1]
+       lts_rval = lts_fit[2]
+       
+    else:
+       lts_slope = nan
+       lts_inter = nan
+       lts_rval  = nan
+       
+    # return fit and data
+    return lts_slope, lts_inter, lts_rval, x[idx], y[idx]
 
 # get weighted std, from http://stackoverflow.com/questions/2413522/weighted-standard-deviation-in-numpy
 def weighted_avg_and_std(values, weights):
