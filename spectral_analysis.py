@@ -202,7 +202,6 @@ def calc_fft(data, sps):
         
         # get frequencies
         freq = np.fft.fftfreq(n, d=1./sps)
-        
     except:
         n = len(data[0])
         
@@ -210,7 +209,6 @@ def calc_fft(data, sps):
         wavfft = np.fft.fft(data[0],n)
         
         freq = freq.reshape(1,n)
-        
     return freq, wavfft
 
 # return instrument corrected velocity
@@ -221,6 +219,7 @@ def get_cor_velocity(corfftr, corffti, freq, inst_ty):
     complex_array = corfftr + 1j*corffti
     
     if inst_ty == 'N': # if accelerometer
+        print('Acceleration Record')
         complex_array[1:] = complex_array[1:] / (2 * np.pi * abs(freq[1:]))
         complex_array[0] = 0 + 1j*0
         
