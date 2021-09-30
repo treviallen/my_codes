@@ -7,6 +7,20 @@ Created on Wed Apr 24 12:29:06 2013
 
 @author: tallen
 """
+# parses output from grdinfo -L2
+def get_grdinfo_stats(grdinfofile):
+    # parse output
+    lines = open(grdinfofile).readlines()
+    for line in lines:
+        
+        if line.strip().endswith('set to NaN'):
+            nan_nodes = int(line.strip().split()[1])
+        if line.split()[1].startswith('x_min'):
+            x_cols = int(line.strip().split()[-1])
+        if line.strip().split()[1].startswith('y_min'):
+            y_rows = int(line.strip().split()[-1])
+        
+    return nan_nodes, x_cols, y_rows
 
 def get_grd_extent(**kwargs):
     from scipy.io.netcdf import netcdf_file
@@ -62,7 +76,7 @@ def gmt_grdtrack(lon, lat, grdfile):
     f.close()
     
     # call grdtrack
-    system('gmt grdtrack lonlat.txt -G' + grdfile + ' > lonlatzval.txt')
+    system('gmt grdtrack lonlat.txt -G' + grdfile + ' > lonlatzval.txt') # may need to run "gmt5 grdtrack" on mac
     
     # get zval from file
     zline = open('lonlatzval.txt').readline()
@@ -533,6 +547,58 @@ def shp2gmt(shpfile, outfile, **kwargs):
                 while p <= parts[part+1]:
                     pt_str = pt_str + str("%0.5f" % shapes[k].points[::-1][p][0])+"\t" \
                          +str("%0.5f" % shapes[k].points[::-1][p][1])+"\n"    # kluge to reverse points
+                    p += 1
+
+                all_str = all_str + pt_str
+                tmpfile.write(all_str)
+
+    print('Writing to file...')
+
+    tmpfile.close()
+    
+# converts shp polygons or lines to GMT-friendly file for interpolation
+def shp2xyz(shpfile, outfile, zfield):
+    '''
+    kwargs decides what to to with the following header:
+        header="none"
+        header="num", field="field name"
+        header="str", field="field name"
+    '''
+
+    import shapefile
+    from mapping_tools import get_field_data
+
+    print('Reading shapefile...')
+    sf = shapefile.Reader(shpfile)
+    shapes = sf.shapes()
+    records = sf.records()
+    zdata = get_field_data(sf, zfield, 'float')
+    nrec = len(records)
+    
+    # now make output text file
+    # first overwrite
+    f = open(outfile,'w')
+    f.close()
+    all_str = ''
+
+    tmpfile = open(outfile,'a')
+    # loop through polygons
+    for k in range(0,nrec):
+    # write polygon to temp file
+    
+        # check to see if shape has multiple parts
+        p = 0
+        if len(shapes[k].points) != 0:
+            parts = shapes[k].parts
+            parts.append(len(shapes[k].points)-1)
+            for part in range(0,len(parts)-1):
+                pt_str = ''
+                all_str = ''
+                
+                while p <= parts[part+1]:
+                    pt_str = pt_str + str("%0.5f" % shapes[k].points[::-1][p][0])+"\t" \
+                         +str("%0.5f" % shapes[k].points[::-1][p][1])+"\t" \
+                         	+str("%0.5f" % zdata[k])+"\n"    # kluge to reverse points
                     p += 1
 
                 all_str = all_str + pt_str

@@ -1334,7 +1334,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         pltbuffer = 0.175
         txtoff = 0.03
     elif lonrng >= 6:
-        pltbuffer = 0.7
+        pltbuffer = 0.45
         txtoff = 0.1
     #print(pltbuffer
     
@@ -1383,7 +1383,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
             print(pltloc[si])
             
             for clol, clal in zip(clonList, clatList):
-                if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (3.*pltbuffer):
+                if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (4.*pltbuffer):
                     #print(pltloc[si]
                     pltCity = False
                     

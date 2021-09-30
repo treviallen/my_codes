@@ -407,6 +407,22 @@ def listdir_extension(folder, extension):
     files.append([each for each in listdir(folder) if each.endswith('.'+extension)])
     
     return files[0]
+    
+def get_folder_list(infolder):
+    from os import path, listdir
+    
+    # get all objects in folder
+    objects = listdir(infolder)
+    
+    # now, check which of the objects is a directory
+    folder_list = []
+    for obj in objects:
+        obj_path = path.join(infolder, obj)
+        
+        if path.isdir(obj_path):
+            folder_list.append(obj)
+            
+    return folder_list 
 
 # list files with a common file prefix
 def listdir_file_prefix(folder, file_prefix):
@@ -665,3 +681,6 @@ def get_ga_master_colours():
     
 def get_ga_secondary_colours():
     return ['#6e7645', '#ca7700', '#988642', '#a5d867', '#003145']
+    
+def get_line_styles():
+    return ['-', '--', '-.', (0, (3, 5, 1, 5, 1, 5)), (0, (3, 1, 1, 1, 1, 1)), (0, (3, 5, 1, 5))]

@@ -5,7 +5,8 @@ def fix_stream_channels(mseedfile):
     
     # loop thru traces
     for tr in st:
-        if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY'):
+        if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY') \
+        or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('HH'):
             tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
         
         elif tr.stats['channel'].startswith('EN'):

@@ -88,11 +88,37 @@ def parse_dataxml(datxml):
     griddata = fromstring(dataStr.strip(), sep=' ')
     rows = int(len(griddata) / fields['cols'])
     newshape = (rows, fields['cols'])
-    print(rows, fields['cols'], newshape)
+    #print(rows, fields['cols'], newshape)
     griddata = griddata.reshape(newshape)
 
     return event, gridspec, fields, griddata
 
+# convert grid.xml to netcdf
+def gridxml2grd(xmlfile):
+    from numpy import hstack, savetxt
+    
+    event, gridspec, fields, griddata = parse_dataxml(xmlfile)
+    
+    # write to txt file
+    sm_lons = griddata[:,0]
+    sm_lats = griddata[:,1]
+    sm_pgas = griddata[:,3]
+    	
+    lons = lons.reshape(len(lons), 1)
+    lats = lats.reshape(len(lats), 1)
+    pgas = pgas.reshape(len(pgas), 1)
+    
+    data = hstack((lons, lats, pgas))
+    
+    savetxt('grid.txt', data, fmt='%.4e', delimiter=' ')
+    
+    R = ' -R' + '/'.join((str(gridspec['lon_min']), str(gridspec['lon_max']), \
+                         str(gridspec['lat_min']), str(gridspec['lat_max'])))
+    
+    I = ' -I' + str(gridspec['nominal_lon_spacing'])
+    
+    system('gmt5 xyz2grd grid.txt -Gpga.grd' + I + R)
+    
 # parse data dat xml
 def parse_gridxml(datxml):
     import xml.etree.ElementTree as e
