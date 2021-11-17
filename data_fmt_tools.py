@@ -9,7 +9,7 @@ def fix_stream_channels(mseedfile):
         or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('HH'):
             tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
         
-        elif tr.stats['channel'].startswith('EN'):
+        elif tr.stats['channel'].startswith('EN') or tr.stats['channel'].startswith('DN'):
             tr.stats['channel'] = 'HN' + tr.stats['channel'][-1]
     
     # overwrite mseed
@@ -1077,38 +1077,47 @@ def reformat_trace_mpl_labels(ax):
     return ticklabels
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
+# parse gmprocess flatfile
+def parse_gmprocess_flatfile(flatfile):
+    from numpy import array
+    
+    lines = open(flatfile).readlines()
+    
+    # get header
+    header = lines[0].split(',')
+    
+    # get periods
+    per = []
+    for key in header:
+        if key.startswith('SA('):
+            per.append(float(key.strip('SA(').strip(')')))
+    
+    per = array(per)
+    
+    recs = []
+    # now loop thru recs
+    for line in lines[1:]:
+        rec = dict.fromkeys(header, 0)
         
+        keys = rec.keys()
+        
+        dat = line.split(',')
+        sa = []
+        for i, key in enumerate(keys):
+            if key == 'PGA' or key == 'PGV':
+                rec[key] = float(dat[i])
+            else:
+                rec[key] = dat[i]
+            
+            if key.startswith('SA('):
+                sa.append(float(dat[i]))
+        
+        sa = array(sa)
+        rec['per'] = per
+        rec['sa'] = sa
+        
+        # make list
+        recs.append(rec)    
+        
+    return recs

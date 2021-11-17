@@ -193,7 +193,6 @@ def readeqwave(wavfile):
     # assume no BB
     i = 0
     for comp in comps:
-        
         if comp.startswith('EH') or comp.startswith('v') or comp.startswith('EL') or comp.endswith(' t') \
            or comp.endswith(' T') or comp.endswith(' T 5') or comp.startswith('SP') \
            or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03') \
@@ -204,7 +203,7 @@ def readeqwave(wavfile):
         
         elif comp.find('Acc') >= 0 or comp.endswith(' a') >= 0 or comp.find(' A ') >= 0 \
            or comp.find('c04') >= 0 or comp.find('c05') >= 0 or comp.find('c06') >= 0 \
-           or comp.find('HNZ') >= 0 or comp.find('HNE') >= 0 or comp.find('HNN') >= 0:
+           or comp.startswith('HN'):
             it = 'N'
             g = 'H'
             
@@ -230,12 +229,14 @@ def readeqwave(wavfile):
         elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.find('East') >= 0 \
             or comp.find('E Tran') >= 0 or comp.find('E ') >= 0 or comp.find('X ') >= 0 \
             or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0 \
-            or comp.find('EHE') >= 0 or comp.startswith('c01') or comp.startswith('BNE'):
+            or comp.find('EHE') >= 0 or comp.startswith('c01') or comp.startswith('BNE') \
+            or comp.startswith('HN1'):
              o = 'E'
         elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.find('North') >= 0 \
             or comp.find('N Tran') >= 0 or comp.find('N ') >= 0 or comp.find('Y ') >= 0 \
             or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0 \
-            or comp.find('EHN') >= 0 or comp.startswith('c02') or comp.startswith('BNN'):
+            or comp.find('EHN') >= 0 or comp.startswith('c02') or comp.startswith('BNN') \
+            or comp.startswith('HN2'):
              o = 'N'
         else:
              o = 'U' # Unknown
@@ -675,6 +676,14 @@ def readseed(st):
                 o = 'N'
                 it = 'H'
                 numtrue = True
+            if tr.stats['channel'] == 'HN1':
+                o = 'H'
+                it = 'N'
+                numtrue = True
+            if tr.stats['channel'] == 'HN2':
+                o = 'H'
+                it = 'N'
+                numtrue = True
             elif tr.stats['channel'] == '003' or tr.stats['channel'] == '006' or tr.stats['channel'] == 'HLZ':
                 o = 'Z'
                 numtrue = True
@@ -690,7 +699,7 @@ def readseed(st):
                     g = 'S'
                 
             if numtrue == True:
-                if int(tr.stats['channel'][2]) > 3:
+                if int(tr.stats['channel'][2]) > 3 or tr.stats['channel'][1] == 'N':
                     it = 'N'
                 else:
                     it = 'H'

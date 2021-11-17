@@ -70,7 +70,7 @@ def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sa
     #print(len(alldata[:,17])
     # select component
     chan, chan_no = readwaves.select_channel(allsta, comps)
-
+    
     # unify kelunji channel names
 #    tmpchan = chan.split(' Trans')
 #    chan = ''
@@ -247,7 +247,7 @@ while continue_loop == True:
                 chan_no, chan_dat, stlo, stla, pazfile, alldata, netid = \
                 common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed)
 
-        print(chan)
+        print(chan, inst_ty)
         # do common fft functions
         chan_dat = chan_dat[0]
         freq, lofreq, hifreq, wavfft, dt = common_fft(chan_dat, inst_ty, sps, seltask)
@@ -294,7 +294,7 @@ while continue_loop == True:
 
         # prepare data for response spectrum calculation
         pgv, iacc, ivel = spectral_analysis.prep_psa(corfftr, corffti, freq, inst_ty)
-
+        
         # calculate 5% damped response spectra
         T, psa, pga = spectral_analysis.calc_response_spectra(iacc.real, sps, 5.0, 1./hifreq, 1./lofreq)
 

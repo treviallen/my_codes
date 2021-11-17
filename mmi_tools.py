@@ -602,7 +602,16 @@ def atkinson_worden_wald14_ceus_oq(mag, rhypo, dep):
     mmi, sig = ipe.get_mean_and_stddevs(sites, rup, dists, MMI(), [StdDev.TOTAL])
     
     return mmi, sig[0]
- 
+
+def leonard15_ipe(mw, rrup):
+    from numpy import log, exp, sqrt
+    
+    c0 = 3.5
+    c1 = 1.05
+    c2 = -1.09
+    c3 = 1.1
+    
+    return c0 + c1 * mw + c2 * log(sqrt(rrup**2 + (1+c3*exp(mw-5))**2))
 
 ##########################################################################################
 # DYFI
