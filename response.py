@@ -134,6 +134,40 @@ def read_pazfile(in_pazfile):
 
     return poles, zeros, constant, normf
 
+# this function reads PAZ files
+def read_sac_respfile(in_pazfile):
+    from os import path
+    import numpy as np
+    from os import getcwd
+    
+    paztxt = open(in_pazfile).readlines()
+        
+    # get zeros first
+    zeros = []
+    num = paztxt[0].split()
+    nzeros = int(num[1])
+    for i in range(1,nzeros+1):
+        tmpz = paztxt[i].strip('\n').split()
+        zeros.append(complex(float(tmpz[0]),float(tmpz[1]))*2*np.pi) # convert to angular frequency
+
+    # now get poles
+    poles = []
+    num = paztxt[nzeros+1].split()
+    npoles = int(num[1])
+    for i in range(nzeros+2,nzeros+npoles+2):
+        tmpp = paztxt[i].strip('\n').split()
+        poles.append(complex(float(tmpp[0]),float(tmpp[1]))*2*np.pi) # convert to angular frequency
+
+    # get constant
+    constant = paztxt[nzeros+npoles+2].split()
+    constant = float(constant[1])
+
+#    # get normalising frequency
+#    normf = paztxt[nzeros+npoles+3].split('\t')
+#    normf = float(normf[1])
+
+    return poles, zeros, constant
+
 # returns normalisation factor from lists of poles & zeros
 def normfact_from_paz(p, z):
     '''
@@ -143,7 +177,7 @@ def normfact_from_paz(p, z):
     
     import scipy.signal as signal
     
-    print(signal.ltisys.zpk2tf(z, p, 1.))
+    #print(signal.ltisys.zpk2tf(z, p, 1.))
     return signal.ltisys.zpk2tf(z, p, 1.)[1][2]
 
 # this function leads the user to input station information
