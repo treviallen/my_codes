@@ -64,6 +64,34 @@ def get_response_info(sta,recdate,chan):
 
     return nat_freq, inst_ty, damping, sen, recsen, gain, pazfile, stlo, stla, netid
 
+def iris_gmap2stationlist(gmap):
+
+	lines = open(gmap).readlines()
+	stas = []
+	for line in lines[3:]:
+		dat = line.replace('"','').strip().split('|')
+		tdict = {'net': dat[0], 'sta': dat[1].upper(), 'lat':float(dat[2]), 'lon':float(dat[3]), \
+			       'start':dat[-2][0:10].replace('-',''), 'stop': dat[-1][0:10].replace('-','')}
+		stas.append(tdict)
+		
+	# now write txt
+	txt = ''
+	txt2 = ''
+	for sta in stas:
+		txt += '\t'.join((sta['sta'],'B',sta['start'],sta['stop'],str('%0.4f' % sta['lon']),str('%0.4f' % sta['lat']),sta['net'],'-12345','-12345','-12345','-12345','1','HHE','inst.paz')) + '\n'
+		txt += '\t'.join((sta['sta'],'B',sta['start'],sta['stop'],str('%0.4f' % sta['lon']),str('%0.4f' % sta['lat']),sta['net'],'-12345','-12345','-12345','-12345','1','HHN','inst.paz')) + '\n'
+		txt += '\t'.join((sta['sta'],'B',sta['start'],sta['stop'],str('%0.4f' % sta['lon']),str('%0.4f' % sta['lat']),sta['net'],'-12345','-12345','-12345','-12345','1','HHZ','inst.paz')) + '\n'
+	
+		txt2 += '\t'.join((sta['sta'],str(sta['lon']),str(sta['lat']),'1',sta['start'][0:4],sta['start'][4:6],sta['stop'][0:4],sta['stop'][4:6])) + '\n'
+	# now write
+	f = open(gmap[0:-4]+'_stationlist.txt', 'w')
+	f.write(txt)
+	f.close()
+
+	f = open(gmap[0:-4]+'_station_data.dat', 'w')
+	f.write(txt2)
+	f.close()	
+
 # this function lists available PAZ files for selection
 def get_paz_list():
     import os
@@ -148,7 +176,7 @@ def read_sac_respfile(in_pazfile):
     nzeros = int(num[1])
     for i in range(1,nzeros+1):
         tmpz = paztxt[i].strip('\n').split()
-        zeros.append(complex(float(tmpz[0]),float(tmpz[1]))*2*np.pi) # convert to angular frequency
+        zeros.append(complex(float(tmpz[0]),float(tmpz[1]))) #*2*np.pi) # convert to angular frequency
 
     # now get poles
     poles = []
@@ -156,7 +184,7 @@ def read_sac_respfile(in_pazfile):
     npoles = int(num[1])
     for i in range(nzeros+2,nzeros+npoles+2):
         tmpp = paztxt[i].strip('\n').split()
-        poles.append(complex(float(tmpp[0]),float(tmpp[1]))*2*np.pi) # convert to angular frequency
+        poles.append(complex(float(tmpp[0]),float(tmpp[1]))) #*2*np.pi) # convert to angular frequency
 
     # get constant
     constant = paztxt[nzeros+npoles+2].split()
