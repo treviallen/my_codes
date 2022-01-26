@@ -1,15 +1,19 @@
-def fix_stream_channels(mseedfile):
+def fix_stream_channels(mseedfile, accel=False):
     from obspy import read
     
     st = read(mseedfile)
     
     # loop thru traces
     for tr in st:
-        if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY') \
-        or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('HH'):
-            tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
+        if accel == False:
+            if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY') \
+            or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('HH'):
+                tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
         
         elif tr.stats['channel'].startswith('EN') or tr.stats['channel'].startswith('DN'):
+            tr.stats['channel'] = 'HN' + tr.stats['channel'][-1]
+        
+        elif accel == True:
             tr.stats['channel'] = 'HN' + tr.stats['channel'][-1]
     
     # overwrite mseed
@@ -26,6 +30,7 @@ def fix_stream_network(mseedfile, newnet):
     # loop thru traces
     for tr in st:
         tr.stats['network'] = newnet
+        print(tr.stats.network)
     
     # overwrite mseed
     st.write(mseedfile, format="MSEED")

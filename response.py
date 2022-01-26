@@ -42,7 +42,7 @@ def get_response_info(sta,recdate,chan):
     for line in stadat[1:]:
         # skip first row
         tmp = line.rstrip().split('\t')
-        
+        #print(line)
         mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
         maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
         #print(mindate, maxdate, recdate)
