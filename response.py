@@ -64,6 +64,48 @@ def get_response_info(sta,recdate,chan):
 
     return nat_freq, inst_ty, damping, sen, recsen, gain, pazfile, stlo, stla, netid
 
+# parses staionlist and outputs to list of dictionaries
+def stationlist2dict():
+    import datetime as dt
+    from os import getcwd
+    
+    # check if sitename in file
+    cwd = getcwd()
+    if cwd.startswith('/nas'):
+        stalist = '/nas/users/u56903/unix/Code/my_codes/stationlist.dat'
+    else:
+        stalist = '//Users//trev//Documents//Code//my_codes//stationlist.dat'
+        
+    stadat = open(stalist).readlines()
+    
+    stalistDict = []
+    for line in stadat[1:]:
+        if not line.startswith('#'):
+            tmp = line.rstrip().split('\t')
+            #print(line)
+            mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
+            maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
+            #print(mindate, maxdate, recdate)
+            sta = tmp[0]
+            inst_ty = tmp[1]
+            stlo = float(tmp[4])
+            stla = float(tmp[5])
+            netid = tmp[6]
+            nat_freq = float(tmp[7])
+            damping = float(tmp[8])
+            sen = float(tmp[9])
+            recsen = float(tmp[10])
+            gain = float(tmp[11])
+            chan = tmp[12]
+            pazfile = tmp[13].rstrip()
+            
+            sld = {'sta':sta, 'start':mindate, 'stop':maxdate, 'insttype':inst_ty, 'stlo':stlo, 'stla':stla, 'channel':chan, \
+                   'netid':netid, 'sen_sensitivity':sen, 'rec_sensitivity':recsen, 'gain':gain, 'pazfile':pazfile}
+                 	
+            stalistDict.append(sld)
+        
+    return stalistDict
+
 def iris_gmap2stationlist(gmap):
 
 	lines = open(gmap).readlines()

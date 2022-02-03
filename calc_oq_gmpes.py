@@ -159,7 +159,7 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from atkinson_adams_2013 import atkinson_adams_2013
     from fault_tools import mag2rupwid_WC94
-    from numpy import array, sqrt, log, exp
+    from numpy import array, sqrt, log, exp, arange
     
     crust_ty = 'wcrust'
 
@@ -169,7 +169,7 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #sites.z1pt0 = exp(28.5 - (3.82/8.)*log(sites.vs30**8 + 378.7**8)) # in m; from ChiouYoungs2008
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
-    
+    sites.sids = arange(1)
 
     rup = RuptureContext()
     rup.mag = mag
@@ -236,7 +236,7 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.kuehn_2020 import KuehnEtAl2020SSlab
     from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array, sqrt, log, exp
+    from numpy import array, sqrt, log, exp, arange
     
     crust_ty = 'inslab'
     
@@ -247,6 +247,7 @@ def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
     sites.backarc = [True]
+    sites.sids = arange(1)
     
     rup = RuptureContext()
     rup.mag = mag
@@ -317,7 +318,7 @@ def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.megawati_pan_2010 import MegawatiPan2010
     #from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array, sqrt, log, exp
+    from numpy import array, sqrt, log, exp, arange
     
     crust_ty = 'interface'
     
@@ -337,6 +338,7 @@ def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
     sites.backarc = [False]
+    sites.sids = arange(1)
     
     rup = RuptureContext()
     rup.mag = mag
@@ -396,8 +398,10 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.chiou_youngs_2008 import ChiouYoungs2008
     from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009NonCratonic
     from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009YilgarnCraton
+    from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009NonCratonic_SS14
+    from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009YilgarnCraton_SS14
     from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
-    from openquake.hazardlib.gsim.allen_2012 import Allen2012
+    from openquake.hazardlib.gsim.allen_2012 import Allen2012, Allen2012_SS14
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
     #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015BSSA
     #from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
@@ -411,7 +415,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     '''
     #from atkinson_adams_2013 import atkinson_adams_2013
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array, sqrt, log, exp
+    from numpy import array, sqrt, log, exp, arange
     
     crust_ty = 'intraplate'
     
@@ -420,6 +424,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     sites.vs30measured = False
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.sids = arange(1)
     
     rup = RuptureContext()
     rup.mag = mag
@@ -451,10 +456,10 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #gmpe = ChiouYoungs2008()
     #CY08imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
-    gmpe = SomervilleEtAl2009NonCratonic()
+    gmpe = SomervilleEtAl2009NonCratonic_SS14() # ******* Using SS14 *******
     Sea09imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
-    gmpe = SomervilleEtAl2009YilgarnCraton()
+    gmpe = SomervilleEtAl2009YilgarnCraton() # ******* Using SS14 *******
     Sea09YCimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
     gmpe = PezeshkEtAl2011()
@@ -462,6 +467,9 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
     gmpe = Allen2012()
     A12imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = Allen2012_SS14()
+    A12imt_SS14 = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     gmpe = BooreEtAl2014()
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
@@ -479,17 +487,19 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #AA13imt = []
 
     #return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
-    return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt #, SP16imt # AA13imt, CY08imt, 
+    return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt #, SP16imt # AA13imt, CY08imt, 
 
-def allen2012_gsim(mag, dep, rrup):
+def allen2012_gsim(mag, dep, rrup, vs30):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array
+    from numpy import array, arange
     
     crust_ty = 'intraplate'
     
     sites = SitesContext()
-
+    sites.vs30 = array([float(vs30)])
+    sites.sids = arange(1)
+    
     rup = RuptureContext()
     rup.mag = mag
     rup.hypo_depth = dep
