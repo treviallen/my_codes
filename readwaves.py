@@ -46,18 +46,19 @@ def check_file_fmt(wavfile):
 # return data
 def return_data(wavfile):  
     fmt = check_file_fmt(wavfile)
+    datadict = {}
     if fmt == 'eqw':
         # read the eqWave text file
         #allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readeqwave(wavfile)
-        allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp, cntpvolt, sen, gain = readeqwave(wavfile)
+        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, cntpvolt, sen, gain, datadict = readeqwave(wavfile)
     elif fmt == 'nmx':
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readnmx(wavfile)
     elif fmt == 'tspair':
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readtspair(wavfile)
     elif fmt == 'sm':
-        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readseismac(wavfile)
+        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, datadict = readseismac(wavfile)
     elif fmt == 'bkn':
-        allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp, cntpvolt, sen, gain, instrument, secoffset = readbkn(wavfile)
+        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, cntpvolt, sen, gain, instrument, secoffset = readbkn(wavfile)
     elif fmt == 'mseed':
         from obspy.core import read
         st = read(wavfile)
@@ -66,9 +67,11 @@ def return_data(wavfile):
         '\nFile format not recognised!'
         
     #print('return_data', alldata[:, 0]
-    return allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, fmt
+    return allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, fmt, datadict
 
 def readeqwave(wavfile):
+    from datetime import datetime
+    
     # READ HEADER INFO
     cntpvolt = 'null' 
     sen = 'null'
@@ -120,7 +123,8 @@ def readeqwave(wavfile):
                 for j in range(0,len(sec)):
                     tmpsec = float(sec[j])
                     intsec.append(str(int(np.floor(tmpsec))))
-
+        
+        
         ind = line.find('#samples per second')
         if ind >= 0:
             sps = line.split('\t')
@@ -142,8 +146,17 @@ def readeqwave(wavfile):
         if ind >= 0:
             gain = line.split('\t')
             gain = gain[0:-1]
-
-
+            	
+        ind = line.find('#latitude')
+        if ind >= 0:
+            lats = line.split('\t')
+            lats = lats[0:-1]
+        
+        ind = line.find('#longitude')
+        if ind >= 0:
+            lons = line.split('\t')
+            lons = lons[0:-1]
+            	
         ind = line.find('#number of samples')
         if ind >= 0:
             nsampstr = line.split('\t')
@@ -164,7 +177,7 @@ def readeqwave(wavfile):
 #        ind = line.find('       	       	')
 #        if ind >= 0:
 #            readdat = 0
-#
+        
         # this part reads in the data in raw counts
         if readdat == 1:
             i += 1
@@ -188,7 +201,13 @@ def readeqwave(wavfile):
     for j in range(0,len(sec)):
         #alldatestr.append(ymd[j]+hhmm[j]+intsec[j])
         alldatestr.append(ymd[j]+hhmm[j])
-
+    
+    # set additional data
+    tmptime = str(ymd[0])+str(hhmm[0])+str(tmpsec)
+    tmptime = datetime.strptime(tmptime,"%Y%m%d%H%M%S.%f")
+    datadict = {'net':'MEL', 'datetime':tmptime, 'lats': lats, 'lons':lons}
+#
+    
     # reformat kelunji components
     # assume no BB
     i = 0
@@ -197,7 +216,8 @@ def readeqwave(wavfile):
            or comp.endswith(' T') or comp.endswith(' T 5') or comp.startswith('SP') \
            or comp.startswith('c01') or comp.startswith('c02') or comp.startswith('c03') \
            or comp.endswith('vel') or comp.endswith('v') or comp.endswith(' 1') \
-           or comp.endswith(' 2') or comp.endswith(' 3') or comp.startswith('HH'):
+           or comp.endswith(' 2') or comp.endswith(' 3') or comp.startswith('HH') \
+           or comp.startswith('U Tran'):
             it = 'H'
             g = 'E'
         
@@ -209,10 +229,11 @@ def readeqwave(wavfile):
             
         else:
             it = 'H'
-            if int(sps[i]) > 80:
-                g = 'E'
-            else:
-                g = 'S'
+        
+        if it == 'H' and int(sps[i]) > 80:
+            g = 'E'
+        else:
+            g = 'S'
 
         if comp[0] == 'H' or comp[0] == 'B':
             g = comp[0]
@@ -243,10 +264,10 @@ def readeqwave(wavfile):
 
         comps[i] = g + it + o
         #print(comps
-
+        
         i += 1
     
-    return sta, comps, alldatestr, sec, sps, data, nsamp, cntpvolt, sen, gain
+    return sta, comps, alldatestr, sec, sps, data, nsamp, cntpvolt, sen, gain, datadict
 
 # this function reads nmx ascii format
 def readnmx(wavfile):
@@ -388,7 +409,12 @@ def readseismac(wavfile):
         if ind >= 0:
             sta = line.strip('\n').split('=')
             sta = sta[1]
-
+        
+        ind = line.find('Operator=')
+        if ind >= 0:
+            net = line.strip('\n').split('=')
+            net = net[1]
+            
         # get components
         ind = line.find('TIME')
         if ind >= 0:
@@ -437,13 +463,18 @@ def readseismac(wavfile):
     allsta = []
     allsec = []
     tmptime = datetime.strptime(ymd,"%Y-%m-%d %H%M %S.%f")
+    #print(comps)
     sec = tmptime.strftime("%S")
     for j in range(0,len(comps)):
-        alldatestr.append(tmptime.strftime("%Y%m%d%H%M%S"))
+        alldatestr.append(tmptime.strftime("%Y%m%d%H%M%S")) # 2022-02-21 edit
+        alldatestr.append(tmptime)
         allnsamp.append(nsamp)
         allsta.append(sta)
         allsec.append(sec)
-
+    
+    # set additional data
+    datadict = {'net':net, 'datetime':tmptime}
+    
     # reformat kelunji components
     # assume no BB
     i = 0
@@ -466,30 +497,33 @@ def readseismac(wavfile):
             it = comp[1]
 
         # now get orientation
-        if comp.find('z ') >= 0 or comp.find('v ') >= 0 or comp.find('Up') >= 0 \
+        if comp.find('z ') >= 0 or comp.find('v ') >= 0 or comp.startswith('Up') \
             or comp.find('u ') >= 0 or comp.find('U Tran') >= 0 or comp.find('Z ') >= 0 \
             or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0 \
-            or comp.startswith('vertical') >= 0:
+            or comp.startswith('vertical'):
              o = 'Z'
-        elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.find('East') >= 0 \
+             #print('up?')
+        elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.startswith('East') \
             or comp.find('E Tran') >= 0 or comp.find('E ') >= 0 or comp.find('X ') >= 0 \
             or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0 \
-            or comp.startswith('east') >= 0:
+            or comp.startswith('east'):
              o = 'E'
-        elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.find('North') >= 0 \
+             #print('east?')
+        elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.startswith('North') \
             or comp.find('N Tran') >= 0 or comp.find('N ') >= 0 or comp.find('Y ') >= 0 \
             or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0 \
-            or comp.startswith('north') >= 0:
+            or comp.startswith('north'):
              o = 'N'
+             #print('north?')
         else:
              o = 'U' # Unknown
 
         comps[i] = g + it + o
-        #print(comps
+        #print(comps)
 
         i += 1
 
-    return allsta, comps, alldatestr, allsec, sps, data, allnsamp
+    return allsta, comps, alldatestr, allsec, sps, data, allnsamp, datadict
 
 # here we use obspy to read miniseed files
 #def readseed(allst):

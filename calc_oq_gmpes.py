@@ -403,6 +403,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
     from openquake.hazardlib.gsim.allen_2012 import Allen2012, Allen2012_SS14
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
+    from openquake.hazardlib.gsim.nga_east import NGAEastGMPE, get_hard_rock_mean
     #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015BSSA
     #from openquake.hazardlib.gsim.shahjouei_pezeshk_2016 import ShahjoueiPezeshk2016
     '''
@@ -474,6 +475,9 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = BooreEtAl2014()
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    #gmpe = NGAEastGMPE()
+    #NGAEimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
     #gmpe = YenierAtkinson2015BSSA()
     #YA15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
@@ -533,9 +537,10 @@ def gaull1990_gsim(mag, dep, rhypo):
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from openquake.hazardlib.imt import PGA
     from openquake.hazardlib.const import StdDev
-    from numpy import array
+    from numpy import array, arange
     
     sites = SitesContext()
+    sites.sids = arange(1)
 
     rup = RuptureContext()
     rup.mag = mag # input MW - GaullEtAL1990 corrects to ML
@@ -579,6 +584,7 @@ def hdf5_gsim(mag, dep, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     sites.vs30measured = False
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.sids = arange(1)
 
     rup = RuptureContext()
     rup.mag = mag
@@ -784,7 +790,7 @@ def adjust_gmm_with_SS14(inIMT, hostVS, targetVS):
     # make new data struct
     return {'per':inIMT['per'], 'pga':pga_target, 'sa': array(sa_target)}
     	
-def adjust_gmm_with_nga_east(inIMT, targetVS):
+def adjust_gmm_with_nga_east(inIMT, targetVS, impedance=False):
     from nga_east_amplification_2020 import nga_east_siteamp
     from numpy import array, exp, log
     
@@ -801,12 +807,12 @@ def adjust_gmm_with_nga_east(inIMT, targetVS):
     ln_pga_ref3k = inIMT['pga'][0]
     
     # first correct PGA to target site class - ignore impeedance term for AU sites
-    pga_target = log(ln_pga_ref3k * nga_east_siteamp(targetVS, refT, ln_pga_ref3k, impedance=False)[0])
+    pga_target = log(ln_pga_ref3k * nga_east_siteamp(targetVS, refT, ln_pga_ref3k, impedance=impedance)[0])
     
     # correct spectra to target site class
     sa_target = []
     for t, sa in zip(inIMT['per'], inIMT['sa']):
-        sa_target.append(log(exp(sa) * nga_east_siteamp(targetVS, t, ln_pga_ref3k, impedance=False)[0]))
+        sa_target.append(log(exp(sa) * nga_east_siteamp(targetVS, t, ln_pga_ref3k, impedance=impedance)[0]))
         
     # make new data struct
     return {'per':inIMT['per'], 'pga':pga_target, 'sa': array(sa_target)}

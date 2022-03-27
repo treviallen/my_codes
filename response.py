@@ -110,8 +110,14 @@ def iris_gmap2stationlist(gmap):
 
 	lines = open(gmap).readlines()
 	stas = []
-	for line in lines[3:]:
+	if lines[0].startswith('#Network'):
+		skiprows = 1
+	else:
+		skiprows = 3 
+	for line in lines[skiprows:]:
+		line = line.replace('||', '|')
 		dat = line.replace('"','').strip().split('|')
+		#print(dat)
 		tdict = {'net': dat[0], 'sta': dat[1].upper(), 'lat':float(dat[2]), 'lon':float(dat[3]), \
 			       'start':dat[-2][0:10].replace('-',''), 'stop': dat[-1][0:10].replace('-','')}
 		stas.append(tdict)
@@ -132,7 +138,57 @@ def iris_gmap2stationlist(gmap):
 
 	f = open(gmap[0:-4]+'_station_data.dat', 'w')
 	f.write(txt2)
-	f.close()	
+	f.close()
+	
+def fdsn_text2stationlist(gmap):
+
+	lines = open(gmap).readlines()
+	stas = []
+	if lines[0].startswith('#Network'):
+		skiprows = 1
+	else:
+		skiprows = 3 
+	for line in lines[skiprows:]:
+		line = line.replace('||', '|')
+		dat = line.replace('"','').strip().split('|')
+		#print(dat)
+		tdict = {'net': dat[0], 'sta': dat[1].upper(), 'chan': dat[2].upper(), 'lat':float(dat[3]), 'lon':float(dat[4]), \
+			       'sensor':dat[9], 'sensitivity':float(dat[10]), \
+			       'start':dat[-2][0:10].replace('-',''), 'stop': dat[-1][0:10].replace('-','')}
+		stas.append(tdict)
+		
+	# now write txt
+	txt = ''
+	for sta in stas:
+		
+		txt += '\t'.join((sta['sta'], sta['chan'][0], sta['start'],sta['stop'],str('%0.4f' % sta['lon']), \
+		                  str('%0.4f' % sta['lat']),sta['net'],'-12345','-12345',str('%0.6e' % sta['sensitivity']),'1.0', \
+		                  '1.0',sta['chan'],sta['sensor'])) + '\n'
+	# now write
+	f = open(gmap[0:-4]+'_stationlist.txt', 'w')
+	f.write(txt)
+	f.close()
+
+
+# extracts data for stationlist from eqwave file
+def eqwave2staionlist(wavfile):
+    from readwaves import readeqwave
+
+    sta, comps, recdate, sec, sps, data, nsamp, cntpvolt, sen, gain, datadict = readeqwave(wavfile)
+    
+    lines = ''
+    for i in range(0, len(sta)):
+        line = '\t'.join((sta[i], comps[i][0], recdate[i][0:8], '25990101', \
+        	                datadict['lons'][i], datadict['lats'][i], 'MEL', '-12345', '-12345', \
+                          sen[i], cntpvolt[i], gain[i], comps[i], 'NULL'))
+        lines += line + '\n'
+    
+    # make filename
+    slfile = wavfile.split('.')[0].split('/')[1]+'.stationlist'
+    slfile = slfile.replace(' ', '_')
+    f = open(slfile, 'wb')
+    f.write(lines)
+    f.close()
 
 # this function lists available PAZ files for selection
 def get_paz_list():

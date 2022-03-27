@@ -7,7 +7,8 @@ def fix_stream_channels(mseedfile, accel=False):
     for tr in st:
         if accel == False:
             if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY') \
-            or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('HH'):
+            or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('HH') \
+            or tr.stats['channel'].startswith('CH'):
                 tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
         
         elif tr.stats['channel'].startswith('EN') or tr.stats['channel'].startswith('DN'):
@@ -477,6 +478,7 @@ def split_mseed_stations(mseedfile, out_prefix):
         newfile = '.'.join((out_prefix, sta, 'mseed'))
         
         # write mseed file
+        print('    '+newfile)
         new_st.write(newfile, format="MSEED")
         
 # trims segment from larger mseed file
@@ -516,6 +518,35 @@ def trim_seed(eventDateTuple, mseedFile):
     st.write(outfile, format='MSEED')
     
     return st_trim
+
+# trim big mseed file to something more manageable
+def trim_mseed(mseedIn, dateStr, durn=600):
+    from obspy import read, UTCDateTime, Stream, Trace
+    from misc_tools import ymd2doy
+    import datetime as dt
+    from sys import argv
+    from os import path
+    
+    starttime = UTCDateTime(dateStr) # e.g. 2017-01-01T04:11:33
+    
+    # read big file
+    st = read(mseedFile)
+    
+    endtime = peakTime + durn
+    
+    # now trim
+    st_trim = st.trim(starttime, endtime)
+    
+    # set filename
+    mseedOut = '.'.join((st_trim[0].stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+    
+                          st_trim[0].stats['network'], st_trim[0].stats['station'], \
+                          st[0].stats.channel, 'mseed'))
+                          
+    # write file
+    print('Writing file:', mseedOut)
+    outpath = path.join(mseedOut)           
+    st_trim.write(outpath, format="MSEED")
 
 
 # REMOVE DC OFFSET
@@ -658,6 +689,62 @@ def get_iris_data(dateTuple, sta, net, durn=600):
     '''
     
     return st, trname
+    
+
+def get_auspass_data(dateTupple, durn=600, network='S1', station='*', channel='*'):
+    '''
+    datetime tuple fmt = (Y,m,d,H,M)
+    '''
+    from obspy import UTCDateTime, Stream
+    from obspy.clients.fdsn import Client as FDSN_Client
+    from numpy import unique
+    from os import path, makedirs
+    
+    auspass = FDSN_Client('http://auspass.edu.au:8080',user_agent='trevor.allen@ga.gov.au') 
+    
+    '''
+    Networks:
+        2P = SWAN
+        1K = ALFREX
+    '''
+    location = "*" #n.b. AusPass data typically has a univeral blank (e.g. '') value for ALL station locations. "*" works just as well. 
+    time0 = UTCDateTime(dateTupple[0],dateTupple[1],dateTupple[2],dateTupple[3],dateTupple[4]) - 120
+    time1 = time0 + durn 
+    
+    try:
+        st = auspass.get_waveforms(network=network,station=station,location=location,channel=channel,starttime=time0,endtime=time1)
+        
+        if len(st) > 0:
+            # get array of stations
+            stalist = []
+            for tr in st:
+                stalist.append(tr.stats.station)
+                
+            stalist = unique(stalist)
+            
+            # check if waves folder exists
+            if not path.isdir('auspass_dump'):
+                makedirs('auspass_dump')
+            
+            # now loop thru unique stalist and output streams
+            for us in stalist:
+                new_st = Stream()
+                for tr in st:
+                    if tr.stats.station == us:
+                        new_st += tr
+                        
+                # save out to file
+                tr = new_st[0]
+                
+                trname = path.join('auspass_dump', \
+                                   '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                                   tr.stats['network'], tr.stats['station'], 'mseed')))
+                
+                print('Writing file:', trname)
+                new_st.write(trname, format="MSEED")
+                
+    except:
+        print('No AusPass data available...')
     
 def get_arclink_data(datetupple, sta, net):
     from obspy import UTCDateTime
@@ -961,6 +1048,10 @@ def return_sta_data(sta):
 
 # parses txt files downloaded from e.g.: http://ds.iris.edu/gmap/#network=AU&planet=earth
 def parse_iris_stationlist(stationlist):
+    '''
+    look at response.iris_gmap2stationlist for export formats
+    '''
+    
     from obspy import UTCDateTime
     lines = open(stationlist).readlines()[3:]
     
