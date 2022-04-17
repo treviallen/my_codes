@@ -515,6 +515,30 @@ def allen2012_gsim(mag, dep, rrup, vs30):
     A12imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     return A12imt
+
+# Banda Sea model    
+def allen2022_gsim(mag, dep, rhypo, vs30):
+    from openquake.hazardlib.gsim.allen_2022 import Allen2022
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array, arange
+    
+    crust_ty = 'inslab'
+    
+    sites = SitesContext()
+    sites.vs30 = array([float(vs30)])
+    sites.sids = arange(1)
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+
+    dists = DistancesContext()
+    dists.rhypo = array([rhypo])
+    
+    gmpe = Allen2022()
+    A22imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    return A22imt
     
 def gaull1990_gsim(mag, dep, rhypo):
     
