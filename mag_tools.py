@@ -174,6 +174,8 @@ def get_au_ml_zone(eqlos, eqlas):
     
     if getcwd().startswith('/nas'):
         shpfile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Magnitudes/NEAC/australia_ml_regions.shp'
+    else:
+        shpfile = '/Users/trev/Documents/Manuscripts/manuscripts/2021/ml_adjustmets/shapefile/australia_ml_regions.shp'
     
     sf = shapefile.Reader(shpfile)
     shapes = sf.shapes()

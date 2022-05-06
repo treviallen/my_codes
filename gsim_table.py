@@ -33,10 +33,10 @@ import h5py
 from scipy.interpolate import interp1d
 import numpy
 
-from openquake.hazardlib import const
-from openquake.hazardlib import imt as imt_module
-from openquake.hazardlib.gsim.base import GMPE, RuptureContext, SitesContext
-from openquake.baselib.python3compat import round
+from openquake_3_6_0.hazardlib import const
+from openquake_3_6_0.hazardlib import imt as imt_module
+from openquake_3_6_0.hazardlib.gsim.base import GMPE, RuptureContext, SitesContext
+from openquake_3_6_0.baselib.python3compat import round
 
 
 def hdf_arrays_to_dict(hdfgroup):
@@ -509,7 +509,16 @@ class GMPETable(GMPE):
         :param val_type:
             String indicating the type of data {"IMLs", "Total", "Inter" etc}
         """
-        if isinstance(imt, (imt_module.PGA, imt_module.PGV)):
+        #if isinstance(imt, imt_module.PGA): # 2022-04-24 - hack to get to work!
+        if str(imt).startswith('PGA'):
+            # Get scalar imt
+            if val_type == "IMLs":
+                iml_table = self.imls[str(imt)][:]
+            else:
+                iml_table = self.stddevs[val_type][str(imt)][:]
+            n_d, n_s, n_m = iml_table.shape
+            iml_table = iml_table.reshape([n_d, n_m])
+        elif str(imt).startswith('PGV'):
             # Get scalar imt
             if val_type == "IMLs":
                 iml_table = self.imls[str(imt)][:]

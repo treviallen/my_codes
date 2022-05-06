@@ -852,7 +852,7 @@ def discretize_xy_profile(lons, lats, disckm, remainder=0.0):
 
 # add dip direction along faults with non-uniform xy coords
 def map_fault_dip_dirn(m, plt, lons, lats, disckm, trikm, triScale=1.0, remainder=0.0, \
-                       fc='k', ec='none', lw=0.5, invArrow=False):
+                       fc='k', ec='none', lw=0.5, invArrow=False, zorder=10000):
     '''
     trikm = length of equilateral triangle
     triScale = vertical scaling for triangle
@@ -889,7 +889,7 @@ def map_fault_dip_dirn(m, plt, lons, lats, disckm, trikm, triScale=1.0, remainde
         triLats.append(reckon(dla, dlo, triHeight, daz-arrowDirn)[1])
     
         xx, yy = m(triLons, triLats)
-        plt.fill(xx,yy, facecolor=fc, edgecolor=ec, linewidth=lw, alpha=1)
+        plt.fill(xx,yy, facecolor=fc, edgecolor=ec, linewidth=lw, alpha=1, zorder=zorder)
 
 # generates a vector of distance, azimuth & back azimuth using "distance"
 # returns rngkm (km), az, baz (degrees)

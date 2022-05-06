@@ -824,3 +824,35 @@ def parse_ga_event_query(gacsv):
             
     return evdict
 
+def parse_iscgem(iscgemcsv):
+    """
+    function to parse the ISC-GEM V5 earthquake catalogue in csv format
+    
+    returns a list of dictionaries, each dictionary relating to a single event
+    """
+    
+    import csv
+    from numpy import nan, isnan, floor
+    from catalogue.parsers import checkint
+    from datetime import datetime
+    
+    # open file
+    lines = open(iscgemcsv).readlines() # exclude header    
+    
+    # parse csv    
+    #lines = csv.reader(raw)
+    
+    # set array to append event dictionaries
+    iscgemCat = []
+    
+    for line in lines:
+        if line.startswith('#') == False:
+            line = line.strip().split(',')
+            evdt = datetime.strptime(line[0].strip(), '%Y-%m-%d %H:%M:%S.%f')
+            tmpdict = {'eventid':line[-1].strip(), 'datetime':evdt, 'year':evdt.year, 'month':evdt.month, 'day':evdt.day, \
+                       'hour':evdt.hour, 'min':evdt.minute, 'sec':evdt.second, 'lon':float(line[2].strip()), 'lat':float(line[1].strip()), \
+                       'dep':float(line[7].strip()), 'mw':float(line[10].strip()), 'mo_auth':line[16].strip()}
+                       
+            iscgemCat.append(tmpdict)
+            
+    return iscgemCat
