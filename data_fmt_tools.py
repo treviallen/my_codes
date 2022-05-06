@@ -957,6 +957,9 @@ def get_iris_stn_dataless_seed(network):
     # set dataless path
     if getcwd().startswith('/nas'):
         dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.IRIS.dataless'))
+    elif getcwd().startswith('C:'):
+        print(path.join('C:\\Users\\u56903\\OneDrive - Geoscience Australia\\Networks', network, network+'.IRIS.dataless'))
+        dataless = Parser(path.join('C:\\Users\\u56903\\OneDrive - Geoscience Australia\\Networks', network, network+'.IRIS.dataless'))
     else:    
         dataless = Parser(path.join('..\\..\\..\\Networks', network, network+'.IRIS.dataless'))
         
@@ -1011,7 +1014,8 @@ def return_all_au_station_data():
     from os import getcwd
     
     if getcwd().startswith('/nas'):
-        au_station_file = '/nas/users/u56903/unix/Code/my_codes/au_station_data.dat'
+        #au_station_file = '/nas/users/u56903/unix/Code/my_codes/au_station_data.dat'
+        au_station_file = 'C:\\Code\\my_codes\\au_station_data.dat' # windows
     else:
         au_station_file = '/Users/trev/Documents/Code/my_codes/au_station_data.dat'
     
