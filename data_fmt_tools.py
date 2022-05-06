@@ -957,6 +957,8 @@ def get_iris_stn_dataless_seed(network):
     # set dataless path
     if getcwd().startswith('/nas'):
         dataless = Parser(path.join('/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Networks', network, network+'.IRIS.dataless'))
+    else:    
+        dataless = Parser(path.join('..\\..\\..\\Networks', network, network+'.IRIS.dataless'))
         
     return dataless
 
