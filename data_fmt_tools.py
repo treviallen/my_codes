@@ -1013,7 +1013,7 @@ def return_all_au_station_data():
     from datetime import datetime
     from os import getcwd
     
-    if getcwd().startswith('/nas'):
+    if getcwd().startswith('C:'):
         #au_station_file = '/nas/users/u56903/unix/Code/my_codes/au_station_data.dat'
         au_station_file = 'C:\\Code\\my_codes\\au_station_data.dat' # windows
     else:
