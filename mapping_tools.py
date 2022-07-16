@@ -612,7 +612,7 @@ def addTextOutline(textHandle, lineWidth, backColour):
     textHandle.set_path_effects([PathEffects.withStroke(linewidth=lineWidth, foreground=backColour)])
 
 
-def labelCentroid(plt, m, txt, fsize, xarray, yarray, xoff):
+def labelCentroid(plt, m, txt, xarray, yarray, xoff=0, fsize=8):
     from shapely.geometry import Polygon
     
     col = 'k'

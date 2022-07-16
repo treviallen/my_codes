@@ -693,7 +693,7 @@ def get_ga_secondary_colours():
     return ['#6e7645', '#ca7700', '#988642', '#a5d867', '#003145']
 
 def get_ga_master_colours_2022():
-    return ['#00718b', #082e41', '#e6edef']
+    return ['#00718b', '#082e41', '#e6edef']
     
 def get_ga_secondary_colours_2022():
     return ['#606f74', '#773775', '#637c6b', '#0b5e4a', '#cb6c37', '#b43b3b']

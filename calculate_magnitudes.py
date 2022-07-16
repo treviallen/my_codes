@@ -166,7 +166,7 @@ def calc_BJ84(comp, logA, rhyp):
     magstr = 'HB87:\t' + str("%0.2f" % BJ84)
     if comp == 0: # if vertical
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return BJ84
 
@@ -198,6 +198,9 @@ def calc_SED84(comp, logA, rhyp):
 
 # Gaull & Gregson (1991) - WA
 def calc_GG91(comp, logA, rhyp):
+    # GG91 adjust V to H (p 252)
+    logA += np.log10(1.34)
+    
     GG91 = logA + 1.137 * np.log10(rhyp) + 0.000657 * rhyp + 0.66
     
     magstr = 'GG91:\t' + str("%0.2f" % GG91)
@@ -216,7 +219,7 @@ def calc_MLM92(comp, logA, rhyp):
         MLM92 = logA + 1.34 * np.log10(rhyp / 100.) + 0.00055 * (rhyp - 100) + 3.0
 
     magstr = 'MLM92:\t' + str("%0.2f" % MLM92)
-    print(magstr)
+    #print(magstr)
 
     return MLM92
 

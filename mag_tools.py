@@ -36,6 +36,23 @@ def nsha18_ml2mw(ml):
     # get Mw
     return a*ml**2 + b*ml + c
     
+def solve_nsha18_mw2ml(mw_list):
+    '''
+    mw_list = list of mws to convert to ml - numpy array
+    '''
+    from numpy import arange, interp
+    from mag_tools import nsha18_ml2mw
+    
+    # make finely discrestised ml array
+    ml_array = arange(0,7.8, 0.001)
+    
+    # calculate equivalent mws
+    mw_array = nsha18_ml2mw(ml_array)
+
+    # interpolate over mw_list
+    return interp(mw_list, mw_array, ml_array, left=0, right=7.8)
+
+    
 def nsha18_fixed_bilin_ml2mw(ml):
     from numpy import zeros_like
     

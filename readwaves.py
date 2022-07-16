@@ -76,6 +76,7 @@ def readeqwave(wavfile):
     cntpvolt = 'null' 
     sen = 'null'
     gain = 'null'
+    lats = -9999
     
     #print('\nReading header info...'
     header = open(wavfile).readlines()
@@ -130,7 +131,7 @@ def readeqwave(wavfile):
             sps = line.split('\t')
             sps = sps[0:-1]
             sps = [round(float(x)) for x in sps]
-            print(sps)
+            #print(sps)
         
         ind = line.find('#Counts/Volt')
         if ind >= 0:
@@ -205,6 +206,12 @@ def readeqwave(wavfile):
     # set additional data
     tmptime = str(ymd[0])+str(hhmm[0])+str(tmpsec)
     tmptime = datetime.strptime(tmptime,"%Y%m%d%H%M%S.%f")
+    if lats == -9999:
+        from data_fmt_tools import return_sta_data
+        austa = return_sta_data(sta[0])
+        lats = austa['stla']
+        lons = austa['stlo']
+        
     datadict = {'net':'MEL', 'datetime':tmptime, 'lats': lats, 'lons':lons}
 #
     
@@ -473,6 +480,14 @@ def readseismac(wavfile):
         allsec.append(sec)
     
     # set additional data
+    if net == 'ASC':
+        net = 'AU'
+    elif net == 'SRC':
+        net = 'MEL'
+    else:
+        net = 'MEL'
+    if sta[0] == 'NLD' or sta[0] == 'RIV' or sta[0] == 'KIM':
+       net = 'AU'
     datadict = {'net':net, 'datetime':tmptime}
     
     # reformat kelunji components

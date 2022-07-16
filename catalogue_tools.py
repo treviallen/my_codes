@@ -12,6 +12,32 @@ def bval2beta(bval):
     from numpy import log
     return log(10**bval)
 
+# get simple obsrevations per mag bin
+def get_nobs_rates(mrng, mag_list, n_yrs):
+    '''
+    mrng = range of magnitudes considered
+    mag_list = magnitude list of catalogue 
+    n_yrs= number of years for catalogue
+    '''
+    # get cumulative rates for mags >= m
+    cum_num = []
+    
+    # add small number to deal with precission issues
+    for m in mfd_mrng:
+        midx = where(mag_list+1E-7 >= m)[0]    
+        # set temp cum mags & times
+        cum_num.append(len(midx))
+        
+    # get events per mag bin
+    n_obs = []
+    for r in range(0, len(cum_num)-1):
+        n_obs.append(cum_num[r] - cum_num[r+1])
+    n_obs.append(cum_num[-1])
+    n_obs = array(n_obs)
+    bin_rates = array(cum_num) / n_yrs
+    
+    return cum_num, n_obs, bin_rates
+
 # code simplified from OpenQuake HMTK
 def aki_maximum_likelihood(mrng, number_obs, mc):
     '''
