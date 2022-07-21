@@ -8,7 +8,7 @@ def fix_stream_channels(mseedfile, accel=False):
         if accel == False:
             if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY') \
             or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('DD') \
-            or tr.stats['channel'].startswith('CH'):
+            or tr.stats['channel'].startswith('CH'): # or tr.stats['channel'].startswith('HN'):
                 tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
         
         elif tr.stats['channel'].startswith('EN') or tr.stats['channel'].startswith('DN'):

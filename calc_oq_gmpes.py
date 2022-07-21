@@ -731,12 +731,12 @@ def aa13_gsims(mag, dep, rrup, rjb, rhypo, vs30):
     return AA13_crustal, AA13_offshore
 
 # calls and calculates candidate active crustal GMPEs - values returned in ln(g)
-def bssa_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
+def bssa_gsim(mag, dep, ztor, dip, rake, rjb, vs30):
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from atkinson_adams_2013 import atkinson_adams_2013
+    #from atkinson_adams_2013 import atkinson_adams_2013
     from fault_tools import mag2rupwid_WC94
-    from numpy import array, sqrt, log, exp
+    from numpy import array, sqrt, log, exp, arange
     
     crust_ty = 'wcrust'
 
@@ -746,8 +746,8 @@ def bssa_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #sites.z1pt0 = exp(28.5 - (3.82/8.)*log(sites.vs30**8 + 378.7**8)) # in m; from ChiouYoungs2008
     sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
     sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.sids = arange(1)
     
-
     rup = RuptureContext()
     rup.mag = mag
     rup.hypo_depth = dep
@@ -757,9 +757,9 @@ def bssa_gsim(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     rup.width = mag2rupwid_WC94(mag, 'all') # should be checked
 
     dists = DistancesContext()
-    dists.rrup = array([rrup])
+    #dists.rrup = array([rrup])
     dists.rjb = array([rjb])    
-    dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
+    dists.rx = sqrt(dists.rjb**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
 
     gmpe = BooreEtAl2014()
     Bea14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)

@@ -199,7 +199,8 @@ def calc_SED84(comp, logA, rhyp):
 # Gaull & Gregson (1991) - WA
 def calc_GG91(comp, logA, rhyp):
     # GG91 adjust V to H (p 252)
-    logA += np.log10(1.34)
+    if comp == 0: # if vertical
+        logA += np.log10(1.34)
     
     GG91 = logA + 1.137 * np.log10(rhyp) + 0.000657 * rhyp + 0.66
     
