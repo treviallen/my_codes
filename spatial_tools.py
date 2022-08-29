@@ -47,6 +47,8 @@ def write_evlist(evdate, eqla, eqlo, eqdep, eqmag):
     datestr = evdate.strftime("%Y%m%d%H%M")
     if getcwd().startswith('/nas'):
         eqlist = '//nas//users//u56903//unix//eventlist.dat'
+    elif getcwd().startswith('C:'):
+        eqlist = 'C:\\Code\\eventlist.dat'
     else:
         eqlist = '/Users/trev/Documents/Earthquake_Data/eventlist.dat'
         
@@ -109,6 +111,8 @@ def get_eq_distance(stlo, stla, evdate):
     # before asking for earthquake parameters, check event file
     if getcwd().startswith('/nas'):
         eqlist = '//nas//users//u56903//unix//eventlist.dat'
+    elif getcwd().startswith('C:'):
+        eqlist = 'C:\\Code\\eventlist.dat'
     else:
         eqlist = '/Users/trev/Documents/Earthquake_Data/eventlist.dat'
 

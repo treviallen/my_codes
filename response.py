@@ -26,6 +26,8 @@ def get_response_info(sta,recdate,chan):
     cwd = getcwd()
     if cwd.startswith('/nas'):
         stalist = '/nas/users/u56903/unix/Code/my_codes/stationlist.dat'        
+    elif cwd.startswith('C:'):
+        stalist = 'C:\Code\my_codes\stationlist.dat' 
     else:
         stalist = '//Users//trev//Documents//Code//my_codes//stationlist.dat'
         
@@ -218,7 +220,9 @@ def read_pazfile(in_pazfile):
     cwd = getcwd()
     # open paz file
     if cwd.startswith('/nas'):
-        pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute        
+        pazpath = '//nas//users//u56903//unix//paz' # for rhe-compute
+    if cwd.startswith('C:'):
+        pazpath = 'C:\\Code\\paz' # for rhe-compute        
     else:
         pazpath = '//Users//trev//Documents//Earthquake_Data//paz' # for bob
     
