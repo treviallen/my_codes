@@ -254,7 +254,7 @@ def parse_faultdat(faultfile):
 
     if len(lat) > 0:
         tmpfault = {'lat': lat, 'lon': lon, 'dep': dep}
-        faultdat .append(tmpfault)
+        faultdat.append(tmpfault)
 
     return faultdat
 
@@ -357,7 +357,7 @@ def make_fault_mesh(faultfile, res):
 
     #ax.scatter(x, y, z, marker='+', color = 'r')
     #plt.show()
-    return x, y, z
+    return {'lon':x, 'lat':y, 'dep':z}
 
 def change_grind_param(smpath, configin, event, param, value, numflags):
     '''
