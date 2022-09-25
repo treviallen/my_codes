@@ -186,7 +186,7 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
     from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from atkinson_adams_2013 import atkinson_adams_2013
+    #from atkinson_adams_2013 import atkinson_adams_2013
     from fault_tools import mag2rupwid_WC94
     from numpy import array, sqrt, log, exp, arange
     
@@ -243,15 +243,17 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = ChiouYoungs2014()
     CY14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    '''
     # prepare Atkinson & Adams 2013
     repi = sqrt(rrup**2 - dep**2) # not correct if rrup != rhypo
     #print('crust', mag, dists.rjb[0]
     AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty) # assume Rjb = Repi
     '''
+    '''
     return Bea97imt, Zea06imt, CB08imt, CY08imt, Bea11imt, BA11imt, AA13imt, Aea14imt, Bea14imt, CY14imt, \
            sites, rup, dists
     '''       
-    return Bea97imt, Zea06imt, CB08imt, CY08imt, Bea11imt, BA11imt, AA13imt, Aea14imt, Bea14imt, CB14imt, CY14imt
+    return Bea97imt, Zea06imt, CB08imt, CY08imt, Bea11imt, BA11imt, Aea14imt, Bea14imt, CB14imt, CY14imt
 
 # calls and calculates candidate intraslab GMPEs - values returned in ln(g)
 def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):

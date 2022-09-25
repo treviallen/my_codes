@@ -325,11 +325,14 @@ def plot_instrument_resp(sta, inst_ty, freq, nat_freq, damping, sen, recsen, \
     respp = np.angle(resp_real + 1j*resp_imag, deg=True)
 
     # plot amplitude
-    n = len(freq[0]) / 2
+    n = int(len(freq) / 2)
+    print(n)
     fignum = 80 + chan_no
     fig = plt.figure(fignum,figsize=(16,7))
+    print(len(freq))
+    print(freq)
     ax1 = fig.add_subplot(111)
-    p1 = ax1.loglog(freq[0,1:n], respa[0,1:n],'b')
+    p1 = ax1.loglog(freq[1:n], respa[1:n],'b')
     ax1.set_xlabel('Frequency (Hz)')
     if inst_ty == 'N':
         ax1.set_ylabel('Sensor Magnification (Counts/m/s**2)')
@@ -338,7 +341,7 @@ def plot_instrument_resp(sta, inst_ty, freq, nat_freq, damping, sen, recsen, \
 
     # plot phase
     ax2 = ax1.twinx()
-    p2 = ax2.semilogx(freq[0,1:n], respp[0,1:n],'g')
+    p2 = ax2.semilogx(freq[1:n], respp[1:n],'g')
     ax2.set_ylabel('Phase Angle (Degrees)')
     plt.legend( (p1[0], p2[0]), ['Amplitude','Phase'],loc=2)
     if pazfile == 'NULL':
