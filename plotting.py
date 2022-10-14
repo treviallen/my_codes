@@ -326,11 +326,8 @@ def plot_instrument_resp(sta, inst_ty, freq, nat_freq, damping, sen, recsen, \
 
     # plot amplitude
     n = int(len(freq) / 2)
-    print(n)
     fignum = 80 + chan_no
     fig = plt.figure(fignum,figsize=(16,7))
-    print(len(freq))
-    print(freq)
     ax1 = fig.add_subplot(111)
     p1 = ax1.loglog(freq[1:n], respa[1:n],'b')
     ax1.set_xlabel('Frequency (Hz)')

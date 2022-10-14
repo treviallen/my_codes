@@ -357,7 +357,6 @@ while continue_loop == True:
         freq, wavfft = spectral_analysis.calc_fft(dummydat, sps)
 
         # calculate and plot instrument response
-        print(freq)
         plotting.plot_instrument_resp(sta, inst_ty, freq, nat_freq, damping, \
                                       sen, recsen, gain, pazfile, chan_no)
 

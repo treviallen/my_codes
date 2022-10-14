@@ -218,6 +218,8 @@ def readeqwave(wavfile):
     # reformat kelunji components
     # assume no BB
     i = 0
+    #print(comps)
+    #print(sps)
     for comp in comps:
         if comp.startswith('EH') or comp.startswith('v') or comp.startswith('EL') or comp.endswith(' t') \
            or comp.endswith(' T') or comp.endswith(' T 5') or comp.startswith('SP') \
@@ -227,12 +229,17 @@ def readeqwave(wavfile):
            or comp.startswith('U Tran'):
             it = 'H'
             g = 'E'
+            #print('vel', comp)
         
-        elif comp.find('Acc') >= 0 or comp.endswith(' a') >= 0 or comp.find(' A ') >= 0 \
+        if comp.find('Acc') >= 0 or comp.endswith('a') or comp.find(' A ') >= 0 \
            or comp.find('c04') >= 0 or comp.find('c05') >= 0 or comp.find('c06') >= 0 \
-           or comp.startswith('HN'):
+           or comp.startswith('HN') or comp.startswith('e 2') or comp.startswith('n 2') \
+           or comp.startswith('x DIG1') or comp.startswith('y DIG1') or comp.startswith('z DIG1') \
+           or comp.startswith('x 1') or comp.startswith('y 1') or comp.startswith('z 1') \
+           or comp.startswith('v 2') or comp.endswith('acc') or comp.startswith('acc'):
             it = 'N'
             g = 'H'
+            #print('accel', comp)
             
         else:
             it = 'H'
@@ -498,6 +505,9 @@ def readseismac(wavfile):
         if ind >= 0:
             it = 'N'
             g = 'H'
+        elif comp.endswith('4') or comp.endswith('5') or comp.endswith('6'):
+            it = 'N'
+            g = 'H'
         else:
             it = 'H'
             if int(sps[i]) > 80:
@@ -515,19 +525,19 @@ def readseismac(wavfile):
         if comp.find('z ') >= 0 or comp.find('v ') >= 0 or comp.startswith('Up') \
             or comp.find('u ') >= 0 or comp.find('U Tran') >= 0 or comp.find('Z ') >= 0 \
             or comp.find('HHZ') >= 0 or comp.find('BHZ') >= 0 or comp.find('HNZ') >= 0 \
-            or comp.startswith('vertical'):
+            or comp.startswith('vertical') or comp.endswith('3') or comp.endswith('6'):
              o = 'Z'
              #print('up?')
         elif comp.find('x ') >= 0 or comp.find('e ') >= 0 or comp.startswith('East') \
             or comp.find('E Tran') >= 0 or comp.find('E ') >= 0 or comp.find('X ') >= 0 \
             or comp.find('HHE') >= 0 or comp.find('BHE') >= 0 or comp.find('HNE') >= 0 \
-            or comp.startswith('east'):
+            or comp.startswith('east') or comp.endswith('1') or comp.endswith('4'):
              o = 'E'
              #print('east?')
         elif comp.find('y ') >= 0 or comp.find('n ') >= 0 or comp.startswith('North') \
             or comp.find('N Tran') >= 0 or comp.find('N ') >= 0 or comp.find('Y ') >= 0 \
             or comp.find('HHN') >= 0 or comp.find('BHN') >= 0 or comp.find('HNN') >= 0 \
-            or comp.startswith('north'):
+            or comp.startswith('north') or comp.endswith('2') or comp.endswith('5'):
              o = 'N'
              #print('north?')
         else:

@@ -1088,7 +1088,7 @@ def return_all_au_station_data():
     
     for line in lines:
         dat = line.strip().split('\t')
-        
+        #print(line)
         if int(dat[5]) < 1:
             dat[5] = 1
         if int(dat[7]) < 1:
@@ -1217,16 +1217,18 @@ def remove_low_sample_data(st):
             if tr.stats.channel.encode('ascii','ignore').startswith('L') \
                 or tr.stats.channel.encode('ascii','ignore').startswith('V') \
                 or tr.stats.channel.encode('ascii','ignore').startswith('U') \
-                or tr.stats.channel.encode('ascii','ignore').startswith('C') \
                 or tr.stats.sampling_rate < 1.0:
                 st = st.remove(tr)
+                
+                #or tr.stats.channel.encode('ascii','ignore').startswith('C') \
         except:
             if tr.stats.channel.startswith('L') \
                 or tr.stats.channel.startswith('V') \
                 or tr.stats.channel.startswith('U') \
-                or tr.stats.channel.startswith('C') \
                 or tr.stats.sampling_rate < 1.0:
                 st = st.remove(tr)
+                
+                #or tr.stats.channel.startswith('C') \
                 
     # now strip low sample data from stream
     if rmlsr == True:
