@@ -485,9 +485,10 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = AtkinsonBoore2006Modified2011()
     AB11imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    '''
     gmpe = ChiouYoungs2008SWISS01()
     CY08imtSWISS = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
-    
+    '''
     gmpe = SomervilleEtAl2009NonCratonic_SS14() # ******* Using SS14 *******
     Sea09imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
@@ -525,7 +526,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
     #return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
     #return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
-    return Tea02imt, C03imt, AB06imt, AB11imt, CY08imtSWISS, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
+    return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup, vs30):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
