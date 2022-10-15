@@ -6,16 +6,24 @@ def fix_stream_channels(mseedfile, accel=False):
     # loop thru traces
     for tr in st:
         if accel == False:
+            
             if tr.stats['channel'].startswith('EL') or tr.stats['channel'].startswith('EY') \
             or tr.stats['channel'].startswith('DH') or tr.stats['channel'].startswith('DD') \
             or tr.stats['channel'].startswith('CH'): # or tr.stats['channel'].startswith('HN'):
-                tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
+            
+                if tr.stats['station'].startswith('SWN1') or tr.stats['station'].startswith('SWN0') \
+                    or tr.stats['station'].startswith('SWN2'):
+                    tr.stats['channel'] = 'HH' + tr.stats['channel'][-1]
+                else:
+                    tr.stats['channel'] = 'EH' + tr.stats['channel'][-1]
         
-        elif tr.stats['channel'].startswith('EN') or tr.stats['channel'].startswith('DN'):
-            tr.stats['channel'] = 'HN' + tr.stats['channel'][-1]
         
         elif accel == True:
             tr.stats['channel'] = 'HN' + tr.stats['channel'][-1]
+        '''
+        elif tr.stats['channel'].startswith('EN') or tr.stats['channel'].startswith('DN'):
+            tr.stats['channel'] = 'HN' + tr.stats['channel'][-1]
+        '''
     
     # overwrite mseed
     st.write(mseedfile, format="MSEED")
@@ -745,6 +753,61 @@ def get_auspass_data(dateTupple, durn=600, network='S1', station='*', channel='*
                 
     except:
         print('No AusPass data available...')
+        
+def get_swan_data(dateTupple, durn=600, network='2P', station='*', channel='*'):
+    '''
+    datetime tuple fmt = (Y,m,d,H,M)
+    '''
+    from obspy import UTCDateTime, Stream
+    from obspy.clients.fdsn import Client as FDSN_Client
+    from numpy import unique
+    from os import path, makedirs
+    
+    auspass = FDSN_Client('http://auspass.edu.au:8080',user_agent='trevor.allen@ga.gov.au',user='2p',password='kiwi30') 
+    
+    '''
+    Networks:
+        2P = SWAN
+        1K = ALFREX
+    '''
+    location = "*" #n.b. AusPass data typically has a univeral blank (e.g. '') value for ALL station locations. "*" works just as well. 
+    time0 = UTCDateTime(dateTupple[0],dateTupple[1],dateTupple[2],dateTupple[3],dateTupple[4]) - 120
+    time1 = time0 + durn 
+    
+    try:
+        st = auspass.get_waveforms(network=network,station=station,location=location,channel=channel,starttime=time0,endtime=time1)
+        
+        if len(st) > 0:
+            # get array of stations
+            stalist = []
+            for tr in st:
+                stalist.append(tr.stats.station)
+                
+            stalist = unique(stalist)
+            
+            # check if waves folder exists
+            if not path.isdir('auspass_dump'):
+                makedirs('auspass_dump')
+            
+            # now loop thru unique stalist and output streams
+            for us in stalist:
+                new_st = Stream()
+                for tr in st:
+                    if tr.stats.station == us:
+                        new_st += tr
+                        
+                # save out to file
+                tr = new_st[0]
+                
+                trname = path.join('auspass_dump', \
+                                   '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                                   tr.stats['network'], tr.stats['station'], 'mseed')))
+                
+                print('Writing file:', trname)
+                new_st.write(trname, format="MSEED")
+                
+    except:
+        print('No AusPass data available...')
     
 def get_arclink_data(datetupple, sta, net):
     from obspy import UTCDateTime
@@ -1074,6 +1137,53 @@ def parse_iris_stationlist(stationlist):
         
     return staDict
 
+def iris_gmap2stationlist(iris_gmap):
+    from data_fmt_tools import parse_iris_stationlist
+    staDict = parse_iris_stationlist(iris_gmap)
+    
+    # now write txt
+    txt = ''
+    txt2 = ''
+    for sta in staDict:
+    	txt += '\t'.join((sta['sta'],'B','20220101','25990101',str(sta['lon']),str(sta['lat']),'2P','-12345','-12345','1196.42','419430.4','1','HHE','trillium-compact-120.paz')) + '\n'
+    	txt += '\t'.join((sta['sta'],'B','20220101','25990101',str(sta['lon']),str(sta['lat']),'2P','-12345','-12345','1196.42','419430.4','1','HHN','trillium-compact-120.paz')) + '\n'
+    	txt += '\t'.join((sta['sta'],'B','20220101','25990101',str(sta['lon']),str(sta['lat']),'2P','-12345','-12345','1196.42','419430.4','1','HHZ','trillium-compact-120.paz')) + '\n'
+    	
+    	txt2 += '\t'.join((sta['sta'],str(sta['lon']),str(sta['lat']),'1','2022','1','2599','1')) + '\n'
+    # now write
+    f = open('2p_stationlist.txt', 'w')
+    f.write(txt)
+    f.close()
+    
+    f = open('2p_station_data.dat', 'w')
+    f.write(txt2)
+    f.close()
+
+
+# this has not been tested!
+def eqwave2stationlist(eqwave_txtfile):
+    from readwaves import readeqwave
+    from sys import argv
+    
+    wavfile = argv[1]
+    sta, comps, recdate, sec, sps, data, nsamp, cntpvolt, sen, gain = readeqwave(wavfile)
+    
+    lines = ''
+    for i in range(0, len(sta)):
+        line = '\t'.join((sta[i], comps[i][0], recdate[i][0:8], '25990101', 'LON', 'LAT', 'MEL', '-12345', '-12345', \
+                          sen[i], cntpvolt[i], gain[i], comps[i], 'NULL'))
+        lines += line + '\n'
+    
+    # make filename
+    slfile = wavfile.split('.')[0].split('/')[1]+'.stationlist'
+    slfile = slfile.replace(' ', '_')
+    f = open(slfile, 'wb')
+    f.write(lines)
+    f.close()
+
+
+
+
 def remove_acceleration_data(st):
     # first split the stream and remerge
     st = st.split().split().merge(method=1, fill_value=0)
@@ -1089,6 +1199,10 @@ def remove_acceleration_data(st):
 def remove_low_sample_data(st):
     from numpy import array, unique, zeros_like, where
     
+    for tr in st:
+        if tr.stats.sampling_rate < 1.0:
+            st = st.remove(tr)
+            
     # first split the stream and remerge
     st = st.split().split().merge(method=1, fill_value=0)
     
@@ -1096,19 +1210,22 @@ def remove_low_sample_data(st):
     for tr in st:
         if tr.stats.sampling_rate >= 80:
             rmlsr = True
+        
             
         # remove junk stations
         try:
             if tr.stats.channel.encode('ascii','ignore').startswith('L') \
                 or tr.stats.channel.encode('ascii','ignore').startswith('V') \
                 or tr.stats.channel.encode('ascii','ignore').startswith('U') \
-                or tr.stats.channel.encode('ascii','ignore').startswith('C'):
+                or tr.stats.channel.encode('ascii','ignore').startswith('C') \
+                or tr.stats.sampling_rate < 1.0:
                 st = st.remove(tr)
         except:
             if tr.stats.channel.startswith('L') \
                 or tr.stats.channel.startswith('V') \
                 or tr.stats.channel.startswith('U') \
-                or tr.stats.channel.startswith('C'):
+                or tr.stats.channel.startswith('C') \
+                or tr.stats.sampling_rate < 1.0:
                 st = st.remove(tr)
                 
     # now strip low sample data from stream

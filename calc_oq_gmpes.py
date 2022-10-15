@@ -1,3 +1,5 @@
+from openquake.hazardlib.contexts import *  # for backward compatibility
+
 # converts g to cm/s**2
 def g2cgs(gin):
     from scipy.constants import g
@@ -22,6 +24,7 @@ def get_pga_sa(gmpe, sites, rup, dists, crust_ty):
     '''
         
     #print(gmpe.imls['T'])
+    #gmpe.imls['T']
     
     # get gmpe periods
     if crust_ty == 'wcrust':
@@ -183,7 +186,7 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
     from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from atkinson_adams_2013 import atkinson_adams_2013
+    #from atkinson_adams_2013 import atkinson_adams_2013
     from fault_tools import mag2rupwid_WC94
     from numpy import array, sqrt, log, exp, arange
     
@@ -240,15 +243,17 @@ def crustal_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = ChiouYoungs2014()
     CY14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
+    '''
     # prepare Atkinson & Adams 2013
     repi = sqrt(rrup**2 - dep**2) # not correct if rrup != rhypo
     #print('crust', mag, dists.rjb[0]
     AA13imt = atkinson_adams_2013(mag, dists.rjb[0], crust_ty = crust_ty) # assume Rjb = Repi
     '''
+    '''
     return Bea97imt, Zea06imt, CB08imt, CY08imt, Bea11imt, BA11imt, AA13imt, Aea14imt, Bea14imt, CY14imt, \
            sites, rup, dists
     '''       
-    return Bea97imt, Zea06imt, CB08imt, CY08imt, Bea11imt, BA11imt, AA13imt, Aea14imt, Bea14imt, CB14imt, CY14imt
+    return Bea97imt, Zea06imt, CB08imt, CY08imt, Bea11imt, BA11imt, Aea14imt, Bea14imt, CB14imt, CY14imt
 
 # calls and calculates candidate intraslab GMPEs - values returned in ln(g)
 def inslab_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
@@ -421,13 +426,13 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
     from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
     from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006Modified2011
-    from openquake.hazardlib.gsim.chiou_youngs_2008 import ChiouYoungs2008
+    from openquake.hazardlib.gsim.chiou_youngs_2008_swiss import ChiouYoungs2008SWISS01
     from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009NonCratonic
     from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009YilgarnCraton
-    from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009NonCratonic_SS14
-    from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009YilgarnCraton_SS14
+    from openquake.hazardlib.gsim.somerville_2009_ss14 import SomervilleEtAl2009NonCratonic_SS14
+    from openquake.hazardlib.gsim.somerville_2009_ss14 import SomervilleEtAl2009YilgarnCraton_SS14
     from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
-    from openquake.hazardlib.gsim.allen_2012 import Allen2012, Allen2012_SS14
+    from openquake.hazardlib.gsim.allen_2012_ss14 import Allen2012, Allen2012_SS14
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
     #from openquake.hazardlib.gsim.nga_east import NGAEastGMPE, get_hard_rock_mean
     #from openquake.hazardlib.gsim.yenier_atkinson_2015 import YenierAtkinson2015BSSA
@@ -480,13 +485,13 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     gmpe = AtkinsonBoore2006Modified2011()
     AB11imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
-    #gmpe = ChiouYoungs2008()
-    #CY08imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    gmpe = ChiouYoungs2008SWISS01()
+    CY08imtSWISS = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     gmpe = SomervilleEtAl2009NonCratonic_SS14() # ******* Using SS14 *******
     Sea09imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
-    gmpe = SomervilleEtAl2009YilgarnCraton() # ******* Using SS14 *******
+    gmpe = SomervilleEtAl2009YilgarnCraton_SS14() # ******* Using SS14 *******
     Sea09YCimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
 
     gmpe = PezeshkEtAl2011()
@@ -494,6 +499,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
 
     gmpe = Allen2012()
     A12imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
     
     gmpe = Allen2012_SS14()
     A12imt_SS14 = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
@@ -518,7 +524,8 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #AA13imt = []
 
     #return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
-    return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
+    #return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
+    return Tea02imt, C03imt, AB06imt, AB11imt, CY08imtSWISS, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup, vs30):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012
@@ -621,12 +628,16 @@ def gaull1990_gsim(mag, dep, rhypo):
     return G90WAimt, G90SEAimt, G90INDimt, G90WA_PGVimt, G90SEA_PGVimt, G90IND_PGVimt
     
 def hdf5_gsim(mag, dep, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
+    from openquake_3_11_4.hazardlib.gsim.gmpe_table import GMPETable
+    #from gsim_table import GMPETable
     #from openquake.hazardlib.gsim.gmpe_table import GMPETable
-    from gsim_table import GMPETable
-    from openquake_3_6_0.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array, sqrt, log, exp, arange
-    from openquake_3_6_0.hazardlib.imt import PGA, PGV, SA
-    from openquake_3_6_0.hazardlib.const import StdDev
+    from openquake_3_11_4.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    #from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array, sqrt, log, exp, arange, isnan
+    from openquake_3_11_4.hazardlib.imt import PGA, PGV, SA
+    from openquake_3_11_4.hazardlib.const import StdDev
+    #from openquake.hazardlib.imt import PGA, PGV, SA
+    #from openquake.hazardlib.const import StdDev
 
     crust_ty = 'gmpetable'
     
@@ -639,6 +650,7 @@ def hdf5_gsim(mag, dep, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
 
     rup = RuptureContext()
     rup.mag = mag
+    #print(rup.mag)
     rup.hypo_depth = dep
     rup.dip = dip
     rup.rake = rake
@@ -651,37 +663,49 @@ def hdf5_gsim(mag, dep, dip, rake, rrup, rjb, rhypo, vs30, hdf5file):
     dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
         
     gmpe = GMPETable(gmpe_table = hdf5file) # use full path
-    #imt = gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])
-    hdf5imt = get_pga_sa_gmpe_legacy(gmpe, sites, rup, dists, crust_ty)
+    hdf5imt = gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL]) # this works!
     
-    return hdf5imt
-    #return imt
+    imt = {}
+    imt['per'] = gmpe.imls['T']
+    
+    # get PGA   
+    imt['pga'] = '0' 
+    
+    # get PGV
+    try:
+        imt['pgv'] = gmpe.get_mean_and_stddevs(sites, rup, dists, PGV(), [StdDev.TOTAL])
+    except:
+        imt['pgv'] = nan
 
-def tang2019_cam_gsim(mag, dep, rrup, vs30):
-    from openquake.hazardlib.gsim.tang_2019 import TangEtAl2019
-    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array
+    # now get SA data
+    imt['sa'] = []
+    imt['sig'] = []
     
-    crust_ty = 'intraplate'
+    for p in imt['per']:
+        
+        satmp = array([gmpe.get_mean_and_stddevs(sites, rup, dists, SA(p), [StdDev.TOTAL])[0]])
+        imt['sa'].append(satmp[0])
+        '''
+        try:
+            if isnan(satmp[0]):
+                imt['sa'].append(satmp[1])
+            else:
+                imt['sa'].append(satmp[0])
+        except:
+            if isnan(satmp[0][0]):
+                imt['sa'].append(satmp[0][1])
+            else:
+                imt['sa'].append(satmp[0][0])
+        '''        
+        imt['sig'].append(gmpe.get_mean_and_stddevs(sites, rup, dists, SA(p), [StdDev.TOTAL])[1][0])
+        
+    imtpga = {'pga':gmpe.get_mean_and_stddevs(sites, rup, dists, PGA(), [StdDev.TOTAL])}
+    imt['pga'] = imtpga['pga'] # I have no idea why I need to do this, but it fixes all the probs
     
-    sites = SitesContext()
-    sites.vs30 = array([float(vs30)])
-    sites.vs30measured = 0
-    
-    rup = RuptureContext()
-    rup.mag = mag
-    rup.hypo_depth = dep
-
-    dists = DistancesContext()
-    dists.rrup = array([rrup])
-    
-    gmpe = TangEtAl2019()
-    Tea19imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
-    
-    return Tea19imt
+    return imt, imtpga
 
 # USGS 2018 mean NGA-East from PEER Report 2018/XX
-def nga_east_mean(mag, dep, dip, rake, rrup, vs30):
+def nga_east_mean(mag, dep, dip, rake, rrup, vs30, ztor=5):
     from numpy import sqrt
     
     hdf5file = '/Users/trev/Documents/Code/my_codes/hdf5/NGA-East_Backbone_Model.geometric.hdf5'
@@ -691,10 +715,10 @@ def nga_east_mean(mag, dep, dip, rake, rrup, vs30):
     else:
         rjb = sqrt(rrup**2 - dep**2)
     rhypo = rrup
-    ztor = dep - 2 # random guess
+    ztor = ztor # random guess
                     
     return hdf5_gsim(mag, dep, dip, rake, rrup, rjb, rhypo, vs30, hdf5file)
-
+    
 def aa13_gsims(mag, dep, rrup, rjb, rhypo, vs30):
     from openquake_3_6_0.hazardlib.gsim.gsim_table import GMPETable
     from atkinson_adams_2013 import atkinson_adams_2013
@@ -730,6 +754,29 @@ def aa13_gsims(mag, dep, rrup, rjb, rhypo, vs30):
     
     return AA13_crustal, AA13_offshore
 
+def tang2019_cam_gsim(mag, dep, rrup, vs30):
+    from openquake.hazardlib.gsim.tang_2019 import TangEtAl2019
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array
+    
+    crust_ty = 'intraplate'
+    
+    sites = SitesContext()
+    sites.vs30 = array([float(vs30)])
+    sites.vs30measured = 0
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+
+    dists = DistancesContext()
+    dists.rrup = array([rrup])
+    
+    gmpe = TangEtAl2019()
+    Tea19imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    return Tea19imt
+    
 # calls and calculates candidate active crustal GMPEs - values returned in ln(g)
 def bssa_gsim(mag, dep, ztor, dip, rake, rjb, vs30):
     from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014

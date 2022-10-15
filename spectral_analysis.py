@@ -202,13 +202,18 @@ def calc_fft(data, sps):
         
         # get frequencies
         freq = np.fft.fftfreq(n, d=1./sps)
+        #print('blah')
     except:
         n = len(data[0])
         
         # calc FFT
         wavfft = np.fft.fft(data[0],n)
         
-        freq = freq.reshape(1,n)
+         # get frequencies
+        freq = np.fft.fftfreq(n, d=1./sps)
+        
+        #freq = freq.reshape(1,n)
+        #print('blah2')
     return freq, wavfft
 
 # return instrument corrected velocity

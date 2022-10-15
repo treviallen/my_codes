@@ -344,19 +344,20 @@ while continue_loop == True:
     elif seltask == '8': # plot instrument response
         # do common read functions
         sta, inst_ty, sps, recdate, nat_freq, damping, sen, recsen, gain, chan, \
-                chan_no, chan_dat, stlo, stla, pazfile, alldata = \
-                common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp)
+                chan_no, chan_dat, stlo, stla, pazfile, alldata, netid = \
+                common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed)
 
         # make dummy dataset of size 131072
         if inst_ty == 'H':
-            dummydat = np.random.rand(1,131072)
+            dummydat = np.random.rand(131072)
         else:
-            dummydat = np.random.rand(1,32768)
+            dummydat = np.random.rand(32768)
 
         # do FFT to get dummy frequencies
         freq, wavfft = spectral_analysis.calc_fft(dummydat, sps)
 
         # calculate and plot instrument response
+        print(freq)
         plotting.plot_instrument_resp(sta, inst_ty, freq, nat_freq, damping, \
                                       sen, recsen, gain, pazfile, chan_no)
 
