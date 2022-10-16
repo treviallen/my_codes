@@ -1151,11 +1151,11 @@ def iris_gmap2stationlist(iris_gmap):
     	
     	txt2 += '\t'.join((sta['sta'],str(sta['lon']),str(sta['lat']),'1','2022','1','2599','1')) + '\n'
     # now write
-    f = open('2p_stationlist.txt', 'w')
+    f = open('au_stationlist.txt', 'w')
     f.write(txt)
     f.close()
     
-    f = open('2p_station_data.dat', 'w')
+    f = open('au_station_data.dat', 'w')
     f.write(txt2)
     f.close()
 
