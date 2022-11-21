@@ -529,7 +529,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup, vs30):
-    from openquake.hazardlib.gsim.allen_2012 import Allen2012
+    from openquake.hazardlib.gsim.allen_2012 import Allen2012, Allen2012_SS14
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
     from numpy import array, arange
     
@@ -549,7 +549,10 @@ def allen2012_gsim(mag, dep, rrup, vs30):
     gmpe = Allen2012()
     A12imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
-    return A12imt
+    gmpe = Allen2012_SS14()
+    A12_SS14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    return A12imt, A12_SS14imt
 
 # Banda Sea model    
 def allen2022_gsim(mag, dep, rhypo, vs30):
@@ -575,6 +578,43 @@ def allen2022_gsim(mag, dep, rhypo, vs30):
     
     return A22imt
     
+def somerville2009_gsim(mag, rjb, vs30, dep):
+    from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009NonCratonic
+    from openquake.hazardlib.gsim.somerville_2009 import SomervilleEtAl2009YilgarnCraton
+    from openquake.hazardlib.gsim.somerville_2009_ss14 import SomervilleEtAl2009NonCratonic_SS14
+    from openquake.hazardlib.gsim.somerville_2009_ss14 import SomervilleEtAl2009YilgarnCraton_SS14
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array, sqrt, log, exp, arange
+    
+    crust_ty = 'intraplate'
+    
+    sites = SitesContext()
+    sites.vs30 = array([float(vs30)])
+    sites.vs30measured = False
+    sites.sids = arange(1)
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+
+    dists = DistancesContext()
+    dists.rjb = array([rjb])
+
+    gmpe = SomervilleEtAl2009NonCratonic()
+    Sea09imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+
+    gmpe = SomervilleEtAl2009YilgarnCraton()
+    Sea09YCimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = SomervilleEtAl2009NonCratonic_SS14() # ******* Using SS14 *******
+    Sea09_SS14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+
+    gmpe = SomervilleEtAl2009YilgarnCraton_SS14() # ******* Using SS14 *******
+    Sea09YC_SS14imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+
+    return Sea09imt, Sea09YCimt, Sea09_SS14imt, Sea09YC_SS14imt
+
+
 def gaull1990_gsim(mag, dep, rhypo):
     
     from openquake.hazardlib.gsim.gaull_1990 import GaullEtAL1990WesternAustralia, \
