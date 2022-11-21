@@ -851,8 +851,30 @@ def parse_iscgem(iscgemcsv):
             evdt = datetime.strptime(line[0].strip(), '%Y-%m-%d %H:%M:%S.%f')
             tmpdict = {'eventid':line[-1].strip(), 'datetime':evdt, 'year':evdt.year, 'month':evdt.month, 'day':evdt.day, \
                        'hour':evdt.hour, 'min':evdt.minute, 'sec':evdt.second, 'lon':float(line[2].strip()), 'lat':float(line[1].strip()), \
-                       'dep':float(line[7].strip()), 'mw':float(line[10].strip()), 'mo_auth':line[16].strip()}
+                       'dep':float(line[7].strip()), 'mw':float(line[10].strip()), 'mo_auth':line[16].strip(), 'evid':line[-1].strip()}
                        
             iscgemCat.append(tmpdict)
             
     return iscgemCat
+
+def iscgem2htmk(iscgemcsv):
+    
+    # parse ISC-GEM catalogue
+    iscgemCat = parse_iscgem(iscgemcsv)
+    
+    # write HMTK catalogue
+    header = ','.join(('eventID','year', 'month', 'day', 'hour', 'minute', 'second', 'longitude', 'latitude','depth','magnitude','magnitudeType','Agency'))
+    oq_dat = header + '\n'
+    # loop thru eqs
+    for igc in iscgemCat:
+        line = ','.join((igc['evid'],str(igc['year']), str(igc['month']),str(igc['day']),str(igc['hour']),str(igc['min']),str(igc['sec']),str(igc['lon']),str(igc['lat']), \
+                        str(igc['dep']),str(igc['mw']),'MW',igc['mo_auth']))
+        oq_dat += line + '\n'
+        
+    #write to OQ out
+    print('Writing HMTK csv...\n')
+    hmtkfile = iscgemcsv.split('.')[0] + '_hmtk.csv'
+    f = open(hmtkfile, 'w')
+    f.write(oq_dat)
+    f.close()
+    

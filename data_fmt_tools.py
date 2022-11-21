@@ -635,7 +635,7 @@ def eqwave2mseed(eqwfile):
     st.write(outfile, format='MSEED')
 
 
-def get_iris_data(dateTuple, sta, net, durn=600):     
+def get_iris_data(dateTuple, sta, net, durn=600, client='IRIS'):     
     from obspy.core.utcdatetime import UTCDateTime
     from obspy.clients.fdsn.client import Client
     from os import path, makedirs
@@ -660,7 +660,7 @@ def get_iris_data(dateTuple, sta, net, durn=600):
     utcdt = '-'.join((dtsplit[0], dtsplit[1].zfill(2), dtsplit[2].zfill(2))) \
             + 'T' + ':'.join((dtsplit[3].zfill(2), dtsplit[4].zfill(2), '00.000'))
     
-    client = Client("IRIS")
+    data_client = Client(client)
     t1 = UTCDateTime(utcdt) - 120
     t2 = t1 + durn
     t3 = t1 + 3
@@ -669,7 +669,7 @@ def get_iris_data(dateTuple, sta, net, durn=600):
             ("AU", "AFI", "1?", "BHE", t1, t3)]
     
     try:        
-        st = client.get_waveforms_bulk(bulk)
+        st = data_client.get_waveforms_bulk(bulk)
         
         # save out to file
         tr = st[0]
