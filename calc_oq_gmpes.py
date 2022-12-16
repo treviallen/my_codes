@@ -502,7 +502,7 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     A12imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     
-    gmpe = Allen2012_SS14()
+    gmpe = Allen2012_SS14() # ******* Using SS14 *******
     A12imt_SS14 = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
     
     gmpe = BooreEtAl2014()
@@ -798,13 +798,14 @@ def aa13_gsims(mag, dep, rrup, rjb, rhypo, vs30):
 def tang2019_cam_gsim(mag, dep, rrup, vs30):
     from openquake.hazardlib.gsim.tang_2019 import TangEtAl2019
     from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
-    from numpy import array
+    from numpy import array, arange
     
     crust_ty = 'intraplate'
     
     sites = SitesContext()
     sites.vs30 = array([float(vs30)])
     sites.vs30measured = 0
+    sites.sids = arange(1)
     
     rup = RuptureContext()
     rup.mag = mag

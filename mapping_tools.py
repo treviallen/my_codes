@@ -145,7 +145,7 @@ def getshapecolour(sf, field, colmap, ncolours, **kwargs):
         
     return cs, ci, cmap, zmin, zmax
     
-def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, zorder=20000, **kwargs):
+def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, zorder=5000, **kwargs):
     from numpy import arange, isnan, nan
     
     # get kwargs
@@ -1303,11 +1303,11 @@ savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
 """
 
 def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', \
-                    marker='o', markersize=6, markeredgewidth=0.5, fs=14):
+                    marker='o', markersize=6, markeredgewidth=0.5, fs=14, weight='normal'):
     from numpy import argsort
     from os import getcwd
     import matplotlib.patheffects as PathEffects
-    path_effects=[PathEffects.withStroke(linewidth=3, foreground="w")]
+    path_effects=[PathEffects.withStroke(linewidth=2.5, foreground="w")]
     
     # set grid size (in degrees)
     lonrng = m.urcrnrlon - m.llcrnrlon
@@ -1320,7 +1320,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         txtoff = 0.005 
     elif lonrng <= 1:
         pltbuffer = 0.04
-        txtoff = 0.006
+        txtoff = 0.025
     elif lonrng <= 2:
         pltbuffer = 0.06
         txtoff = 0.012 
@@ -1334,8 +1334,8 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         pltbuffer = 0.175
         txtoff = 0.03
     elif lonrng >= 6:
-        pltbuffer = 0.45
-        txtoff = 0.1
+        pltbuffer = 0.2
+        txtoff = 0.07
     #print(pltbuffer
     
     # parse AU cities
@@ -1383,7 +1383,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
             print(pltloc[si])
             
             for clol, clal in zip(clonList, clatList):
-                if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (4.*pltbuffer):
+                if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (2.5*pltbuffer):
                     #print(pltloc[si]
                     pltCity = False
                     
@@ -1396,9 +1396,14 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
                 plt.plot(x, y, marker, markerfacecolor=markerfacecolor, \
                          markeredgecolor=markeredgecolor, markeredgewidth=markeredgewidth, \
                          markersize=markersize, zorder=11000)
-        
+                
+                # check if capital city and make upper case
+                if pltloc[si] == 'Perth' or pltloc[si] == 'Darwin' or pltloc[si] == 'Adelaide' or pltloc[si] == 'Melbourne' \
+                    or pltloc[si] == 'Canberra' or pltloc[si] == 'Sydney' or pltloc[si] == 'Brisbane' or pltloc[si] == 'Hobart':
+                        pltloc[si] = pltloc[si].upper()
+                         
                 x, y = m(pltlo[si]-txtoff, pltla[si]+txtoff) # changed for camden fig
-                plt.text(x, y, pltloc[si], size=fs, ha='right', weight='normal', path_effects=path_effects, zorder=11000)
+                plt.text(x, y, pltloc[si], size=fs, ha='right', weight=weight, path_effects=path_effects, zorder=11000)
                 
                 i += 1
                 
