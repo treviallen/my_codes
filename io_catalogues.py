@@ -817,7 +817,7 @@ def parse_ga_event_query(gacsv):
                      'dep': float(dat[4]), 'mag_ml': checkfloat(dat[17]), \
                      'mag_mb': checkfloat(dat[15]), 'mag_ms': checkfloat(dat[18]),
                      'mag_mw': checkfloat(dat[19]), 'mag_mwp': checkfloat(dat[21]),
-                     'mag': checkfloat(dat[30]), 'magType': dat[31], 'auth':dat[-1],
+                     'mag': checkfloat(dat[30]), 'magType': dat[31], 'auth':dat[-3],
                      'timestr': dat[10], 'description': dat[6], 'event_id':dat[11]} 
                      	
             evdict.append(tdict)
@@ -877,4 +877,24 @@ def iscgem2htmk(iscgemcsv):
     f = open(hmtkfile, 'w')
     f.write(oq_dat)
     f.close()
+
+def ga_query2htmk(ga_query):
     
+    # parse GA catalogue
+    gaCat = parse_ga_event_query(ga_query)
+    
+    # write HMTK catalogue
+    header = ','.join(('eventID','year', 'month', 'day', 'hour', 'minute', 'second', 'longitude', 'latitude','depth','magnitude','magnitudeType','Agency'))
+    oq_dat = header + '\n'
+    # loop thru eqs
+    for gac in gaCat:
+        line = ','.join((gac['event_id'],str(gac['year']), str(gac['month']),str(gac['day']),str(gac['hour']),str(gac['minute']),str(gac['second']),str(gac['lon']),str(gac['lat']), \
+                        str(gac['dep']),str(gac['mag']),gac['magType'],gac['auth']))
+        oq_dat += line + '\n'
+        
+    #write to OQ out
+    print('Writing HMTK csv...\n')
+    hmtkfile = ga_query.split('.')[0] + '_hmtk.csv'
+    f = open(hmtkfile, 'w')
+    f.write(oq_dat)
+    f.close()    
