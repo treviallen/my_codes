@@ -176,6 +176,21 @@ def ghasemi_bl_ms2mw(ms):
     
     return c1 * mb + c2
 
+# Ghasemi et al (2020) ISC mb2MW conversion for PNG region
+def ghasemi20_mb2mw_png(mb):
+    return 1.085 * mb - 0.207
+    
+##########################################################
+# ISC-GEM conversions
+##########################################################
+
+def digiacomo15_mb2mw_linear(mb):
+    return 1.38 * mb - 1.79
+    	
+def digiacomo15_mb2mw_exp(mb):
+    from numpy import exp
+    return exp(-4.664 + 0.859 * mb) + 4.555
+
 def get_au_ml_zone(eqlos, eqlas):
     '''
     eqlos & eqlas are a list of lats/lons

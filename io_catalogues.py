@@ -879,6 +879,7 @@ def iscgem2htmk(iscgemcsv):
     f.close()
 
 def ga_query2htmk(ga_query):
+    from mag_tools import ghasemi20_mb2mw_png
     
     # parse GA catalogue
     gaCat = parse_ga_event_query(ga_query)
@@ -888,6 +889,11 @@ def ga_query2htmk(ga_query):
     oq_dat = header + '\n'
     # loop thru eqs
     for gac in gaCat:
+        # first convert mb to MW using Ghasemi et al (2020) for PNG data
+        if gac['magType'].strip() == 'mb':
+            gac['mag'] = ghasemi20_mb2mw_png(gac['mag'])
+            gac['magType'] = 'MwG20'
+            
         line = ','.join((gac['event_id'],str(gac['year']), str(gac['month']),str(gac['day']),str(gac['hour']),str(gac['minute']),str(gac['second']),str(gac['lon']),str(gac['lat']), \
                         str(gac['dep']),str(gac['mag']),gac['magType'],gac['auth']))
         oq_dat += line + '\n'
