@@ -903,4 +903,20 @@ def ga_query2htmk(ga_query):
     hmtkfile = ga_query.split('.')[0] + '_hmtk.csv'
     f = open(hmtkfile, 'w')
     f.write(oq_dat)
-    f.close()    
+    f.close()
+    
+def ga_query_find_event(ga_csv, utcdatetime, td_lower=60, td_upper=60, mmin=-9.9, mmax=9.9):
+    '''
+    td_lower = lower timedelta in seconds
+    td_upper = upper timedelta in seconds
+    
+    '''
+    evdict = parse_ga_event_query(ga_csv)
+    
+    for evnum, ev in enumerate(evdict): 
+        #ev['datetime'] = UTCDateTime(2009,3,18,5,28,17)
+        if fft_datetime > UTCDateTime(ev['datetime']-timedelta(seconds=td_lower)) \
+           and fft_datetime < UTCDateTime(ev['datetime']+timedelta(seconds=td_upper)):
+               return_event = ev
+               
+    return return_event
