@@ -904,13 +904,17 @@ def ga_query2htmk(ga_query):
     f = open(hmtkfile, 'w')
     f.write(oq_dat)
     f.close()
-    
+
+# find event in GA event query - not yet complete    
 def ga_query_find_event(ga_csv, utcdatetime, td_lower=60, td_upper=60, mmin=-9.9, mmax=9.9):
     '''
     td_lower = lower timedelta in seconds
     td_upper = upper timedelta in seconds
-    
+    utcdatetime = obspy UTCDateTime object
     '''
+    from datetime import timedelta
+    from obspy import UTCDateTime
+    
     evdict = parse_ga_event_query(ga_csv)
     
     for evnum, ev in enumerate(evdict): 
