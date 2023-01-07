@@ -9,7 +9,7 @@ wave file
 
 """
 
-def get_response_info(sta,recdate,chan):
+def get_response_info(sta,recdate,chan,netid):
     import datetime as dt
     from os import getcwd
     
@@ -19,8 +19,16 @@ def get_response_info(sta,recdate,chan):
     sen = 1.0
     recsen = 1.0
     gain = 1.0
-    netid = ''
+    #netid = ''
     pazfile = 'NULL' 
+    
+    # make hack to network codes
+    print(netid + '1')
+    print(netid.strip()=='ME') 
+    if netid.strip()=='ME' or netid.strip() == 'SR' or netid.strip() == '':
+        netid = 'MEL'
+   
+    print(netid + '2')
 
     # check if sitename in file
     cwd = getcwd()
@@ -48,12 +56,12 @@ def get_response_info(sta,recdate,chan):
         mindate = dt.datetime.strptime(tmp[2], "%Y%m%d")
         maxdate = dt.datetime.strptime(tmp[3], "%Y%m%d")
         #print(mindate, maxdate, recdate)
-        if tmp[0] == sta and tmp[12].strip() == chan:
+        if tmp[0] == sta and tmp[12].strip() == chan and tmp[6] == netid:
             if recdate >= mindate and recdate <= maxdate:
                 inst_ty = tmp[1]
                 stlo = float(tmp[4])
                 stla = float(tmp[5])
-                netid = tmp[6]
+                #netid = tmp[6]
                 nat_freq = float(tmp[7])
                 damping = float(tmp[8])
                 sen = float(tmp[9])

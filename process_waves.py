@@ -65,7 +65,7 @@ def task_options():
 Common functions to read data file and get instrument parameters
 ****************************************************************************"""
 
-def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed):
+def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed, allnetid):
     
     #print(len(alldata[:,17])
     # select component
@@ -80,6 +80,7 @@ def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sa
     # get channel data of interest
     sta = allsta[chan_no].strip()
     sps = int(allsps[chan_no])
+    netid = allnetid[chan_no]
     
     if sacseed == True:
         chan_dat = alldata[:,chan_no]
@@ -105,7 +106,7 @@ def common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sa
 
     # check to see if response exists
     nat_freq, inst_ty, damping, sen, recsen, gain, pazfile, stlo, stla, netid \
-        = response.get_response_info(sta,recdate,chan)
+        = response.get_response_info(sta,recdate,chan,netid=netid)
 
     # if info does not exist, ask for user input
     if nat_freq == -12345 and pazfile == 'NULL':
@@ -212,7 +213,7 @@ except:
 
 # if SAC or SEED read waves
 if sacseed == True:
-    allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readwaves.readseed(st)
+    allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, allnetid = readwaves.readseed(st)
     fmt = 'obspy'
 
 # esle read text file format
@@ -245,7 +246,7 @@ while continue_loop == True:
         # do common read functions
         sta, inst_ty, sps, recdate, nat_freq, damping, sen, recsen, gain, chan, \
                 chan_no, chan_dat, stlo, stla, pazfile, alldata, netid = \
-                common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed)
+                common_read(allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, sacseed, allnetid)
 
         print(chan, inst_ty)
         # do common fft functions

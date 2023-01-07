@@ -62,7 +62,7 @@ def return_data(wavfile):
     elif fmt == 'mseed':
         from obspy.core import read
         st = read(wavfile)
-        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readseed(st)
+        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, allnetid = readseed(st)
     else:
         '\nFile format not recognised!'
         
@@ -675,6 +675,7 @@ def readseed(st):
     allsps = []
     alldata = []
     allnsamp = []
+    allnetid = []
     
     # first merge data gaps
     st.merge()
@@ -699,6 +700,7 @@ def readseed(st):
         allsec.append(tr.stats['starttime'].strftime("%S"))
         allsps.append(tr.stats['sampling_rate'])
         allnsamp.append(tr.stats['npts'])
+        allnetid.append(tr.stats['network'])
         #allnsamp.append(min_npts) # not sure why this line was added!
               
         # get channel 
@@ -777,7 +779,7 @@ def readseed(st):
             alldata = hstack((alldata, tmpdat.reshape(max_npts,1)))
             
     #print(shape(alldata)
-    return allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp
+    return allsta, comps, alldatestr, allsec, allsps, alldata, allnsamp, allnetid
 
 # make text to select channel
 def select_channel(sta, comps):

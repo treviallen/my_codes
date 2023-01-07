@@ -26,8 +26,9 @@ def m02mw(m0):
 Begin magnitude conversions here
 '''
 
+# ML 2 MW conversion used in the NSHA18
 def nsha18_ml2mw(ml):
-    # use ODR polynomial of simulated data from Ghasemi & Allen (2017)
+    # use ODR polynomial of simulated data from Ghasemi & Allen (2017) and Allen et al (2018)
     a = 0.04160769
     b = 0.48058286
     c = 1.39485216
