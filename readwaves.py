@@ -710,21 +710,23 @@ def readseed(st):
            tr.stats['channel'] == 'EHE' or tr.stats['channel'] == 'SHE' or \
            tr.stats['channel'] == 'SNE' or tr.stats['channel'] == 'BNE' or \
            tr.stats['channel'] == 'HN1' or tr.stats['channel'] == 'HLE' or \
-           tr.stats['channel'] == 'CPE' or tr.stats['channel'] == 'EYE':
+           tr.stats['channel'] == 'CPE' or tr.stats['channel'] == 'EYE' or \
+           tr.stats['channel'] == 'CHE':
             comp = tr.stats['channel']
         elif tr.stats['channel'] == 'HHN' or tr.stats['channel'] == 'HNN' or \
              tr.stats['channel'] == 'BHN' or tr.stats['channel'] == 'ENN' or \
              tr.stats['channel'] == 'EHN' or tr.stats['channel'] == 'SHN' or \
              tr.stats['channel'] == 'SNN' or tr.stats['channel'] == 'BNN' or \
              tr.stats['channel'] == 'HN2' or tr.stats['channel'] == 'HLN' or \
-             tr.stats['channel'] == 'CPN' or tr.stats['channel'] == 'EYN':
+             tr.stats['channel'] == 'CPN' or tr.stats['channel'] == 'EYN' or \
+             tr.stats['channel'] == 'CHN':
             comp = tr.stats['channel']
         elif tr.stats['channel'] == 'HHZ' or tr.stats['channel'] == 'HNZ' or \
              tr.stats['channel'] == 'BHZ' or tr.stats['channel'] == 'ENZ' or \
              tr.stats['channel'] == 'EHZ' or tr.stats['channel'] == 'SHZ' or \
              tr.stats['channel'] == 'SNZ' or tr.stats['channel'] == 'BNZ' or \
              tr.stats['channel'] == 'HLZ' or tr.stats['channel'] == 'CPZ' or \
-             tr.stats['channel'] == 'EYZ':
+             tr.stats['channel'] == 'EYZ'  or tr.stats['channel'] == 'CHZ':
             comp = tr.stats['channel']
         else:
             numtrue = False

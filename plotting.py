@@ -290,6 +290,7 @@ def plot_fft(sps, freq, corfftr, corffti, header, inst_ty):
         #corffti = corffti[0,1:]/(2.*(np.pi)*freq[0,1:])
         corfftr = corfftr[1:]/(2.*(np.pi)*freq[1:])
         corffti = corffti[1:]/(2.*(np.pi)*freq[1:])
+    
     dispamp = np.sqrt((1./sps)**2 * (corfftr**2 + corffti**2))
 
     # get plotting length

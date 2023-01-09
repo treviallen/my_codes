@@ -27,6 +27,20 @@ def fix_stream_channels(mseedfile, accel=False):
     
     # overwrite mseed
     st.write(mseedfile, format="MSEED")
+    
+def fix_swan_stream_channels(mseedfile):
+    from obspy import read
+    
+    st = read(mseedfile)
+    
+    # loop thru traces
+    for tr in st:
+    
+        if tr.stats['channel'].startswith('CH'):
+            tr.stats['channel'] = 'HH' + tr.stats['channel'][-1]
+
+    # overwrite mseed
+    st.write(mseedfile, format="MSEED")
 
 def fix_stream_network(mseedfile, newnet):
     '''

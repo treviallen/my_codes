@@ -23,13 +23,35 @@ def get_response_info(sta,recdate,chan,netid):
     pazfile = 'NULL' 
     
     # make hack to network codes
-    print(netid + '1')
-    print(netid.strip()=='ME') 
-    if netid.strip()=='ME' or netid.strip() == 'SR' or netid.strip() == '':
+    if netid.strip()=='ME' or netid.strip() == 'SR' or netid.strip() == 'VI' or netid.strip() == 'GM':
         netid = 'MEL'
-   
-    print(netid + '2')
-
+    elif netid.strip() == 'AB':
+        if sta == 'CCRM' or sta == 'GLEAD' or sta == 'MALDN' or sta == 'CAWDR' or sta == 'CORA' \
+           or sta == 'FINNS' or sta == 'BOGA' or sta == 'MILD' or sta == 'BUCHN' or sta == 'GOOG':
+            netid = 'MEL'
+    elif netid.strip() == 'OZ':
+        if sta == 'WILL' or sta == 'GLMM' or sta == 'JEER' or sta == 'DTMM' or sta == 'HOPM' \
+           or sta == 'KORUM':
+            netid = 'MEL'
+    
+    if sta == 'DROM' or sta == 'KORUM' or sta == 'JENM' or sta == 'EASTN' or sta == 'GLADS' or sta == 'TOMM' \
+       or sta == 'CDNM' or sta == 'FSHM' or sta == 'AWOON' or sta == 'TPND' or sta == 'GLADS' or sta == 'TOMM':
+        netid = 'MEL'   
+        
+    '''
+    elif netid.strip() == 'AB':
+        netid = 'UM'
+    '''    
+    if sta == 'RIV' or sta == 'KIM' or sta == 'CHI' or sta == 'NLD' or sta == 'NPS' or sta == 'DOW' \
+       or sta.startswith('NOR'):
+        netid = 'AU'
+        
+    if sta == 'ARKL' or sta == 'HWK':
+        netid = 'AD'
+        
+    if sta == 'S88U' or sta == 'STGU':
+        netid = 'UM'
+    
     # check if sitename in file
     cwd = getcwd()
     if cwd.startswith('/nas'):
@@ -68,6 +90,20 @@ def get_response_info(sta,recdate,chan,netid):
                 recsen = float(tmp[10])
                 gain = float(tmp[11])
                 pazfile = tmp[13].rstrip()
+                
+        elif netid == 'AB':
+            if tmp[0] == sta and tmp[12].strip() == chan:
+                if recdate >= mindate and recdate <= maxdate:
+                    inst_ty = tmp[1]
+                    stlo = float(tmp[4])
+                    stla = float(tmp[5])
+                    netid = tmp[6]
+                    nat_freq = float(tmp[7])
+                    damping = float(tmp[8])
+                    sen = float(tmp[9])
+                    recsen = float(tmp[10])
+                    gain = float(tmp[11])
+                    pazfile = tmp[13].rstrip()
                     
     if stlo == -12345:
         print(recdate,': Station', sta, chan, 'not found...')
