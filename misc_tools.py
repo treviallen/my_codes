@@ -701,8 +701,10 @@ def get_ga_secondary_colours_2022():
 def get_line_styles():
     return ['-', '--', '-.', (0, (3, 5, 1, 5, 1, 5)), (0, (3, 1, 1, 1, 1, 1)), (0, (3, 5, 1, 5))]
     
-    
+'''    
 # function to convert csv to json
+# copied from: https://pythonexamples.org/python-csv-to-json/
+'''
 def csv2json(csvFilePath, jsonFilePath):
     '''
     csvFilePath = input csv file
