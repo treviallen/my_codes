@@ -94,6 +94,9 @@ def nsha18_fixed_bilin_mw2ml(mw):
     
 def nsha18_mb2mw(mb):
     return 1.20 * mb - 1.176
+    
+def nsha18_ms2mw(ms):
+    return 0.075 * ms**2 - 3.357
 
 # from Mueller (pers comm) - from Sipkin SRL 2003
 def sipkin_mb2mw(mb):
@@ -175,7 +178,7 @@ def ghasemi_bl_ms2mw(ms):
     c1 = 0.84896727404297323
     c2 = -0.87192285009579173
     
-    return c1 * mb + c2
+    return c1 * ms + c2
 
 # Ghasemi et al (2020) ISC mb2MW conversion for PNG region
 def ghasemi20_mb2mw_png(mb):
@@ -205,12 +208,19 @@ def get_au_ml_zone(eqlos, eqlas):
     from os import getcwd
     from numpy import array
     
-    if getcwd().startswith('/nas'):
-        shpfile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Magnitudes/NEAC/australia_ml_regions.shp'
+    if getcwd().startswith('C:') or getcwd().startswith('Z:') or getcwd().startswith('M:'):
+        #shpfile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Magnitudes/NEAC/australia_ml_regions.shp'
+        try:
+            shpfile = 'Z:\\Magnitudes\\NEAC\\australia_ml_regions.shp'
+            sf = shapefile.Reader(shpfile)
+        except:
+            shpfile = 'C:\\Users\\u56903\\OneDrive - Geoscience Australia\\Magnitudes\\shapefiles\\australia_ml_regions.shp'
+            sf = shapefile.Reader(shpfile)
+        
     else:
         shpfile = '/Users/trev/Documents/Manuscripts/manuscripts/2021/ml_adjustmets/shapefile/australia_ml_regions.shp'
+        sf = shapefile.Reader(shpfile)
     
-    sf = shapefile.Reader(shpfile)
     shapes = sf.shapes()
     polygons = []
     for poly in shapes:

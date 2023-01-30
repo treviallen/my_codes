@@ -757,7 +757,30 @@ def export_historic_event_mmi(Y,m,d,H,M, outcsv):
     f.write(outtxt)
     f.close()
 
+
+def shakemap_rgb2cmap():
+    from matplotlib.colors import ListedColormap
     
+    MMI_COLORS_24BIT = [
+    (255, 255, 255),
+    (191, 204, 255),
+    (160, 230, 255),
+    (128, 255, 255),
+    (122, 255, 147),
+    (255, 255, 0),
+    (255, 200, 0),
+    (255, 145, 0),
+    (255, 0, 0),
+    (180, 0, 0),
+    ] 
+    
+    MMI_COLORS = [tuple(x / 255. for x in color) for color in MMI_COLORS_24BIT]
+    cmap = ListedColormap(MMI_COLORS)
+    
+    # usage
+    #mmi_data.plot(ax=ax, cmap=cmap, column='intensity', vmin=0.5, vmax=10.5, legend=True)
+    
+    return cmap    
 
 
 

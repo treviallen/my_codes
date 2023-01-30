@@ -680,6 +680,30 @@ def cmap2rgb(cmap, ncolours):
     x = linspace(0.0, 1.0, ncolours)
     
     return plt.get_cmap(plt.get_cmap(cmap))(x)[newaxis, :, :3]
+
+def shakemap_rgb2cmap():
+    from matplotlib.colors import ListedColormap
+    
+    MMI_COLORS_24BIT = [
+    (255, 255, 255),
+    (191, 204, 255),
+    (160, 230, 255),
+    (128, 255, 255),
+    (122, 255, 147),
+    (255, 255, 0),
+    (255, 200, 0),
+    (255, 145, 0),
+    (255, 0, 0),
+    (180, 0, 0)] 
+    
+    MMI_COLORS = [tuple(x / 255 for x in color) for color in MMI_COLORS_24BIT]
+    cmap = ListedColormap(MMI_COLORS)
+    
+    # usage
+    #mmi_data.plot(ax=ax, cmap=cmap, column='intensity', vmin=0.5, vmax=10.5, legend=True)
+    
+    return cmap
+
     
 def get_mpl2_colourlist():
     return ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
