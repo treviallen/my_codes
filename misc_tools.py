@@ -446,6 +446,16 @@ def get_log_xy_locs(lims, fraction_loc):
    
    return 10**(min(loglims) + logdiff * fraction_loc) 
    
+# set one decimal point on x & y axes
+def fmt_axes_tick_decimals(ax):
+    '''
+    e.g., ax = plt.subplot(111)
+    '''
+    
+    from matplotlib.ticker import FormatStrFormatter
+    ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
 # from http://stackoverflow.com/questions/2413522/weighted-standard-deviation-in-numpy
 def weighted_avg_and_std(values, weights):
     """
@@ -681,6 +691,7 @@ def cmap2rgb(cmap, ncolours):
     
     return plt.get_cmap(plt.get_cmap(cmap))(x)[newaxis, :, :3]
 
+"""
 def shakemap_rgb2cmap():
     from matplotlib.colors import ListedColormap
     
@@ -703,7 +714,7 @@ def shakemap_rgb2cmap():
     #mmi_data.plot(ax=ax, cmap=cmap, column='intensity', vmin=0.5, vmax=10.5, legend=True)
     
     return cmap
-
+"""
     
 def get_mpl2_colourlist():
     return ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',

@@ -1136,7 +1136,7 @@ def parse_iris_stationlist(stationlist):
     '''
     
     from obspy import UTCDateTime
-    lines = open(stationlist).readlines()[3:]
+    lines = open(stationlist).readlines() #[:]
     
     staDict = []
     
