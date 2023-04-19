@@ -131,7 +131,7 @@ def calc_GS86(comp, logA, repi):
     magstr = 'GS86:\t' + str("%0.2f" % GS86)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return GS86
 
@@ -143,7 +143,7 @@ def calc_HB87(comp, logA, rhyp):
     magstr = 'HB87:\t' + str("%0.2f" % HB87)
     if comp == 0: # if vertical
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return HB87
     
@@ -154,7 +154,7 @@ def calc_HB87_IASPEI(comp, logA, rhyp):
     magstr = 'HB87 IASPEI:\t' + str("%0.2f" % HB87_IASPEI)
     if comp == 0: # if vertical
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return HB87_IASPEI
 
@@ -192,22 +192,23 @@ def calc_SED84(comp, logA, rhyp):
         SED84 = logA2800 + Cd + Ce
             
     magstr = 'SED84:\t' + str("%0.2f" % SED84)
-    print(magstr)
+    #print(magstr)
 
     return SED84
 
 # Gaull & Gregson (1991) - WA
 def calc_GG91(comp, logA, rhyp):
     # GG91 adjust V to H (p 252)
+    '''
     if comp == 0: # if vertical
         logA += np.log10(1.34)
-    
+    '''
     GG91 = logA + 1.137 * np.log10(rhyp) + 0.000657 * rhyp + 0.66
     
     magstr = 'GG91:\t' + str("%0.2f" % GG91)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return GG91
 
@@ -231,7 +232,7 @@ def calc_WGW96(comp, logA, rhyp):
     magstr = 'WGW96:\t' + str("%0.2f" % WGW96)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return WGW96
     
@@ -254,7 +255,7 @@ def calc_A10(comp, logA, rhyp):
     magstr = 'A10:\t' + str("%0.2f" % A10)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
 
     return A10
     
@@ -291,7 +292,7 @@ def calc_A16(logA, rhyp, comp):
     magstr = 'A16:\t' + str("%0.2f" % A16)
     if comp == 1: # if horizontal
         magstr = magstr + '*'
-    print(magstr)
+    #print(magstr)
     
     return A16
 
@@ -326,6 +327,52 @@ def calc_Y17(logA, rhyp, comp):
     return Y17
 '''    
 
+def get_ml_corrections(logA, rhyp, eqdep):
+    from numpy import sqrt
+    
+    repi = sqrt(rhyp**2 - eqdep**2)
+    
+    # set dummy comp value
+    comp = 1
+
+    # get Richer (1935; 1958), extended by Eiby & Muir (1968)
+    R35 = calc_R35(comp, logA, repi)
+
+    # calculate Greenhalgh & Singh (1986)
+    GS86 = calc_GS86(comp, logA, repi)
+
+    # calculate Hutton & Boore (1987)
+    HB87 = calc_HB87(comp, logA, rhyp)
+    
+    # calculate Bakun & Joyner (1984)
+    BJ84 = calc_BJ84(comp, logA, rhyp)
+
+    # calculate GG91
+    GG91 = calc_GG91(comp, logA, rhyp)    
+    
+    # calculate MLM92
+    MLM92 = calc_MLM92(comp, logA, rhyp)
+    
+    # calculate WGW96
+    WGW96 = calc_WGW96(comp, logA, rhyp)
+    
+    # calculate A10
+    A10 = calc_A10(comp, logA, rhyp)
+    
+    mlDict = {'logA':logA,
+              'repi':repi,
+              'rhyp':rhyp,
+              'R35':R35,
+              'GS86':GS86,
+              'HB87':HB87,
+              'BJ84':BJ84,
+              'GG91':GG91,
+              'MLM92':MLM92,
+              'WGW96':WGW96,
+              'A10':A10}
+    
+    return mlDict
+    
 
 def main(filename, logA, rhyp, eqdep):
 
