@@ -764,4 +764,13 @@ def csv2json(csvFilePath, jsonFilePath):
     with open(jsonFilePath, 'w', encoding='utf-8') as jsonf: 
         jsonString = json.dumps(jsonArray, indent=4)
         jsonf.write(jsonString)
-          
+
+# from https://stackoverflow.com/questions/27327513/create-pdf-from-a-list-of-images
+def pnglist2pdf(pnglist, outpdf):
+    from fpdf import FPDF
+    pdf = FPDF()
+    # imagelist is the list with all image filenames
+    for image in pnglist:
+        pdf.add_page()
+        pdf.image(image,x,y,w,h)
+    pdf.output(outpdf, "F")             
