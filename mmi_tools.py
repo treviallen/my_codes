@@ -443,11 +443,12 @@ def allen_etal_2012_rrup_ipe(mag, rrup, dep):
     from openquake.hazardlib.imt import MMI
     from openquake.hazardlib.const import StdDev
     
-    from numpy import array, log10, logspace, sqrt
+    from numpy import array, log10, logspace, sqrt, arange
     
     ipe = AllenEtAl2012()
     
     sites = SitesContext()
+    sites.sids = arange(len(rrup))
     
     rup = RuptureContext()
     rup.mag = mag
@@ -466,11 +467,12 @@ def allen_etal_2012_rhypo_ipe(mag, rhypo, dep):
     from openquake.hazardlib.imt import MMI
     from openquake.hazardlib.const import StdDev
     
-    from numpy import array, log10, logspace, sqrt
+    from numpy import array, log10, logspace, sqrt, arange
     
     ipe = AllenEtAl2012Rhypo()
     
     sites = SitesContext()
+    sites.sids = arange(len(rhypo))
     
     rup = RuptureContext()
     rup.mag = mag
@@ -757,7 +759,7 @@ def export_historic_event_mmi(Y,m,d,H,M, outcsv):
     f.write(outtxt)
     f.close()
 
-
+"""
 def shakemap_rgb2cmap():
     from matplotlib.colors import ListedColormap
     
@@ -781,7 +783,7 @@ def shakemap_rgb2cmap():
     #mmi_data.plot(ax=ax, cmap=cmap, column='intensity', vmin=0.5, vmax=10.5, legend=True)
     
     return cmap    
-
+"""
 
 
 

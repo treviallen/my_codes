@@ -527,6 +527,75 @@ def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     #return Tea02imt, C03imt, AB06imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, Bea14imt , YA15imt, SP16imt # AA13imt, CY08imt, 
     #return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
     return Tea02imt, C03imt, AB06imt, AB11imt, Sea09imt, Sea09YCimt, Pea11imt, A12imt, A12imt_SS14, Bea14imt  #, SP16imt # AA13imt, CY08imt, 
+    
+# calls and calculates candidate SCR GMPEs
+def nsha23_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
+    from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
+    from openquake.hazardlib.gsim.somerville_2009_ss14 import SomervilleEtAl2009NonCratonic_SS14
+    from openquake.hazardlib.gsim.somerville_2009_ss14 import SomervilleEtAl2009YilgarnCraton_SS14
+    from openquake.hazardlib.gsim.allen_2012_ss14 import Allen2012_SS14
+    
+    from openquake.hazardlib.gsim.drouet_2015_brazil import DrouetBrazil2015
+    from openquake.hazardlib.gsim.eshm20_craton import ESHM20Craton
+    from openquake.hazardlib.gsim.somerville_2009_ss14 import SomervilleEtAl2009YilgarnCraton_SS14
+    #from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
+    #from openquake.hazardlib.gsim.allen_2012_ss14 import Allen2012, Allen2012_SS14
+    
+    from calc_oq_gmpes import nga_east_mean, adjust_gmm_with_nga_east
+    
+
+    #from atkinson_adams_2013 import atkinson_adams_2013
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array, sqrt, log, exp, arange
+    
+    crust_ty = 'intraplate'
+    
+    sites = SitesContext()
+    sites.vs30 = array([float(vs30)])
+    sites.vs30measured = False
+    sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
+    sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.sids = arange(1)
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+    rup.dip = dip
+    rup.rake = rake
+    rup.ztor = rup.hypo_depth
+    rup.stress_drop = 300. # bar for YA15 CEUS
+
+    dists = DistancesContext()
+    dists.rrup = array([rrup])
+    dists.rjb = array([rjb])
+    dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
+
+    gmpe = DrouetBrazil2015()
+    D15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)    
+    
+    gmpe = ESHM20Craton()
+    ESHM20Cimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+
+    gmpe = AtkinsonBoore2006()
+    AB06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = SomervilleEtAl2009NonCratonic_SS14() # ******* Using SS14 *******
+    Sea09imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+
+    gmpe = SomervilleEtAl2009YilgarnCraton_SS14() # ******* Using SS14 *******
+    Sea09YCimt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+
+    gmpe = Allen2012_SS14() # ******* Using SS14 *******
+    A12imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    NGAEimt = nga_east_mean(mag, dep, dip, rake, rrup, vs30)
+    # adjust NGA-E from 3000 -> target
+    NGAEimt = adjust_gmm_with_nga_east(NGAEimt[0], vs30)
+    
+    
+    crust_ty = 'ena'
+    
+    return AB06imt, Sea09imt, Sea09YCimt, A12imt, D15imt, NGAEimt, ESHM20Cimt  #, SP16imt # AA13imt, CY08imt, 
 
 def allen2012_gsim(mag, dep, rrup, vs30):
     from openquake.hazardlib.gsim.allen_2012 import Allen2012, Allen2012_SS14

@@ -202,7 +202,10 @@ def nga_east_siteamp(vs30, imt, ln_pga_ref3k, impedance=False):
     # get fv
     ###############################################################################
     
-    
+    # set min vs30 to 200
+    if vs30 < vl:
+        vs30 = vl
+        
     if vs30 >= vl and vs30 <= LC['v1']:
         fv = LC['c'] * log(LC['v1'] / vref)
     elif vs30 > LC['v1'] and vs30 <= LC['v2']:

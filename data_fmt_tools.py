@@ -1138,9 +1138,14 @@ def parse_iris_stationlist(stationlist):
     from obspy import UTCDateTime
     lines = open(stationlist).readlines() #[:]
     
+    if lines[0].startswith('#Network'):
+       startidx = 3
+    else:
+        startidx = 0
+    
     staDict = []
     
-    for line in lines:
+    for line in lines[startidx:]:
         dat = line.strip().split('|')
         start = UTCDateTime(dat[6]).datetime
         stop  = UTCDateTime(dat[7]).datetime

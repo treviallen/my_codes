@@ -1333,9 +1333,19 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
     elif lonrng > 3 and lonrng < 6:
         pltbuffer = 0.175
         txtoff = 0.03
-    elif lonrng >= 6:
+    elif lonrng >= 6 and lonrng < 8:
+        pltbuffer = 0.185
+        txtoff = 0.06
+    elif lonrng >= 8 and lonrng < 10:
+        pltbuffer = 0.15
+        txtoff = 0.07
+    elif lonrng >= 10 and lonrng < 14:
         pltbuffer = 0.2
         txtoff = 0.07
+    elif lonrng >= 14:
+        pltbuffer = 0.55
+        txtoff = 0.2
+        
     #print(pltbuffer
     
     # parse AU cities
@@ -1380,13 +1390,14 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         # plt max num locs
         if i < numCities:
             pltCity = True
+            pltDiag = False
             print(pltloc[si])
             
             for clol, clal in zip(clonList, clatList):
-                if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (2.5*pltbuffer):
+                if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (3*pltbuffer):
                     #print(pltloc[si]
                     pltCity = False
-                    
+                                
             # build list of locs
             clatList.append(pltla[si])
             clonList.append(pltlo[si])
@@ -1412,7 +1423,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
 # code based on: http://qingkaikong.blogspot.com/2016/06/nice-python-basemap-background.html
 def make_street_map(clat, clon, service='ESRI_Imagery_World_2D', ll_buffer = 0.1, \
              xpixels = 1500, plt_inset = True, inset_state = 'nsw', inset_loc = 3, \
-             inset_multiplier=0.03, plt_marker = True, marker='*', ms = 14, mew = 0.5, mfc = 'r', mec='k'):
+             inset_multiplier=0.03, plt_marker = True, marker='*', ms = 14, mew = 0.5, mfc = 'r', mec='k', epsg=3112):
     
     from mpl_toolkits.basemap import Basemap
     import matplotlib.pyplot as plt
@@ -1446,7 +1457,6 @@ def make_street_map(clat, clon, service='ESRI_Imagery_World_2D', ll_buffer = 0.1
     # EPSG Projection 3577 - GDA94 / Australian Albers
     # EPSG Projection 3112 - GDA94 / Geoscience Australia Lambert
     # EPSG:3308 - GDA94 / NSW Lambert 
-    epsg = 3308
     
     # note, you need change the epsg for different region, 
     #US is 4269, and you can google the region you want
@@ -1456,6 +1466,8 @@ def make_street_map(clat, clon, service='ESRI_Imagery_World_2D', ll_buffer = 0.1
     m = Basemap(projection='mill',llcrnrlon=llcrnrlon ,llcrnrlat=llcrnrlat,
         urcrnrlon=urcrnrlon ,urcrnrlat=urcrnrlat, resolution = 'h', epsg = epsg)
     
+    
+    map = Basemap(llcrnrlon=3.75,llcrnrlat=39.75,urcrnrlon=4.35,urcrnrlat=40.15, epsg=5520)
     # xpixels controls the pixels in x direction, and if you leave ypixels
     # None, it will choose ypixels based on the aspect ratio
     m.arcgisimage(service=service, xpixels = xpixels, verbose= True, dpi=600)

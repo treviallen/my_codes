@@ -20,6 +20,10 @@ def m02mw(m0):
     from numpy import log10
     return 2 * log10(m0) / 3 - 6.03
     
+# calculate mw from seismic moment (in dyne-cm)
+def m02mw_dyne_cm(m0):   
+    from numpy import log10
+    return 2 * log10(m0) / 3 - 10.7    
     
 
 '''

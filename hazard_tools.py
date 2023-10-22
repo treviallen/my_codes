@@ -492,3 +492,48 @@ def calc_risk_integral(RTGM, beta, SAs, Probs):
     RiskCoefficient = RTGM / UHGM
     
     return upProbs, upSAs, FragilityCurve, Integrand, CollapseProb
+
+
+def parse_oq_hazard_grid(hazfile, pltprob):
+    '''
+    pltprob = string, e.g. '10' or '2'
+    hazfile = oq csv output map file
+    '''
+    
+    # parse csv files
+    lines = open(hazfile1).readlines()
+    
+    # get keys for model
+    if lines[0].startswith('#'):
+        line = lines[1]
+    else:
+        line = lines[0]
+    
+    # get dictionary keys
+    keys = line.strip().split(',')[2:]
+    	
+    for i, key in enumerate(keys):
+        keyProb = str(int(floor(100*float(key.split('-')[-1]))))
+        if keyProb == pltProbability:
+            mapidx = i
+        
+    # make grid dictionary
+    grddict = []
+    gshap = False
+    #print('\nReading', modnames[ii])
+    for line in lines[2:]:
+        dat = line.strip().split(',')
+        
+        tmpdict = {'lon':float(dat[0]), 'lat':float(dat[1])}
+        
+        # fill keys
+        idx = 2
+        for i, key in enumerate(keys):
+            idx += i
+            if i == mapidx:
+                tmpdict[key] = float(dat[idx])
+        
+        # add to grid list
+        grddict.append(tmpdict)
+        
+    return grddict
