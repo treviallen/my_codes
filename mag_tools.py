@@ -56,7 +56,6 @@ def solve_nsha18_mw2ml(mw_list):
 
     # interpolate over mw_list
     return interp(mw_list, mw_array, ml_array, left=0, right=7.8)
-
     
 def nsha18_fixed_bilin_ml2mw(ml):
     from numpy import zeros_like

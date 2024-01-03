@@ -1147,34 +1147,61 @@ def parse_iris_stationlist(stationlist):
     
     for line in lines[startidx:]:
         dat = line.strip().split('|')
-        start = UTCDateTime(dat[6]).datetime
-        stop  = UTCDateTime(dat[7]).datetime
-        tmp = {'sta': dat[1], 'lat': float(dat[2]), 'lon': float(dat[3]), \
-               'elev': float(dat[4]), 'place': dat[5], \
-               'starttime':start, 'stoptime':stop}
+        #print(dat)
+        try:
+            start = UTCDateTime(dat[6]).datetime
+            stop  = UTCDateTime(dat[7]).datetime
+            tmp = {'sta': dat[1], 'lat': float(dat[2]), 'lon': float(dat[3]), \
+                   'elev': float(dat[4]), 'place': dat[5], 'net': dat[0], \
+                   'starttime':start, 'stoptime':stop}
+        except:
+            start = UTCDateTime(dat[-2]).datetime
+            stop  = UTCDateTime(dat[-1]).datetime
+            tmp = {'sta': dat[1], 'lat': float(dat[4]), 'lon': float(dat[5]), \
+                   'elev': float(dat[6]), 'place': dat[1], 'net': dat[0], \
+                   'sensitivity': float(dat[11]), 'starttime':start, 'stoptime':stop}
+        
         staDict.append(tmp)
         
     return staDict
 
 def iris_gmap2stationlist(iris_gmap):
     from data_fmt_tools import parse_iris_stationlist
+    from misc_tools import dictlist2array
+    from numpy import unique
+    
     staDict = parse_iris_stationlist(iris_gmap)
+    
+    # remove channels
+    stations = dictlist2array(staDict, 'sta')
+    stations = unique(stations)
+    
+    staDict2 = []
+    
+    for s in stations:
+        for sta in staDict:
+            if sta['sta'] == s:
+                s2 = sta
+                
+        staDict2.append(s2)
     
     # now write txt
     txt = ''
     txt2 = ''
-    for sta in staDict:
-    	txt += '\t'.join((sta['sta'],'B','20220101','25990101',str(sta['lon']),str(sta['lat']),'2P','-12345','-12345','1196.42','419430.4','1','HHE','trillium-compact-120.paz')) + '\n'
-    	txt += '\t'.join((sta['sta'],'B','20220101','25990101',str(sta['lon']),str(sta['lat']),'2P','-12345','-12345','1196.42','419430.4','1','HHN','trillium-compact-120.paz')) + '\n'
-    	txt += '\t'.join((sta['sta'],'B','20220101','25990101',str(sta['lon']),str(sta['lat']),'2P','-12345','-12345','1196.42','419430.4','1','HHZ','trillium-compact-120.paz')) + '\n'
+    digsen = str('%0.1f' % (sta['sensitivity'] / 754.3)) # assume trillium 120
+    for sta in staDict2:
+    	txt += '\t'.join((sta['sta'],'B',sta['starttime'].strftime('%Y%m%d'),sta['stoptime'].strftime('%Y%m%d'),str(sta['lon']),str(sta['lat']),sta['net'],'-12345','-12345','754.3',digsen,'1','HHE','trillium-compact-120.paz')) + '\n'
+    	txt += '\t'.join((sta['sta'],'B',sta['starttime'].strftime('%Y%m%d'),sta['stoptime'].strftime('%Y%m%d'),str(sta['lon']),str(sta['lat']),sta['net'],'-12345','-12345','754.3',digsen,'1','HHN','trillium-compact-120.paz')) + '\n'
+    	txt += '\t'.join((sta['sta'],'B',sta['starttime'].strftime('%Y%m%d'),sta['stoptime'].strftime('%Y%m%d'),str(sta['lon']),str(sta['lat']),sta['net'],'-12345','-12345','754.3',digsen,'1','HHZ','trillium-compact-120.paz')) + '\n'
     	
-    	txt2 += '\t'.join((sta['sta'],str(sta['lon']),str(sta['lat']),'1','2022','1','2599','1')) + '\n'
+    	txt2 += '\t'.join((sta['sta'],str(sta['lon']),str(sta['lat']),'1',str(sta['starttime'].year), str(sta['starttime'].month), \
+    	                   str(sta['stoptime'].year), str(sta['stoptime'].month))) + '\n'
     # now write
-    f = open('au_stationlist.txt', 'w')
+    f = open(sta['net']+'_stationlist.txt', 'w')
     f.write(txt)
     f.close()
     
-    f = open('au_station_data.dat', 'w')
+    f = open(sta['net']+'_station_data.dat', 'w')
     f.write(txt2)
     f.close()
 
