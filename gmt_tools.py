@@ -941,3 +941,12 @@ def remove_last_cmap_colour(cmap):
         cmap_list.append(cmap(i*inc))
         
     return LinearSegmentedColormap.from_list('cmap2', cmap_list, N=cmap.N-1)
+    
+def remove_first_cmap_colour(cmap):
+    from matplotlib.colors import LinearSegmentedColormap
+    cmap_list = []
+    inc = 1. / (cmap.N-1)
+    for i in range(1, cmap.N):
+        cmap_list.append(cmap(i*inc))
+        
+    return LinearSegmentedColormap.from_list('cmap2', cmap_list, N=cmap.N-1)
