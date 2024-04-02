@@ -1052,6 +1052,7 @@ def get_station_vs30(sta):
     usgsvs = nan
     asscmvs = nan
     kvs = nan
+    gavs = nan
     stla = nan
     stlo = nan
     
@@ -1065,10 +1066,19 @@ def get_station_vs30(sta):
             stlo = float(dat[1])
             # check Kayen Vs30
             kvs = float(dat[6])
+            gavs = float(dat[10])
             usgsvs = float(dat[7])
             asscmvs = float(dat[5])           
-            if not isnan(kvs):
+            if not isnan(kvs) and not isnan(gavs):
                 vs30 = kvs
+                isproxy = False
+                
+            elif not isnan(gavs):
+                vs30 = gavs
+                isproxy = False
+                
+            elif not isnan(kvs):
+                vs30 = nanmean([kvs, gavs])
                 isproxy = False
             
             # if nan, take mean of ASSCM and USGS
@@ -1076,7 +1086,7 @@ def get_station_vs30(sta):
                 vs30 = nanmean([float(dat[5]), float(dat[7])])
                 #vs30 = float(dat[-1]) # overwriting with usgs
       
-    return vs30, isproxy, usgsvs, asscmvs, kvs, stla, stlo
+    return vs30, isproxy, usgsvs, asscmvs, kvs, gavs, stla, stlo
         
 
 # script to find extrapolation ratio based on input gmm

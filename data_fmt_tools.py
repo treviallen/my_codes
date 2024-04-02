@@ -728,6 +728,7 @@ def get_auspass_data(dateTupple, durn=600, network='S1', station='*', channel='*
     Networks:
         2P = SWAN
         1K = ALFREX
+        M8 = semi perm
     '''
     location = "*" #n.b. AusPass data typically has a univeral blank (e.g. '') value for ALL station locations. "*" works just as well. 
     time0 = UTCDateTime(dateTupple[0],dateTupple[1],dateTupple[2],dateTupple[3],dateTupple[4]) - 120
@@ -1103,6 +1104,7 @@ def return_all_au_station_data():
     for line in lines:
         dat = line.strip().split('\t')
         #print(line)
+        
         if int(dat[5]) < 1:
             dat[5] = 1
         if int(dat[7]) < 1:
@@ -1136,6 +1138,8 @@ def parse_iris_stationlist(stationlist):
     '''
     
     from obspy import UTCDateTime
+    from numpy import nan
+    
     lines = open(stationlist).readlines() #[:]
     
     if lines[0].startswith('#Network'):
@@ -1153,7 +1157,7 @@ def parse_iris_stationlist(stationlist):
             stop  = UTCDateTime(dat[7]).datetime
             tmp = {'sta': dat[1], 'lat': float(dat[2]), 'lon': float(dat[3]), \
                    'elev': float(dat[4]), 'place': dat[5], 'net': dat[0], \
-                   'starttime':start, 'stoptime':stop}
+                   'starttime':start, 'stoptime':stop, 'sensitivity':nan}
         except:
             start = UTCDateTime(dat[-2]).datetime
             stop  = UTCDateTime(dat[-1]).datetime
