@@ -788,14 +788,17 @@ def parse_ga_event_query(gacsv):
         dat = line.strip().split(',')
         
         if len(dat) >= 27 and not line.startswith('"'):
+ 
             try:
                 try:
                     dateTime = dt.datetime.strptime(dat[27], '%Y-%m-%dT%H:%M:%S.%f')
+                    
                 except:
                     try:
                         dateTime = dt.datetime.strptime(dat[27], '%Y-%m-%dT%H:%M:%S')
                     except:
                         continue
+                        
                 oidx = 27
                 
             except:
