@@ -38,6 +38,9 @@ def get_response_info(sta,recdate,chan,netid):
        or sta == 'CDNM' or sta == 'FSHM' or sta == 'AWOON' or sta == 'TPND' or sta == 'GLADS' or sta == 'TOMM':
         netid = 'MEL'   
         
+    if netid == 'MEL':
+        netid = 'OZ'
+    
     '''
     elif netid.strip() == 'AB':
         netid = 'UM'
