@@ -55,6 +55,20 @@ def fix_stream_channels_bb2sp(mseedfile):
 
     # overwrite mseed
     st.write(mseedfile, format="MSEED")
+    
+def fix_src_stream_channels(mseedfile):
+    from obspy import read
+    
+    st = read(mseedfile)
+    
+    # loop thru traces
+    st[0].stats['channel'] = 'EHE'
+    st[1].stats['channel'] = 'EHN'
+    st[2].stats['channel'] = 'EHZ'
+
+    # overwrite mseed
+    st.write(mseedfile, format="MSEED")
+
 
 def fix_stream_network(mseedfile, newnet):
     '''

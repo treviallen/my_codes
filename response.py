@@ -40,6 +40,13 @@ def get_response_info(sta,recdate,chan,netid):
         
     if netid == 'MEL':
         netid = 'OZ'
+        
+    if netid == '':
+        if sta == 'MALDN' or sta == 'GLEAD':
+            netid = 'OZ'
+            
+        if sta == 'FR27' or sta == 'NAP':
+            netid = 'AD'
     
     '''
     elif netid.strip() == 'AB':
@@ -52,7 +59,7 @@ def get_response_info(sta,recdate,chan,netid):
     if sta == 'ARKL' or sta == 'HWK':
         netid = 'AD'
         
-    if sta == 'S88U' or sta == 'STGU':
+    if sta == 'S88U' or sta == 'STGU' or sta == 'HODL':
         netid = 'UM'
     
     # check if sitename in file

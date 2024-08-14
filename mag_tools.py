@@ -100,6 +100,20 @@ def nsha18_mb2mw(mb):
     
 def nsha18_ms2mw(ms):
     return 0.075 * ms**2 - 3.357
+    
+def nsha23_mb2mw(mb):
+    
+    mhx = 5.642
+    if mb <= mhx:
+        mw = 1.065 * mb - 0.6433
+    else:
+        mhy = 1.065 * mhx - 0.6433
+        mw = 1.973 * (mb - mhx) + mhy
+    
+    return mw
+    
+def nsha23_ms2mw(ms):
+    return 0.0723 * ms**2 - 3.482
 
 # from Mueller (pers comm) - from Sipkin SRL 2003
 def sipkin_mb2mw(mb):
