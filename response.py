@@ -56,9 +56,10 @@ def get_response_info(sta,recdate,chan,netid):
        or sta.startswith('NOR'):
         netid = 'AU'
         
+    '''
     if sta == 'ARKL' or sta == 'HWK':
         netid = 'AD'
-        
+    '''    
     if sta == 'S88U' or sta == 'STGU' or sta == 'HODL':
         netid = 'UM'
     
@@ -104,6 +105,7 @@ def get_response_info(sta,recdate,chan,netid):
         elif netid == 'AB':
             if tmp[0] == sta and tmp[12].strip() == chan:
                 if recdate >= mindate and recdate <= maxdate:
+                    
                     inst_ty = tmp[1]
                     stlo = float(tmp[4])
                     stla = float(tmp[5])
@@ -282,6 +284,7 @@ def read_pazfile(in_pazfile):
     
     try:
         pazfile = path.join(pazpath, in_pazfile)
+        #print(pazfile)
         paztxt = open(pazfile).readlines()
     except:
         pazpath = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/Ground_Motion/Data/paz'

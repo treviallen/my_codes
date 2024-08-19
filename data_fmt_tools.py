@@ -81,7 +81,7 @@ def fix_stream_network(mseedfile, newnet):
     # loop thru traces
     for tr in st:
         tr.stats['network'] = newnet
-        print(tr.stats.network)
+        #print(tr.stats.network)
     
     # overwrite mseed
     st.write(mseedfile, format="MSEED")
