@@ -30,7 +30,7 @@ def m02mw_dyne_cm(m0):
 Begin magnitude conversions here
 '''
 
-# ML 2 MW conversion used in the NSHA18
+# ML 2 MW conversion used in the NSHA18 - assumes W-A gain of 2080
 def nsha18_ml2mw(ml):
     # use ODR polynomial of simulated data from Ghasemi & Allen (2017) and Allen et al (2018)
     a = 0.04160769
@@ -101,6 +101,17 @@ def nsha18_mb2mw(mb):
 def nsha18_ms2mw(ms):
     return 0.075 * ms**2 - 3.357
     
+# ML 2 MW conversion used in the NSHA23 - assumes W-A gain of 2800
+def nsha23_ml2mw(ml):
+    # use ODR polynomial of simulated data from Allen et al (2023)
+    a = 0.0563
+    b = 0.3991
+    c = 1.410
+    sig = 0.24
+    
+    # get Mw
+    return a*ml**2 + b*ml + c
+
 def nsha23_mb2mw(mb):
     
     mhx = 5.642
