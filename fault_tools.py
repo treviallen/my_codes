@@ -717,6 +717,15 @@ def mag2area_L14(mw, ftype): # in MW
         a = 4.19
             
     return 10**((mw - a) / b) # in km**2
+    
+'''do Yang et al 2021'''
+def mag2maxDisp_Yea21(mw): # in m
+    # assume AU relationship
+    return 10**(0.43 * mw - 2.38), 0.12
+
+def mag2srl_Yea21(mw): # in km
+    # assume AU relationship
+    return 10**(0.50 * mw - 1.93), 0.26
 
 '''do Clark et al (2014) - non-extended crust'''
 def srl2mag_Cea14(srl, reg):
