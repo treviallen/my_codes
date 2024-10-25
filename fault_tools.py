@@ -726,6 +726,11 @@ def mag2maxDisp_Yea21(mw): # in m
 def mag2srl_Yea21(mw): # in km
     # assume AU relationship
     return 10**(0.50 * mw - 1.93), 0.26
+    
+def srl2mag_Yea21(srl): # in km
+    # assume AU relationship
+    from numpy import log10
+    return (log10(srl) + 1.93) / 0.5
 
 '''do Clark et al (2014) - non-extended crust'''
 def srl2mag_Cea14(srl, reg):
