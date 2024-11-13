@@ -1302,12 +1302,12 @@ darray = hstack((plo, pla, pop))
 savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
 """
 
-def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', \
+def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', blacklist=[], \
                     marker='o', markersize=6, markeredgewidth=0.5, fs=14, weight='normal'):
     from numpy import argsort
     from os import getcwd
     import matplotlib.patheffects as PathEffects
-    path_effects=[PathEffects.withStroke(linewidth=2.5, foreground="w")]
+    path_effects=[PathEffects.withStroke(linewidth=1.5, foreground="w")]
     
     # set grid size (in degrees)
     lonrng = m.urcrnrlon - m.llcrnrlon
@@ -1326,7 +1326,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         txtoff = 0.012 
     elif lonrng <= 2.5:
         pltbuffer = 0.075
-        txtoff = 0.015  
+        txtoff = 0.021  
     elif lonrng <= 3:
         pltbuffer = 0.1
         txtoff = 0.017
@@ -1372,7 +1372,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         clon = float(dat[5])
         #loc = dat[1]
         
-        if clat > m.llcrnrlat and clat < m.urcrnrlat-txtoff \
+        if clat > m.llcrnrlat+txtoff and clat < m.urcrnrlat-txtoff \
            and clon > m.llcrnrlon and clon < m.urcrnrlon:
             
             # add city to list
@@ -1397,6 +1397,11 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
                 if abs(pltla[si] - clal) < pltbuffer and abs(pltlo[si] - clol) < (3*pltbuffer):
                     #print(pltloc[si]
                     pltCity = False
+            
+            # check blacklist
+            for city in blacklist:
+                if pltloc[si] == city:
+                    pltCity = False
                                 
             # build list of locs
             clatList.append(pltla[si])
@@ -1406,7 +1411,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
                 x, y = m(pltlo[si], pltla[si])
                 plt.plot(x, y, marker, markerfacecolor=markerfacecolor, \
                          markeredgecolor=markeredgecolor, markeredgewidth=markeredgewidth, \
-                         markersize=markersize, zorder=11000)
+                         markersize=markersize, zorder=30000)
                 
                 # check if capital city and make upper case
                 if pltloc[si] == 'Perth' or pltloc[si] == 'Darwin' or pltloc[si] == 'Adelaide' or pltloc[si] == 'Melbourne' \
@@ -1414,7 +1419,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
                         pltloc[si] = pltloc[si].upper()
                          
                 x, y = m(pltlo[si]-txtoff, pltla[si]+txtoff) # changed for camden fig
-                plt.text(x, y, pltloc[si], size=fs, ha='right', weight=weight, path_effects=path_effects, zorder=11000)
+                plt.text(x, y, pltloc[si], size=fs, ha='right', va='bottom', weight=weight, path_effects=path_effects, zorder=30000)
                 
                 i += 1
                 
