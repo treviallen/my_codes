@@ -739,7 +739,20 @@ def get_iris_data(dateTuple, sta, net, durn=600, client='IRIS'):
     '''
     
     return st, trname
+
+def get_iris_inventory(net, stalist):
+    '''
+    net = network code (e.g. "II")
+    stalist = comma separated string (e.g., "TAU,WRAB")
+    '''
+    from obspy.clients.fdsn.client import Client
     
+    client = Client("IRIS")
+    
+    inventory = client.get_stations(network=net, station=stalist, level="response")
+    
+    xmlname = net.lower()+'-inventory.xml'
+    inventory.write(xmlname,'stationxml')
 
 def get_auspass_data(dateTupple, durn=600, network='S1', station='*', channel='*'):
     '''
@@ -757,45 +770,46 @@ def get_auspass_data(dateTupple, durn=600, network='S1', station='*', channel='*
         2P = SWAN
         1K = ALFREX
         M8 = semi perm
+        WG = WA Array
     '''
     location = "*" #n.b. AusPass data typically has a univeral blank (e.g. '') value for ALL station locations. "*" works just as well. 
     time0 = UTCDateTime(dateTupple[0],dateTupple[1],dateTupple[2],dateTupple[3],dateTupple[4]) - 120
     time1 = time0 + durn 
     
-    try:
-        st = auspass.get_waveforms(network=network,station=station,location=location,channel=channel,starttime=time0,endtime=time1)
+    #try:
+    st = auspass.get_waveforms(network=network,station=station,location=location,channel=channel,starttime=time0,endtime=time1)
+    
+    if len(st) > 0:
+        # get array of stations
+        stalist = []
+        for tr in st:
+            stalist.append(tr.stats.station)
+            
+        stalist = unique(stalist)
         
-        if len(st) > 0:
-            # get array of stations
-            stalist = []
+        # check if waves folder exists
+        if not path.isdir('auspass_dump'):
+            makedirs('auspass_dump')
+        
+        # now loop thru unique stalist and output streams
+        for us in stalist:
+            new_st = Stream()
             for tr in st:
-                stalist.append(tr.stats.station)
-                
-            stalist = unique(stalist)
+                if tr.stats.station == us:
+                    new_st += tr
+                    
+            # save out to file
+            tr = new_st[0]
             
-            # check if waves folder exists
-            if not path.isdir('auspass_dump'):
-                makedirs('auspass_dump')
+            trname = path.join('auspass_dump', \
+                               '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
+                               tr.stats['network'], tr.stats['station'], 'mseed')))
             
-            # now loop thru unique stalist and output streams
-            for us in stalist:
-                new_st = Stream()
-                for tr in st:
-                    if tr.stats.station == us:
-                        new_st += tr
-                        
-                # save out to file
-                tr = new_st[0]
-                
-                trname = path.join('auspass_dump', \
-                                   '.'.join((tr.stats.starttime.strftime('%Y-%m-%dT%H.%M'), \
-                                   tr.stats['network'], tr.stats['station'], 'mseed')))
-                
-                print('Writing file:', trname)
-                new_st.write(trname, format="MSEED")
-                
-    except:
-        print('No AusPass data available...')
+            print('Writing file:', trname)
+            new_st.write(trname, format="MSEED")
+            
+    #except:
+    #    print('No AusPass data available...')
         
 def get_swan_data(dateTupple, durn=600, network='2P', station='*', channel='*'):
     '''

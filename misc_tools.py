@@ -445,6 +445,24 @@ def get_log_xy_locs(lims, fraction_loc):
    logdiff = diff(loglims)[0]
    
    return 10**(min(loglims) + logdiff * fraction_loc) 
+
+# from https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_hist.html
+def scatter_hist(x, y, ax, ax_histx, ax_histy, fc='0.7', mec='k'):
+    # no labels
+    ax_histx.tick_params(axis="x", labelbottom=False)
+    ax_histy.tick_params(axis="y", labelleft=False)
+
+    # the scatter plot:
+    ax.scatter(x, y)
+
+    # now determine nice limits by hand:
+    binwidth = 0.25
+    xymax = max(np.max(np.abs(x)), np.max(np.abs(y)))
+    lim = (int(xymax/binwidth) + 1) * binwidth
+
+    bins = np.arange(-lim, lim + binwidth, binwidth)
+    ax_histx.hist(x, bins=bins)
+    ax_histy.hist(y, bins=bins, orientation='horizontal')
    
 # set one decimal point on x & y axes
 def fmt_axes_tick_decimals(ax):

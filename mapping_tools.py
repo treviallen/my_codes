@@ -490,6 +490,7 @@ def labelpolygon(m, plt, sf, field, addOutline=False, **kwargs):
     from mapping_tools import get_field_index
     import matplotlib as mpl
     import matplotlib.patheffects as path_effects
+    from numpy import array
     
     mpl.rcParams['pdf.fonttype'] = 42
     
@@ -525,6 +526,9 @@ def labelpolygon(m, plt, sf, field, addOutline=False, **kwargs):
     # get field index
     findex = get_field_index(sf, field) 
     
+    xcentroids = []
+    ycentroids = []
+    
     for i, shape in enumerate(shapes):
         centroid = Polygon(shape.points).centroid.wkt
         centroid = centroid.strip('PIONT').replace('(',' ').replace(')',' ').split()
@@ -552,6 +556,10 @@ def labelpolygon(m, plt, sf, field, addOutline=False, **kwargs):
                 centroidy.append(shape.points[j][1])
             tx, ty = m(mean(centroidx),mean(centroidy))
         '''
+        xcentroids.append(float(centroid[0]))
+        ycentroids.append(float(centroid[1]))
+    
+    return array(xcentroids), array(ycentroids)
 
 def return_map_shape_points(m, shpfile):
     import shapefile
@@ -1302,12 +1310,12 @@ darray = hstack((plo, pla, pop))
 savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
 """
 
-def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', blacklist=[], \
-                    marker='o', markersize=6, markeredgewidth=0.5, fs=14, weight='normal'):
+def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', blacklist=[], loc=2, \
+                    marker='o', markersize=6, markeredgewidth=0.5, fs=14, weight='normal', splittext=False):
     from numpy import argsort
     from os import getcwd
     import matplotlib.patheffects as PathEffects
-    path_effects=[PathEffects.withStroke(linewidth=1.5, foreground="w")]
+    path_effects=[PathEffects.withStroke(linewidth=2, foreground="w")]
     
     # set grid size (in degrees)
     lonrng = m.urcrnrlon - m.llcrnrlon
@@ -1326,7 +1334,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         txtoff = 0.012 
     elif lonrng <= 2.5:
         pltbuffer = 0.075
-        txtoff = 0.021  
+        txtoff = 0.019  
     elif lonrng <= 3:
         pltbuffer = 0.1
         txtoff = 0.017
@@ -1417,9 +1425,16 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
                 if pltloc[si] == 'Perth' or pltloc[si] == 'Darwin' or pltloc[si] == 'Adelaide' or pltloc[si] == 'Melbourne' \
                     or pltloc[si] == 'Canberra' or pltloc[si] == 'Sydney' or pltloc[si] == 'Brisbane' or pltloc[si] == 'Hobart':
                         pltloc[si] = pltloc[si].upper()
-                         
-                x, y = m(pltlo[si]-txtoff, pltla[si]+txtoff) # changed for camden fig
-                plt.text(x, y, pltloc[si], size=fs, ha='right', va='bottom', weight=weight, path_effects=path_effects, zorder=30000)
+                        
+                if splittext == True:
+                    pltloc[si] = pltloc[si].replace(' ','\n')
+                
+                if loc == 2:         
+                    x, y = m(pltlo[si]-txtoff, pltla[si]+txtoff) # changed for camden fig
+                    plt.text(x, y, pltloc[si], size=fs, ha='right', va='bottom', weight=weight, path_effects=path_effects, zorder=30000)
+                elif loc == 4:         
+                    x, y = m(pltlo[si]+1.1*txtoff, pltla[si]-txtoff) # changed for camden fig
+                    plt.text(x, y, pltloc[si], size=fs, ha='left', va='top', weight=weight, path_effects=path_effects, zorder=30000)
                 
                 i += 1
                 

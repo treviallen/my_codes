@@ -256,7 +256,7 @@ def get_paz_list():
     dirList=os.listdir('paz')
     i = 0
     for fname in dirList:
-        print(str(i+1) + ')\t' + fname.strip('.paz'))
+        #print(str(i+1) + ')\t' + fname.strip('.paz'))
         i += 1
 
     try:
@@ -542,7 +542,7 @@ def paz_response(freq, pazfile, sen, recsen, gain, inst_ty):
     #print(freq
 
     # read PAZ file
-    print(pazfile)
+    #print(pazfile)
     poles, zeros, constant, normf = read_pazfile(pazfile)
     #print(poles, zeros)
     angc = 2.0 * np.pi
