@@ -145,12 +145,11 @@ def getshapecolour(sf, field, colmap, ncolours, **kwargs):
         
     return cs, ci, cmap, zmin, zmax
     
-def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, zorder=5000, **kwargs):
+def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alpha=1, cmap=-99, zorder=5000, lw=2, **kwargs):
     from numpy import arange, isnan, nan
     
     # get kwargs
     ncolours = 256
-    lw = 0.5
     ls = '-'
     fillshape = False
     polyline = False # do not close polygon
@@ -171,9 +170,6 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
 
             if key == 'ls':
                 ls = kwargs[key]
-
-            if key == 'lw':
-                lw = kwargs[key]
 
             if key == 'fillshape':
                 fillshape = kwargs[key]
@@ -231,7 +227,7 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
                     y.append(y[0])
 
             try:
-              # plot each polygon
+                # plot each polygon
                 
                 xx, yy = m(x,y)
                 #print(edgecolor)
@@ -480,7 +476,7 @@ def drawmanualshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k
     '''
         
 # label polygon with a field in shapefile
-def labelpolygon(m, plt, sf, field, addOutline=False, **kwargs):
+def labelpolygon(m, plt, sf, field, addOutline=False, zorder=10000, **kwargs):
     '''
     fstyle  = ['normal', 'italic', 'oblique']
     fweight = ['light', 'normal', 'medium', 'semibold', 'bold', 'heavy', 'black']
@@ -546,7 +542,7 @@ def labelpolygon(m, plt, sf, field, addOutline=False, **kwargs):
                     
                 plt.text(tx + xoff, ty + yoff, recs[i][findex], size=fsize, \
                          weight=fweight, color=col, style=fstyle, va='center', \
-                         ha='center', path_effects=path_effect)
+                         ha='center', path_effects=path_effect, zorder=zorder)
                      
         '''
         centroidx = []

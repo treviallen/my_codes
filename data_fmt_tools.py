@@ -820,7 +820,10 @@ def get_swan_data(dateTupple, durn=600, network='2P', station='*', channel='*'):
     from numpy import unique
     from os import path, makedirs
     
-    auspass = FDSN_Client('http://auspass.edu.au:8080',user_agent='trevor.allen@ga.gov.au',user='2p',password='kiwi30') 
+    if network == '2P':
+        auspass = FDSN_Client('http://auspass.edu.au:8080',user_agent='trevor.allen@ga.gov.au',user='2p',password='kiwi30') 
+    elif network == 'WG':
+        auspass = FDSN_Client('http://auspass.edu.au:8080',user_agent='trevor.allen@ga.gov.au',user='WG',password='bunglebungle') 
     
     '''
     Networks:

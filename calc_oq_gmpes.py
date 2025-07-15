@@ -420,6 +420,123 @@ def interface_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     
     return Yea97imt, AB03imt, Zea06imt, Zea06CISimt, AM09imt, MP10imt, GA14imt, GA14CISimt, Aea15imt
 
+def interface_indonesia_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
+    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SInter
+    from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SInter
+    from openquake.hazardlib.gsim.parker_2020 import ParkerEtAl2020SInter
+    from openquake.hazardlib.gsim.kuehn_2020 import KuehnEtAl2020SInter
+    #from atkinson_adams_2013 import atkinson_adams_2013
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array, sqrt, log, exp, arange
+    
+    crust_ty = 'interface'
+    
+    '''
+    # test data
+    vs30 = [760.]
+    mag = 6.5
+    dep = 10.
+    dip = 45.
+    rake = 90.
+    rrup = 100.
+    '''
+    
+    sites = SitesContext()
+    sites.vs30 = array([float(vs30)])
+    sites.vs30measured = False
+    sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
+    sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.backarc = [False]
+    sites.sids = arange(1)
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+    rup.dip = dip
+    rup.rake = rake
+    rup.ztor = rup.hypo_depth
+    
+    dists = DistancesContext()
+    dists.rrup = array([rrup])
+    dists.rjb = array([rjb])
+    dists.rhypo = array([rrup])
+    dists.rvolc = array([100.]) # assume backarc distance of 100 km
+    dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
+    
+    gmpe = ZhaoEtAl2006SInter()
+    # gmpe = ZhaoEtAl2006SSlab() # for testing only
+    Zea06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = AbrahamsonEtAl2015SInter()
+    Aea15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = ParkerEtAl2020SInter()
+    Pea20imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = KuehnEtAl2020SInter()
+    Kea20imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    return Zea06imt, Aea15imt, Pea20imt, Kea20imt
+
+def inslab_indonesia_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
+    from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SSlab
+    from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
+    from openquake.hazardlib.gsim.parker_2020 import ParkerEtAl2020SSlab
+    from openquake.hazardlib.gsim.kuehn_2020 import KuehnEtAl2020SSlab
+    #from atkinson_adams_2013 import atkinson_adams_2013
+    from openquake.hazardlib.gsim.base import RuptureContext, SitesContext, DistancesContext
+    from numpy import array, sqrt, log, exp, arange
+    
+    crust_ty = 'inslab'
+    
+    '''
+    # test data
+    vs30 = [760.]
+    mag = 6.5
+    dep = 10.
+    dip = 45.
+    rake = 90.
+    rrup = 100.
+    '''
+    
+    sites = SitesContext()
+    sites.vs30 = array([float(vs30)])
+    sites.vs30measured = False
+    sites.z1pt0 = exp((-7.15 / 4.)*log((sites.vs30**4 + 571.**4) / (1360.**4 + 571.**4))) # in m; from ChiouYoungs2014
+    sites.z2pt5 = (519 + 3.595 * sites.z1pt0) / 1000. #in km; from Kaklamanos etal 2011
+    sites.backarc = [False]
+    sites.sids = arange(1)
+    
+    rup = RuptureContext()
+    rup.mag = mag
+    rup.hypo_depth = dep
+    rup.dip = dip
+    rup.rake = rake
+    rup.ztor = rup.hypo_depth
+    
+    dists = DistancesContext()
+    dists.rrup = array([rrup])
+    dists.rjb = array([rjb])
+    dists.rhypo = array([rrup])
+    dists.rvolc = array([100.]) # assume backarc distance of 100 km
+    dists.rx = sqrt(dists.rrup**2 - rup.hypo_depth**2) # this is not correct, but good enough for now
+    
+    gmpe = ZhaoEtAl2006SSlab()
+    # gmpe = ZhaoEtAl2006SSlab() # for testing only
+    Zea06imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = AbrahamsonEtAl2015SSlab()
+    Aea15imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = ParkerEtAl2020SSlab()
+    Pea20imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    gmpe = KuehnEtAl2020SSlab()
+    Kea20imt = get_pga_sa(gmpe, sites, rup, dists, crust_ty)
+    
+    return Zea06imt, Aea15imt, Pea20imt, Kea20imt
+
+
 # calls and calculates candidate SCR GMPEs
 def scr_gsims(mag, dep, ztor, dip, rake, rrup, rjb, vs30):
     from openquake.hazardlib.gsim.toro_2002 import ToroEtAl2002
