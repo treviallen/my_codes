@@ -1307,11 +1307,12 @@ savetxt('can_pop_dat.txt', darray, delimiter='\t', fmt='%0.3f')
 """
 
 def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k', blacklist=[], loc=2, \
-                    marker='o', markersize=6, markeredgewidth=0.5, fs=14, weight='normal', splittext=False):
+                    marker='o', markersize=6, markeredgewidth=0.5, fs=14, weight='normal', splittext=False, \
+                    filterloc=[-180, 180, -90, 90]):
     from numpy import argsort
     from os import getcwd
     import matplotlib.patheffects as PathEffects
-    path_effects=[PathEffects.withStroke(linewidth=2, foreground="w")]
+    path_effects=[PathEffects.withStroke(linewidth=3, foreground="w")]
     
     # set grid size (in degrees)
     lonrng = m.urcrnrlon - m.llcrnrlon
@@ -1326,26 +1327,32 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         pltbuffer = 0.04
         txtoff = 0.025
     elif lonrng <= 2:
-        pltbuffer = 0.06
-        txtoff = 0.012 
+        pltbuffer = 0.04
+        txtoff = 0.005 
     elif lonrng <= 2.5:
         pltbuffer = 0.075
         txtoff = 0.019  
     elif lonrng <= 3:
         pltbuffer = 0.1
         txtoff = 0.017
-    elif lonrng > 3 and lonrng < 6:
+    elif lonrng > 3 and lonrng <= 4:
+        pltbuffer = 0.13
+        txtoff = 0.015
+    elif lonrng > 4 and lonrng <= 6:
         pltbuffer = 0.175
         txtoff = 0.03
-    elif lonrng >= 6 and lonrng < 8:
-        pltbuffer = 0.185
-        txtoff = 0.06
-    elif lonrng >= 8 and lonrng < 10:
+    elif lonrng >= 6 and lonrng < 7:
         pltbuffer = 0.15
-        txtoff = 0.07
+        txtoff = 0.028
+    elif lonrng >= 7 and lonrng < 8:
+        pltbuffer = 0.15
+        txtoff = 0.03
+    elif lonrng >= 8 and lonrng < 10:
+        pltbuffer = 0.13
+        txtoff = 0.022
     elif lonrng >= 10 and lonrng < 14:
         pltbuffer = 0.2
-        txtoff = 0.07
+        txtoff = 0.04
     elif lonrng >= 14:
         pltbuffer = 0.55
         txtoff = 0.2
@@ -1356,7 +1363,8 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
     if getcwd().startswith('/nas'):
         cityFile = '/nas/active/ops/community_safety/ehp/georisk_earthquake/hazard/REQIT/GA-shakemap/mapping/cities1000_au_ascii.txt'
     else:
-        cityFile = '//Users//trev//Documents//DATA//Places//cities1000_au_ascii.txt'
+        #cityFile = '//Users//trev//Documents//DATA//Places//cities1000_au_ascii.txt'
+        cityFile = '//Users//trev//Documents//DATA//Places//AU_geonames_places.txt'
     
     lines = open(cityFile).readlines()
     
@@ -1378,12 +1386,15 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
         
         if clat > m.llcrnrlat+txtoff and clat < m.urcrnrlat-txtoff \
            and clon > m.llcrnrlon and clon < m.urcrnrlon:
+           	
+           if clon > filterloc[0] and clon < filterloc[1] \
+              and clat > filterloc[2] and clat < filterloc[3]:
             
-            # add city to list
-            pltlo.append(clon)
-            pltla.append(clat)
-            pltpop.append(float(dat[14]))
-            pltloc.append(dat[1])
+                 # add city to list
+                 pltlo.append(clon)
+                 pltla.append(clat)
+                 pltpop.append(float(dat[14]))
+                 pltloc.append(dat[1])
     
     # order locs in trems of poplation
     sortidx = argsort(pltpop)[::-1] # and reverse
@@ -1429,7 +1440,7 @@ def annotate_cities(numCities, plt, m, markerfacecolor='k', markeredgecolor='k',
                     x, y = m(pltlo[si]-txtoff, pltla[si]+txtoff) # changed for camden fig
                     plt.text(x, y, pltloc[si], size=fs, ha='right', va='bottom', weight=weight, path_effects=path_effects, zorder=30000)
                 elif loc == 4:         
-                    x, y = m(pltlo[si]+1.1*txtoff, pltla[si]-txtoff) # changed for camden fig
+                    x, y = m(pltlo[si]+1.6*txtoff, pltla[si]-1.6*txtoff) # changed for camden fig
                     plt.text(x, y, pltloc[si], size=fs, ha='left', va='top', weight=weight, path_effects=path_effects, zorder=30000)
                 
                 i += 1
@@ -1502,7 +1513,7 @@ def make_street_map(clat, clon, service='ESRI_Imagery_World_2D', ll_buffer = 0.1
             illcrnrlon = 140.4
         
         from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-        print(inset_loc)
+        #print(inset_loc)
         axins = zoomed_inset_axes(ax, ll_buffer*inset_multiplier, loc=inset_loc)
         
         m2 = Basemap(projection='merc',llcrnrlon=illcrnrlon ,llcrnrlat=illcrnrlat,

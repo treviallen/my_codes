@@ -291,6 +291,34 @@ def return_AS1170_4_shape(periods, siteclass):
                 
     return array(shp1170)
            
+def return_AS1170_4_2025_shape(periods, siteclass):
+    '''
+    siteclass = A-B
+    '''
+    from numpy import array
+    
+    shp1170 = []
+    
+    if siteclass.upper() == 'A':
+        for t in periods:
+            if t <= 0.1:
+                shp1170.append(0.8 + 12.0*t)
+            elif t > 0.1 and t <= 1.5:
+                shp1170.append(min(0.704/t, 2.00))
+            else:
+                shp1170.append(1.056 / t**2)
+                
+    if siteclass.upper() == 'B':
+        for t in periods:
+            if t <= 0.1:
+                shp1170.append(1.0 + 15*t)
+            elif t > 0.1 and t <= 1.5:
+                shp1170.append(min(0.88/t, 2.50))
+            else:
+                shp1170.append(1.32 / t**2)
+                    
+    return array(shp1170)
+
 
 # function to get hazard curves for a list of cities
 def get_nsha18_city_haz_curve(citylist, hazcurvefile):

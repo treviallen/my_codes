@@ -9,7 +9,7 @@ process_eqwave.py
 This code reads ES&S eqWave format text files and performs the following tasks
 depending on the users requirements:
 
-    1) Do instrument correction and write output time history
+    1) Do instrument correction and write output time historyf
     2) Calculate FFT and write output spectrum
     3) Calculate and output 5% damped response spectrum
     4) Convert to Wood-Anderson time history and calculate local magnitude
@@ -231,7 +231,13 @@ else:
     elif fmt == 'tspair':
         allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readwaves.readtspair(wavfile)
     elif fmt == 'sm':
-        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp = readwaves.readseismac(wavfile)
+        allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, datadict = readwaves.readseismac(wavfile)
+        allnetid = []
+        for comp in comps:
+            net = datadict['net']
+            if net == 'MEL':
+                net = 'OZ'
+            allnetid.append(net)
     else:
         '\nFile format not recognised!'
 
@@ -242,7 +248,7 @@ while continue_loop == True:
     if seltask == '':
         seltask = '3' # response spectra
 
-    if seltask != '8':
+    if seltask != '8' and seltask != '6':
         # do common read functions
         sta, inst_ty, sps, recdate, nat_freq, damping, sen, recsen, gain, chan, \
                 chan_no, chan_dat, stlo, stla, pazfile, alldata, netid = \
@@ -327,7 +333,28 @@ while continue_loop == True:
         #         filename, stla, stlo, eqla, eqlo, eqdep, eqmag, rhyp, azim, lofreq, hifreq)
 
     elif seltask == '6': # export as miniSEED
-        print('\nModule not yet functional...')
+        #allsta, comps, allrecdate, allsec, allsps, alldata, allnsamp, datadict, allnetid
+        
+        from obspy import UTCDateTime, Stream, Trace
+        st = Stream()
+
+        for c, comp in enumerate(comps):
+        
+            utc = UTCDateTime(allrecdate[c*2+1])
+            meta = {'station': allsta[c].strip(), 'network': allnetid[c], 'channel': comps[c], \
+                    'sampling_rate': allsps[c], 'npts': len(alldata[c]), 'starttime':utc}
+            
+            meta = {'station': allsta[c].strip(), 'network': 'AU', 'channel': 'HN'+comps[c][-1], \
+                    'sampling_rate': allsps[c], 'npts': len(alldata[c]), 'starttime':utc}
+            
+            tr = Trace(data=alldata[c], header=meta)
+            
+            # fill stream
+            st += tr
+            
+        #save mseed
+        mseedfile = '.'.join((str(utc)[0:16].replace(':','.'), allnetid[c], allsta[c].strip(), 'mseed'))
+        st.write(mseedfile, format='MSEED')
 
     elif seltask == '7': # export as SAC
         # get velocity time history

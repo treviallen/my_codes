@@ -889,27 +889,29 @@ def make_netcdf_map(ax, cnrs, ncfile, cmap, norm, vmin, vmax, mapres, grdres, gr
     print(ncfile)
     nc = NetCDFFile(ncfile)
     
-    data = nc.variables['z'][:] #/ zscale
+    try:
+        data = nc.variables['z'][:] #/ zscale
+    except:
+        data = nc.variables['Band1'][:] #/ zscale
     try:
         lons = nc.variables['lon'][:]
         lats = nc.variables['lat'][:]
     except:
         lons = nc.variables['x'][:]
         lats = nc.variables['y'][:]
-    
+    #print(data)
     # transform to metres
     nx = int((m.xmax-m.xmin)/grdres)+1
     ny = int((m.ymax-m.ymin)/grdres)+1
     
     topodat = m.transform_scalar(data,lons,lats,nx,ny)
     
-    
     # make shading
     print('Making map...')
     if lightsource == True:
         from matplotlib.colors import LightSource
         ls = LightSource(azdeg = 180, altdeg = 45)
-        rgb = ls.shade(topodat, cmap=cmap, norm=norm)
+        rgb = ls.shade(topodat.data, cmap=cmap, norm=norm)
         
         im = m.imshow(rgb)   
     else:
