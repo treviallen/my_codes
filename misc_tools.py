@@ -437,6 +437,19 @@ def listdir_file_prefix(folder, file_prefix):
     
     return files[0]
     
+# list files with a common file prefix
+
+def listdir_file_segment(folder, file_segment):
+
+    from os import listdir
+    files = []
+    files.append([each for each in listdir(folder) if each.find(file_segment) >= 0])
+
+    for f in files[0]:
+        print(f)
+
+    return files[0]
+
 # for getting log xy plotting locations
 def get_log_xy_locs(lims, fraction_loc):
    from numpy import log10, diff

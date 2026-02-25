@@ -40,7 +40,7 @@ def nsha18_ml2mw(ml):
     
     # get Mw
     return a*ml**2 + b*ml + c
-    
+
 def solve_nsha18_mw2ml(mw_list):
     '''
     mw_list = list of mws to convert to ml - numpy array
@@ -120,6 +120,17 @@ def nsha23_mb2mw(mb):
     else:
         mhy = 1.065 * mhx - 0.6433
         mw = 1.973 * (mb - mhx) + mhy
+    
+    return mw
+    
+def allen24_mb2mw(mb):
+    
+    mhx = 5.656
+    if mb <= mhx:
+        mw = 1.083 * mb - 0.7917
+    else:
+        mhy = 1.083 * mhx - 0.7917
+        mw = 1.966 * (mb - mhx) + mhy
     
     return mw
     

@@ -122,13 +122,14 @@ import numpy as np
 DTYPE = {
     # Big-endian integers
     b's4': b'>i',
+    b'sd': b'>i',
     b's2': b'>h',
     # Little-endian integers
     b'i4': b'<i',
     b'i2': b'<h',
     # ASCII integers
-    b'c0': (b'S12', np.int),
-    b'c#': (b'S12', np.int),
+    b'c0': (b'S12', int),
+    b'c#': (b'S12', int),
     # Big-endian floating point
     b't4': b'>f',
     b't8': b'>d',
@@ -519,6 +520,7 @@ def split_mseed_stations(mseedfile, out_prefix):
         new_trs = []
         for tr in st:
             if tr.stats.station == sta:
+                tr.stats.network == 'VW'
                 new_trs.append(tr)
         
         # make new stream for one station
