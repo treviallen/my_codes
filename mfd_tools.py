@@ -7,7 +7,7 @@ Created on Tue Apr 18 12:10:31 2017
 from numpy import array, sqrt, where, nan, isnan, delete, hstack, diff, log10, isfinite
 from tools.nsha_tools import toYearFraction, get_shapely_centroid
 from shapely.geometry import Point, Polygon
-from openquake.hmtk.parsers.catalogue.csv_catalogue_parser import CsvCatalogueParser
+#from openquake.hmtk.parsers.catalogue.csv_catalogue_parser import CsvCatalogueParser
 from datetime import datetime
 from catalogue_tools import weichert_algorithm, aki_maximum_likelihood, bval2beta
 from oq_tools import get_oq_incrementalMFD, beta2bval
@@ -18,7 +18,7 @@ from os import path
 ###############################################################################
 # function to parse modified HMTK catalogue with added fields
 ###############################################################################
-
+"""
 def parse_hmtk_cat(hmtk_csv):
     from numpy import nan
     
@@ -78,6 +78,63 @@ def parse_hmtk_cat(hmtk_csv):
         cat.append(tdict)
     
     return cat, neq
+"""    
+    
+def parse_hmtk_cat(hmtk_csv):
+    from numpy import nan
+    from obspy import UTCDateTime
+    
+    print('parsing HMTK catalogue...')
+
+    lines = open(hmtk_csv).readlines()[1:]
+    cat = []
+    
+    for line in lines:
+        dat = line.strip().split(',')
+    
+        # first make datestr
+        '''try:
+            if not isnan(hmtkcat.data['second'][i]):
+                datestr = str(hmtkcat.data['eventID'][i]) \
+                          + str('%2.2f' % hmtkcat.data['second'][i])
+            else:
+                datestr = str(hmtkcat.data['eventID'][i]) + '00.00'
+                
+            evdt = datetime.strptime(datestr, '%Y%m%d%H%M%S.%f')
+        
+        # if ID not date form, do it the hard way!
+        except:'''
+        evdt = UTCDateTime(int(dat[2]), int(dat[3]), int(dat[4]), int(dat[5]), int(dat[6]), float(dat[7]))
+        datestr = str(evdt)
+        
+        #evdt = datetime.strptime(datestr, '%Y%m%d%H%M%S.%f')
+        
+        # if modified catalogue
+        try:
+            tdict = {'datetime':evdt, 'prefmag':float(dat[16]), \
+                     'lon':float(dat[9]), 'lat':float(dat[10]), \
+                     'dep':float(dat[14]), 'year':evdt.year, \
+                     'month':evdt.month, 'fixdep':0, 'prefmagtype':'MW', \
+                     'auth':dat[1], 'mx_revML':float(dat[16]), \
+                     'mx_origML':float(dat[16]), 'mx_origType':''}
+                     	
+        # if traditional HMTK catalogue
+        except:
+            tdict = {'datetime':evdt, 'prefmag':float(dat[16]), \
+                     'lon':float(dat[9]), 'lat':float(dat[10]), \
+                     'dep':float(dat[14]), 'year':evdt.year, \
+                     'month':evdt.month, 'fixdep':0, 'prefmagtype':'MW', \
+                     'auth':dat[1], 'mx_revML':float(dat[16]), \
+                     'mx_origML':nan, 'mx_origType':''}
+                 	
+        cat.append(tdict)
+        
+    # get number of earthquakes
+    neq = len(lines)
+    
+    
+    return cat, neq
+
   
 ###############################################################################
 # function to get events within polygon

@@ -187,10 +187,12 @@ def drawshapepoly(m, plt, sf, label='null', fillcolor='none', edgecolor='k', alp
             cs = (cmap(arange(ncolours)))
             if isnan(cindex[i]) == False and cindex[i] != -1: 
                 col = [cs[int(cindex[i])][0],cs[int(cindex[i])][1],cs[int(cindex[i])][2]]
+                edgecolor = edgecolor
             else:
                 newfill = False
                 col = '0.9'
-                #col = 'none'
+                col = 'none'
+                edgecolor = 'none'
             
         except:
             try:
